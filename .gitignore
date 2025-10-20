@@ -1,0 +1,92 @@
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+pyenv/
+pyvenv.cfg
+pip-wheel-metadata/
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+*.pyc
+
+# Build / distribution
+build/
+dist/
+*.egg
+*.egg-info/
+.eggs/
+
+# IDEs / editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment / secrets
+.env
+.env.*
+credentials.yml.enc
+secrets.json
+*.pem
+
+# Logs and runtime files
+*.log
+logs/
+airflow.db
+airflow.log
+airflow-webserver.pid
+gunicorn.pid
+
+# Test / coverage / caches
+.coverage
+coverage.xml
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.cache/
+
+# Jupyter
+.ipynb_checkpoints
+*.ipynb
+
+# Docker (ignore local runtime artifacts, not project-compose files tracked in repo)
+*.local.env
+docker/*.log
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+terraform.tfstate
+terraform.tfstate.backup
+.terraform.lock.hcl
+
+# AWS / CLI local credentials
+.aws/
+aws_credentials
+aws_profile
+
+# dbt artifacts
+target/
+dbt_modules/
+dbt_packages/
+ecommerce_analytics/target/
+
+# Node
+node_modules/
+
+# Misc
+.vagrant/
+*.bak
+*.swp
+*~

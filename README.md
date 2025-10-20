@@ -42,18 +42,29 @@ A production-grade data platform processing e-commerce transactions, demonstrati
 
 ### Prerequisites
 - Docker Desktop
-- Python 3.9+
+- **Python 3.9, 3.10, or 3.11** (⚠️ Python 3.12+ not supported by Airflow 2.7)
 - AWS account (free tier)
 
 ### Local Setup
-\`\`\`bash
+```bash
 # Clone repository
 git clone https://github.com/yourusername/ecommerce-analytics
 cd ecommerce-analytics
 
-# Set up environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+# Verify Python version (MUST be 3.9, 3.10, or 3.11)
+python --version
+
+# If you have Python 3.12+ or 3.13+, install Python 3.11 and use:
+# py -3.11 -m venv .venv  (Windows with Python Launcher)
+# python3.11 -m venv .venv  (Linux/Mac)
+
+# Set up environment with compatible Python version
+python -m venv .venv
+.venv\Scripts\Activate.ps1  # On Windows PowerShell
+# source .venv/bin/activate  # On Linux/Mac or Git Bash
+
+# Upgrade pip and install dependencies
+pip install --upgrade pip
 pip install -r requirements.txt
 
 # Configure AWS credentials

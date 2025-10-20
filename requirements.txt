@@ -1,0 +1,45 @@
+# ==============================================================================
+# IMPORTANT: This project requires Python 3.9, 3.10, or 3.11
+# Apache Airflow 2.7.x does NOT support Python 3.12+ or 3.13+
+# 
+# If you have Python 3.13 installed, please:
+# 1. Install Python 3.11 from https://www.python.org/downloads/
+# 2. Create venv with: py -3.11 -m venv .venv
+# 3. Activate and install: .venv\Scripts\Activate.ps1; pip install -r requirements.txt
+# ==============================================================================
+
+# Core workflow orchestration (requires Python <3.12)
+apache-airflow==2.7.3
+apache-airflow-providers-amazon==8.13.0
+apache-airflow-providers-postgres==5.10.0
+
+# Data transformation
+sqlalchemy==1.4.53  # Compatible with Airflow 2.7
+dbt-core==1.6.14
+dbt-postgres==1.6.14
+dbt-snowflake==1.6.2
+
+# Cloud + warehouse connectivity
+snowflake-connector-python==3.5.0
+boto3==1.34.0
+botocore==1.34.0
+psycopg2-binary==2.9.9
+
+# Data quality & testing
+great-expectations==0.18.8
+pytest==7.4.4
+pytest-cov==4.1.0
+
+# Data manipulation & utilities
+pandas==2.0.3  # Compatible with Python 3.11 and Airflow
+numpy==1.24.4
+python-dateutil==2.8.2
+pytz==2023.3
+
+# AWS CLI tools (optional but recommended)
+awscli==1.32.0
+
+# Development tools
+black==23.12.1
+flake8==7.0.0
+isort==5.13.2
