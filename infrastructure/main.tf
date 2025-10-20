@@ -100,10 +100,20 @@ resource "aws_s3_bucket" "data_lake_buckets" {
 
     tags = {
       Name        = "${each.value} Bucket"
-      Environment = "DE Portfolio Project"
+      Environment = var.environment
       ManagedBy   = "Terraform"
       Layer       = each.key    # Adds a tag for 'raw' or 'processed'
     }
+}
+
+# Allow ACL usage for logging requirements
+resource "aws_s3_bucket_ownership_controls" "data_lake_ownership" {
+  for_each = aws_s3_bucket.data_lake_buckets
+  bucket   = each.value.id
+
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
 }
 
 
@@ -116,6 +126,8 @@ resource "aws_s3_bucket_acl" "data_lake_acl" {
   for_each = aws_s3_bucket.data_lake_buckets
   bucket   = each.value.id
   acl      = "private"
+
+  depends_on = [aws_s3_bucket_ownership_controls.data_lake_ownership]
 }
 
 # ========================================
@@ -188,6 +200,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "data_lake_lifecycle" {
     id     = "transition-to-cheaper-storage"
     status = "Enabled"
 
+    filter {
+      prefix = "" # Apply lifecycle rule to the entire bucket
+    }
+
     # Transition current version
     transition {
       days          = 90
@@ -228,9 +244,19 @@ resource "aws_s3_bucket" "logs" {
   }
 }
 
+resource "aws_s3_bucket_ownership_controls" "logs_ownership" {
+  bucket = aws_s3_bucket.logs.id
+
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
+}
+
 resource "aws_s3_bucket_acl" "logs_acl" {
   bucket = aws_s3_bucket.logs.id
   acl    = "log-delivery-write"
+
+  depends_on = [aws_s3_bucket_ownership_controls.logs_ownership]
 }
 
 # ========================================
