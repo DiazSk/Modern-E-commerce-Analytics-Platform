@@ -1,0 +1,51 @@
+@startuml E-Commerce Star Overview
+
+!define FACTTABLE #F9D85E
+!define DIMTABLE #C8E6C9
+
+skinparam backgroundColor white
+skinparam linetype ortho
+skinparam ArrowThickness 2
+skinparam defaultFontSize 14
+
+title High-Level Star Schema
+
+entity "dim_customers" as dim_customers DIMTABLE {
+    * customer_key <<PK>>
+    customer_id <<BK>>
+    segment
+}
+
+entity "dim_products" as dim_products DIMTABLE {
+    * product_key <<PK>>
+    product_id <<BK>>
+    category
+}
+
+entity "dim_date" as dim_date DIMTABLE {
+    * date_key <<PK>>
+    date
+}
+
+entity "fact_orders" as fact_orders FACTTABLE {
+    * order_key <<PK>>
+    customer_key <<FK>>
+    product_key <<FK>>
+    date_key <<FK>>
+    revenue
+}
+
+
+' relationships
+
+dim_customers ||--o{ fact_orders
+
+dim_products ||--o{ fact_orders
+
+dim_date ||--o{ fact_orders
+
+note bottom
+    Fact orders at line-item grain powering BI dashboards
+end note
+
+@enduml

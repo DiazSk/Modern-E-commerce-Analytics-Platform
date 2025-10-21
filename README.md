@@ -1,6 +1,6 @@
 # E-Commerce Analytics Platform
 
-![Architecture Diagram](docs/architecture.png)
+![Architecture Overview](https://www.plantuml.com/plantuml/png/TLHTRzem57tthxXBfRrCI5kPfhOFKu44YWGj1LffZoQv10l7Zcm3fTDUzmFs4_TBTXq89C3oW6oVu-FxSIxtrd7ZLfc4gD7HMOOcHcWfBhTEn1QUrcZM0ZUCVKXmBXJ2eDzxcBO7Bn5SHStkTJUi8q_ZrcEFi6wtqxdvNCTwuoXwXAlEJVIjSrk7HY_ZqO2kjPktOTYkO-CeBFJ2yFfCxmT5KNoCsQLGEJSyWncFbwdHAvLqjDG6DWlXi8AJ1bz9DyKtrv8YLHag1p7zeAcmMiRepNGXugL2Q-6w0b6XSgtemiHj9OB1s76LoWjlT3MHn3l2bw-CEU68_I3IHME0Q_nFoRjIKxbpoe6d24787OU9NX791fNg_sH0Nrn60a6NBt7Yj26jKJy0Re7deY0b937ZbiH6shhKuEHvK13oz5Ia8obVwmnI2j6QZcn1n6B9VbNYQWapfqYXhrAqJcWLr0nm5bx8XTp2IEGegO4xMRxJgEbEcb2aFA1qWgflTefpBHCq48pv1jghU8dx26spffBC77o2YTARkJmAxLrs5jl4yLIe53x2a8PX9qWA9yMhgFa7ortjtI7ksUr-S7JlXMBOnKnpa-pUcecQoFEAI-6s5CvJReEAryzqUjGe1z5RxXtecx3JI_6KEDHAa3SeoOAG7RQdn2aQm-VQP0NFbJiV7za96edUgCRtidDmHvs89jE0vUabp1kDxSnp2Mvp5oy2LfwK3Dlqu82hnCVBQ5iYlgq4JGrNjWYI-PF3lR8bdZFK2KfBjm-79MqcFDvNbWQHciqOrRmXSUwE3xnI0wZn6B1ZfGwSIW8jYTulx52dann6Hg-5zSF1cD8EOQQTqrbHT3_dT_l9Xh-__-mdgLZkvjYl3gaMkrTXlJVUaQ5Am2ioTazB-lzc_m00)
 
 ## 🎯 Project Overview
 
@@ -17,7 +17,7 @@ A production-grade data platform processing e-commerce transactions, demonstrati
 
 ## 🏗️ Architecture
 
-[Insert detailed architecture diagram]
+The simplified flow above is optimized for quick onboarding. Detailed PlantUML source lives in `docs/detailed/architecture.puml` for deep dives (render with `plantuml -tpng docs/detailed/architecture.puml`).
 
 ### Data Flow
 1. **Ingestion:** Multi-source data extraction (REST API, PostgreSQL, event streams)
@@ -98,6 +98,10 @@ dbt test
 \`\`\`
 
 ## 📐 Data Model
+
+![Dimensional Model Overview](https://www.plantuml.com/plantuml/png/TPF1JiCm38RlUGe31oIa7a20DWaXjh8An118snrbZMcZjN6Lf9l6nhlZTMlf2kif_h_8l-su3yvBwyiyWr4GKfwZZH4chC7R0kr2urA84uMVsY14Wt0w7Gp78pYB-e-zcr537fzVzo3iZMx3lX1khaqXhSnX9kDvOgaqAgICB2nJxR75CqxWLmK2MPzI2moifUKqrV7Se7DmrK9iAylCHsJyH7yXN5uBuRNF49vqaWPZN62sws8IfvXB8T0mNy6fqlb7N3fFtAax1UdWGFdjP2s0lmkeqSSSLt1tz_voVr-HHjUAvM4jEqnozXBVXvQ59LN6_jUn5luQxadNhvOFxMBfCI6xwlefrXklRV3NPwjsJRPQEzMdP4UogfvLAsvjGvsn0aVdjDEZRZyTkLLLerb-JbDMXObpZZBfDHcNwi89SVXycqqGqBfTv-v6C-vZ5weP_GSDCPYHPuEgc8WXx4SWVRMz0Izq3ecLsa11IxJQ931yvbvSEYDfbUE1AjXc4kA1Z_oxYHy0)
+
+For the complete schema documentation, render `docs/detailed/dimensional_model.puml`.
 
 ### Dimensional Model (Star Schema)
 
