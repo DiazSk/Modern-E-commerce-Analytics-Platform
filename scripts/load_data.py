@@ -1,0 +1,1 @@
+# Data loading script for Modern E-Commerce Analytics Platform
