@@ -218,6 +218,7 @@ $RECYCLE.BIN/
 # CSV files (generated data)
 *.csv
 !scripts/sample_data.csv
+data/
 
 # Large data files
 *.parquet
