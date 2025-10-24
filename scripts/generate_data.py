@@ -1,0 +1,1 @@
+# Data generation script for Modern E-Commerce Analytics Platform
