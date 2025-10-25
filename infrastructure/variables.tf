@@ -30,3 +30,15 @@ variable "s3_buckets" {
       "processed" = "ecommerce-processed-data"
     }
 }
+
+# Email address for billing alerts
+variable "billing_alert_email" {
+  description = "Email address to receive billing alerts"
+  type        = string
+  default     = "zaid07sk@gmail.com"  # Change this to your actual email
+  
+  validation {
+    condition     = can(regex("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", var.billing_alert_email))
+    error_message = "Must be a valid email address."
+  }
+}

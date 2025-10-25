@@ -39,6 +39,26 @@ provider "aws" {
   }
 }
 
+# ========================================
+# Provider Alias for us-east-1 (Billing/CloudWatch)
+# ========================================
+# Billing metrics and alarms MUST be created in us-east-1
+# This is an AWS requirement - billing data is only available there
+
+provider "aws" {
+  alias  = "us-east-1"
+  region = "us-east-1"
+
+  default_tags {
+    tags = {
+      Project     = var.project_name
+      Environment = var.environment
+      ManagedBy   = "Terraform"
+      Repository  = "https://github.com/DiazSk/Modern-E-commerce-Analytics-Platform"
+    }
+  }
+}
+
 
 # ========================================
 # Random Suffix for Global Bucket Uniqueness
