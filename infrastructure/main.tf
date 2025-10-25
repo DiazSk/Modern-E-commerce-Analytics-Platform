@@ -22,41 +22,6 @@ terraform {
   required_version = ">= 1.2.0"
 }
 
-
-# ================================
-# Variables
-# ================================
-
-# Define the AWS provider and the region as a variable for reusability
-variable "aws_region" {
-  description = "The AWS region to deploy resources in"
-  type        = string
-  default     = "us-east-1"
-}
-
-variable "project_name" {
-  description = "Project name for resource naming and tagging"
-  type = string
-  default = "modern-ecommerce-analytics-platform"
-}
-
-variable "environment" {
-  description = "Environment (dev, staging, prod)"
-  type = string
-  default = "dev"
-}
-
-# Use a map to define the buckets we want to create
-variable "s3_buckets" {
-  description = "A map of S3 buckets to create for the project."
-    type      = map(string)
-    default = {
-      "raw" = "ecommerce-raw-data"
-      "processed" = "ecommerce-processed-data"
-    }
-}
-
-
 # ========================================
 # Provider Configuration
 # ========================================
@@ -268,25 +233,6 @@ resource "aws_s3_bucket_logging" "data_lake_logging" {
   bucket        = each.value.id
   target_bucket = aws_s3_bucket.logs.id
   target_prefix = "s3-access-logs/${each.key}/"
-}
-
-# ========================================
-# Outputs
-# ========================================
-
-output "data_lake_bucket_names" {
-  description = "Names of created S3 buckets"
-  value       = { for k, v in aws_s3_bucket.data_lake_buckets : k => v.bucket }
-}
-
-output "data_lake_bucket_arns" {
-  description = "ARNs of created S3 buckets (useful for IAM policies)"
-  value       = { for k, v in aws_s3_bucket.data_lake_buckets : k => v.arn }
-}
-
-output "logs_bucket_name" {
-  description = "Name of the access logs bucket"
-  value       = aws_s3_bucket.logs.bucket
 }
 
 # ========================================
