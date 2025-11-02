@@ -206,15 +206,15 @@ def load_order_items(conn, csv_path):
     cur.execute("TRUNCATE TABLE order_items;")
     logger.info("  Truncated existing order_items table")
     
-    # Prepare data
+    # Prepare data - convert numpy types to Python native types
     values = []
     for _, row in df.iterrows():
         values.append((
-            row['order_id'],
-            row['product_id'],
-            row['quantity'],
-            row['unit_price'],
-            row['discount_amount']
+            int(row['order_id']),
+            int(row['product_id']),
+            int(row['quantity']),
+            float(row['unit_price']),
+            float(row['discount_amount'])
         ))
     
     # Bulk insert
