@@ -57,8 +57,9 @@ N_PRODUCTS = 200  # Product catalog size
 N_CLICKSTREAM_EVENTS = 50000
 
 # Date ranges
+# Generate data up to yesterday to ensure we have complete daily batches
 START_DATE = datetime.now() - timedelta(days=730)  # 2 years ago
-END_DATE = datetime.now()
+END_DATE = datetime.now() - timedelta(days=1)  # Up to yesterday
 
 # Output directory
 OUTPUT_DIR = Path('data/generated')
