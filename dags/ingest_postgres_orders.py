@@ -111,6 +111,8 @@ def extract_orders_from_postgres(**context):
     
     # Log extraction stats
     logging.info(f"✅ Extracted {len(df)} orders from PostgreSQL")
+    logging.info(f"   DataFrame shape: {df.shape}")
+    logging.info(f"   Columns: {df.columns.tolist()}")
     
     if len(df) > 0:
         logging.info(f"   Order ID range: {df['order_id'].min()} to {df['order_id'].max()}")
@@ -119,8 +121,13 @@ def extract_orders_from_postgres(**context):
     else:
         logging.warning(f"⚠️ No orders found for date: {execution_date_str}")
     
-    # Push DataFrame to XCom as JSON (more reliable than pickle)
-    context['ti'].xcom_push(key='orders_data', value=df.to_json(orient='records'))
+    # Push DataFrame to XCom as JSON with proper handling of dates
+    # Use date_format='iso' to preserve datetime format
+    # Use orient='split' to preserve column names even for empty DataFrames
+    context['ti'].xcom_push(
+        key='orders_data', 
+        value=df.to_json(orient='split', date_format='iso')
+    )
     context['ti'].xcom_push(key='order_count', value=len(df))
     
     return len(df)
@@ -142,15 +149,23 @@ def validate_data(**context):
         task_ids='extract_orders'
     )
     
-    # Convert back to DataFrame
-    df = pd.read_json(StringIO(orders_json), orient='records')
+    # Convert back to DataFrame using orient='split' to preserve column names
+    df = pd.read_json(StringIO(orders_json), orient='split')
     
     logging.info("=" * 50)
     logging.info("DATA VALIDATION")
     logging.info("=" * 50)
+    logging.info(f"DataFrame shape: {df.shape}")
+    logging.info(f"Available columns: {df.columns.tolist()}")
     
     # Validation checks
     validation_passed = True
+    
+    # Check 0: DataFrame is not empty
+    if len(df) == 0:
+        logging.warning("⚠️ No data to validate (empty DataFrame)")
+        logging.info("=" * 50)
+        return True  # Empty data is valid, just no data for this date
     
     # Check 1: Required fields exist
     required_fields = [
@@ -161,7 +176,9 @@ def validate_data(**context):
     missing_fields = [field for field in required_fields if field not in df.columns]
     if missing_fields:
         logging.error(f"❌ Missing required fields: {missing_fields}")
-        validation_passed = False
+        logging.error(f"   Available columns: {df.columns.tolist()}")
+        logging.info("=" * 50)
+        raise ValueError(f"Missing required fields: {missing_fields}")
     else:
         logging.info(f"✅ All required fields present")
     
@@ -212,8 +229,8 @@ def load_to_s3(**context):
         task_ids='get_execution_date'
     )
     
-    # Convert to DataFrame
-    df = pd.read_json(StringIO(orders_json), orient='records')
+    # Convert to DataFrame using orient='split' to preserve column names
+    df = pd.read_json(StringIO(orders_json), orient='split')
     
     if len(df) == 0:
         logging.info("No data to upload. Skipping S3 load.")
