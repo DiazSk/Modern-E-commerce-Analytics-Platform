@@ -1,0 +1,64 @@
+version: 2
+
+# ==============================================================================
+# Products Source Configuration
+# ==============================================================================
+
+sources:
+  - name: postgres_ecommerce
+    description: E-commerce operational database
+    database: ecommerce
+    schema: public
+    
+    tables:
+      - name: products
+        description: |
+          Product catalog from FakeStore API ingested via Airflow.
+          Contains product details, pricing, and ratings.
+          
+          **Update Frequency**: Daily
+          **Source**: FakeStore API (https://fakestoreapi.com)
+        
+        columns:
+          - name: product_id
+            description: "Unique product identifier (Primary Key)"
+            tests:
+              - unique
+              - not_null
+          
+          - name: title
+            description: "Product name/title"
+            tests:
+              - not_null
+          
+          - name: price
+            description: "Product price"
+            tests:
+              - not_null
+          
+          - name: category
+            description: "Product category"
+          
+          - name: description
+            description: "Product description"
+          
+          - name: image
+            description: "Product image URL"
+          
+          - name: rating_rate
+            description: "Average product rating (0-5)"
+          
+          - name: rating_count
+            description: "Number of ratings"
+          
+          - name: ingestion_timestamp
+            description: "When data was ingested from API"
+          
+          - name: ingestion_date
+            description: "Date of ingestion"
+          
+          - name: data_source
+            description: "Source system name"
+          
+          - name: created_at
+            description: "Record creation timestamp in database"

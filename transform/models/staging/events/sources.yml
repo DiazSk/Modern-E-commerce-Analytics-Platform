@@ -1,0 +1,62 @@
+version: 2
+
+# ==============================================================================
+# Events Source Configuration
+# ==============================================================================
+
+sources:
+  - name: postgres_ecommerce
+    description: E-commerce operational database
+    database: ecommerce
+    schema: public
+    
+    tables:
+      - name: clickstream_events
+        description: |
+          Clickstream events from web application tracking user behavior.
+          Contains page views, cart actions, purchases, and search events.
+          
+          **Update Frequency**: Hourly batch processing
+          **Source**: Web application event tracking
+        
+        columns:
+          - name: event_id
+            description: "Unique event identifier (Primary Key)"
+            tests:
+              - unique
+              - not_null
+          
+          - name: session_id
+            description: "User session identifier"
+            tests:
+              - not_null
+          
+          - name: user_id
+            description: "User identifier (null for anonymous users)"
+          
+          - name: event_timestamp
+            description: "When the event occurred"
+            tests:
+              - not_null
+          
+          - name: event_type
+            description: "Type of event (page_view, add_to_cart, purchase, etc.)"
+            tests:
+              - not_null
+              - accepted_values:
+                  values: ['page_view', 'add_to_cart', 'remove_from_cart', 'purchase', 'search']
+          
+          - name: product_id
+            description: "Associated product (if applicable)"
+          
+          - name: page_url
+            description: "URL where event occurred"
+          
+          - name: device_type
+            description: "Device used (mobile, desktop, tablet)"
+          
+          - name: browser
+            description: "Browser used"
+          
+          - name: created_at
+            description: "Record creation timestamp in database"

@@ -1,0 +1,105 @@
+version: 2
+
+models:
+  - name: stg_events
+    description: |
+      Cleaned and standardized clickstream event data.
+      
+      **Grain**: One row per event
+      **Source**: postgres_ecommerce.clickstream_events
+      **Materialization**: View
+    
+    columns:
+      - name: event_id
+        description: "Unique event identifier (Primary Key)"
+        tests:
+          - unique
+          - not_null
+      
+      - name: session_id
+        description: "User session identifier"
+        tests:
+          - not_null
+      
+      - name: user_id
+        description: "User identifier (null for anonymous)"
+      
+      - name: event_timestamp
+        description: "Event occurrence timestamp"
+        tests:
+          - not_null
+      
+      - name: event_type
+        description: "Event type classification"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['page_view', 'add_to_cart', 'remove_from_cart', 'purchase', 'search']
+      
+      - name: product_id
+        description: "Associated product identifier"
+      
+      - name: page_url
+        description: "URL where event occurred"
+      
+      - name: device_type
+        description: "Device type used"
+      
+      - name: browser
+        description: "Browser used"
+      
+      - name: event_date
+        description: "Event date (no time component)"
+      
+      - name: event_year
+        description: "Extracted year from event_timestamp"
+      
+      - name: event_month
+        description: "Extracted month (1-12)"
+      
+      - name: event_day
+        description: "Extracted day (1-31)"
+      
+      - name: event_hour
+        description: "Extracted hour (0-23)"
+      
+      - name: event_day_of_week
+        description: "Day of week (0=Sunday, 6=Saturday)"
+      
+      - name: event_day_name
+        description: "Day name (Monday, Tuesday, etc.)"
+      
+      - name: created_at
+        description: "Database record creation time"
+      
+      - name: is_missing_event_type
+        description: "Flag: true if event_type is null/empty"
+      
+      - name: is_anonymous_user
+        description: "Flag: true if user_id is null"
+      
+      - name: is_missing_product_context
+        description: "Flag: true if product_id missing for cart/purchase events"
+      
+      - name: event_category
+        description: |
+          Event category classification:
+          - browsing: page views
+          - cart_activity: add/remove from cart
+          - conversion: purchases
+          - search: search events
+        tests:
+          - accepted_values:
+              values: ['browsing', 'cart_activity', 'conversion', 'search', 'other']
+      
+      - name: device_category
+        description: "Standardized device category (mobile, tablet, desktop, other)"
+        tests:
+          - accepted_values:
+              values: ['mobile', 'tablet', 'desktop', 'other']
+      
+      - name: is_business_day
+        description: "Flag: true if Monday-Friday"
+      
+      - name: is_business_hours
+        description: "Flag: true if 9 AM - 5 PM"
