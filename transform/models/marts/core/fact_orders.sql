@@ -29,7 +29,10 @@ with orders as (
     
     select * from {{ ref('stg_orders') }}
     {% if is_incremental() %}
-        where order_date > (select max(order_date) from {{ this }})
+        where order_date > (
+            select coalesce(max(order_timestamp), '1900-01-01'::timestamp)
+            from {{ this }}
+        )
     {% endif %}
 
 ),
@@ -89,8 +92,9 @@ joined as (
         oi.quantity,
         oi.unit_price,
         oi.discount_amount,
-        (oi.quantity * oi.unit_price) as gross_amount,
-        (oi.quantity * oi.unit_price - coalesce(oi.discount_amount, 0)) as line_total,
+        oi.discount_amount,
+        oi.gross_line_total as gross_amount,
+        (oi.gross_line_total - coalesce(oi.discount_amount, 0)) as line_total,
         o.order_total,
         
         -- Derived Measures
@@ -103,7 +107,9 @@ joined as (
             when oi.discount_amount > 0 
             then (oi.discount_amount / nullif(oi.quantity * oi.unit_price, 0)) * 100
             else 0
-        end as discount_percentage
+        end as discount_percentage,
+
+        oi.gross_line_total - coalesce(oi.discount_amount, 0) as net_revenue
 
     from orders o
     inner join order_items oi 
