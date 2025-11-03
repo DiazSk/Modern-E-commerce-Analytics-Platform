@@ -92,7 +92,6 @@ joined as (
         oi.quantity,
         oi.unit_price,
         oi.discount_amount,
-        oi.discount_amount,
         oi.gross_line_total as gross_amount,
         (oi.gross_line_total - coalesce(oi.discount_amount, 0)) as line_total,
         o.order_total,
