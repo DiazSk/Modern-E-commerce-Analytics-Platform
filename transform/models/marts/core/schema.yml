@@ -91,7 +91,7 @@ models:
         tests:
           - not_null
           - accepted_values:
-              values: ['Premium', 'Standard', 'Basic']
+              values: ['bronze', 'silver', 'gold', 'platinum']
       
       - name: is_current
         description: "Flag indicating if this is the current active record"
