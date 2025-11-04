@@ -37,6 +37,7 @@ env/
 ENV/
 .venv
 .virtualenv
+vevn/
 
 # Python cache
 __pycache__/
@@ -227,6 +228,10 @@ data/
 *.zip
 *.tar.gz
 
+# Test files in root
+test_*.csv
+test_*.json
+
 # ==========================================
 # LOGS
 # ==========================================
@@ -260,6 +265,9 @@ _site/
 # ==========================================
 uncommitted/
 .ge_store_backend_id
+
+# Duplicate GE folder (we use gx/)
+great_expectations/
 
 # ==========================================
 # NOTES
