@@ -67,7 +67,7 @@ joined as (
 
     select
         -- Unique Key for Fact Table
-        {{ dbt_utils.generate_surrogate_key(['o.order_id', 'oi.product_id']) }} as order_item_key,
+        {{ dbt_utils.generate_surrogate_key(['o.order_id', 'oi.order_item_id']) }} as order_item_key,
         
         -- Foreign Keys to Dimensions
         c.customer_key,
