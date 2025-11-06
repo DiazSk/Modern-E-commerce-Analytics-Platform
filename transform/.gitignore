@@ -1,4 +1,28 @@
-
+# dbt-specific ignores
 target/
 dbt_packages/
 logs/
+
+# Virtual environments (NEVER in models directory!)
+venv/
+.venv/
+env/
+ENV/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
