@@ -319,6 +319,59 @@ services:
     networks:
       - ecommerce-network
 
+  # ==========================================
+  # Metabase - Business Intelligence & Dashboards
+  # ==========================================
+  metabase:
+    image: metabase/metabase:latest
+    container_name: ecommerce-metabase
+    environment:
+      MB_DB_TYPE: postgres
+      MB_DB_DBNAME: ${METABASE_DB:-metabase}
+      MB_DB_PORT: 5432
+      MB_DB_USER: ${METABASE_DB_USER:-metabase}
+      MB_DB_PASS: ${METABASE_DB_PASSWORD:-metabase_password}
+      MB_DB_HOST: postgres-metabase
+    ports:
+      - "3001:3000"  # Using 3001 to avoid conflict with other Metabase
+    volumes:
+      - metabase-data:/metabase-data
+    networks:
+      - ecommerce-network
+    restart: unless-stopped
+    depends_on:
+      postgres-metabase:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # ==========================================
+  # PostgreSQL - Metabase Metadata Database
+  # ==========================================
+  postgres-metabase:
+    image: postgres:14-alpine
+    container_name: ecommerce-postgres-metabase
+    environment:
+      POSTGRES_USER: ${METABASE_DB_USER:-metabase}
+      POSTGRES_PASSWORD: ${METABASE_DB_PASSWORD:-metabase_password}
+      POSTGRES_DB: ${METABASE_DB:-metabase}
+    volumes:
+      - postgres-metabase-data:/var/lib/postgresql/data
+    ports:
+      - "5435:5432"  # External port 5435
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${METABASE_DB_USER:-metabase}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ecommerce-network
+    restart: unless-stopped
+
 # ============================================
 # VOLUMES
 # ============================================
@@ -327,6 +380,10 @@ volumes:
     name: ecommerce-postgres-source-data
   postgres-airflow-data:
     name: ecommerce-postgres-airflow-data
+  postgres-metabase-data:
+    name: ecommerce-postgres-metabase-data
+  metabase-data:
+    name: ecommerce-metabase-data
 
 # ============================================
 # NETWORKS
