@@ -1,6 +1,7 @@
 """
 Load Products from S3 JSON to PostgreSQL
 """
+
 import json
 import os
 from datetime import datetime

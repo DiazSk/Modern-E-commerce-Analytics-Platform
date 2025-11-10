@@ -117,9 +117,11 @@ def load_customers(conn, csv_path):
                 row["registration_date"],
                 row["customer_segment"],
                 row["segment_start_date"],
-                None
-                if pd.isna(row.get("segment_end_date"))
-                else row["segment_end_date"],
+                (
+                    None
+                    if pd.isna(row.get("segment_end_date"))
+                    else row["segment_end_date"]
+                ),
                 row["is_current"],
             )
         )

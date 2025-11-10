@@ -1,6 +1,7 @@
 """
 Load Clickstream Events from S3 CSV to PostgreSQL
 """
+
 import csv
 import os
 from datetime import datetime
