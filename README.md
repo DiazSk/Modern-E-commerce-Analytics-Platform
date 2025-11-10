@@ -2,7 +2,7 @@
 
 A production-grade data engineering platform demonstrating end-to-end analytics capabilities from infrastructure provisioning to business intelligence delivery.
 
-![Architecture Overview](docs/high-level-diagrams/high_level_architecture.png)
+![Architecture Overview](docs/high-level-diagrams/high_level_architecture_diagram.png)
 
 **Status:** 🎉 **ALL 6 WEEKS COMPLETE** ✅  
 **Timeline:** 6 weeks | **Progress:** 💯 100% Complete  
