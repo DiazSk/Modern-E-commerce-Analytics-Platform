@@ -9,14 +9,14 @@
 # SNS Topic for Billing Alerts
 # ==========================================
 resource "aws_sns_topic" "billing_alerts" {
-  name     = "billing-alerts"  # Simple name for portfolio project
+  name     = "billing-alerts" # Simple name for portfolio project
   provider = aws.us-east-1
-  
+
   display_name = "AWS Billing Alerts"
-  
+
   tags = {
-    Name        = "Billing Alerts SNS Topic"
-    Purpose     = "Cost Monitoring"
+    Name    = "Billing Alerts SNS Topic"
+    Purpose = "Cost Monitoring"
   }
 }
 
@@ -40,23 +40,23 @@ resource "aws_cloudwatch_metric_alarm" "billing_alarm_1" {
   evaluation_periods  = 1
   metric_name         = "EstimatedCharges"
   namespace           = "AWS/Billing"
-  period              = 21600  # 6 hours (minimum for billing metrics)
+  period              = 21600 # 6 hours (minimum for billing metrics)
   statistic           = "Maximum"
   threshold           = 1.0
   treat_missing_data  = "notBreaching"
-  
+
   dimensions = {
     Currency = "USD"
   }
-  
+
   alarm_actions = [aws_sns_topic.billing_alerts.arn]
-  
+
   provider = aws.us-east-1
-  
+
   tags = {
-    Name        = "Billing Alert 1USD"
-    Severity    = "Low"
-    Threshold   = "1USD"
+    Name      = "Billing Alert 1USD"
+    Severity  = "Low"
+    Threshold = "1USD"
   }
 }
 
@@ -74,19 +74,19 @@ resource "aws_cloudwatch_metric_alarm" "billing_alarm_5" {
   statistic           = "Maximum"
   threshold           = 5.0
   treat_missing_data  = "notBreaching"
-  
+
   dimensions = {
     Currency = "USD"
   }
-  
+
   alarm_actions = [aws_sns_topic.billing_alerts.arn]
-  
+
   provider = aws.us-east-1
-  
+
   tags = {
-    Name        = "Billing Alert 5USD"
-    Severity    = "Medium"
-    Threshold   = "5USD"
+    Name      = "Billing Alert 5USD"
+    Severity  = "Medium"
+    Threshold = "5USD"
   }
 }
 
@@ -104,19 +104,19 @@ resource "aws_cloudwatch_metric_alarm" "billing_alarm_10" {
   statistic           = "Maximum"
   threshold           = 10.0
   treat_missing_data  = "notBreaching"
-  
+
   dimensions = {
     Currency = "USD"
   }
-  
+
   alarm_actions = [aws_sns_topic.billing_alerts.arn]
-  
+
   provider = aws.us-east-1
-  
+
   tags = {
-    Name        = "Billing Alert 10USD"
-    Severity    = "High"
-    Threshold   = "10USD"
+    Name      = "Billing Alert 10USD"
+    Severity  = "High"
+    Threshold = "10USD"
   }
 }
 
@@ -140,7 +140,7 @@ output "billing_alarms" {
 output "billing_alert_email" {
   description = "Email address receiving billing alerts"
   value       = var.billing_alert_email
-  sensitive   = true  # Don't display in plan output
+  sensitive   = true # Don't display in plan output
 }
 
 # ==========================================

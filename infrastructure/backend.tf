@@ -9,7 +9,7 @@ terraform {
     bucket = "modern-ecommerce-analytics-platform-logs-dev-bnf5etbn"
 
     # Path within the bucket where the state file will be stored
-    key    = "infrastructure/terraform.tfstate"
+    key = "infrastructure/terraform.tfstate"
 
     # Region for the S3 bucket
     region = "us-east-1"

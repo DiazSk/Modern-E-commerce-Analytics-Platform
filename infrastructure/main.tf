@@ -11,12 +11,12 @@
 terraform {
   required_providers {
     aws = {
-        source = "hashicorp/aws"
-        version = "~> 5.0"
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
     }
     random = {
-        source = "hashicorp/random"
-        version = "~> 3.5"
+      source  = "hashicorp/random"
+      version = "~> 3.5"
     }
   }
   required_version = ">= 1.2.0"
@@ -68,9 +68,9 @@ provider "aws" {
 
 # Single random string resource to ensure both buckets have a unique suffix
 resource "random_string" "bucket_suffix" {
-  length = 8
+  length  = 8
   special = false
-  upper = false
+  upper   = false
 }
 
 
@@ -80,15 +80,15 @@ resource "random_string" "bucket_suffix" {
 
 # Use for_each to create multiple S3 buckets from our map variable
 resource "aws_s3_bucket" "data_lake_buckets" {
-    for_each = var.s3_buckets
-    bucket = "${each.value}-${random_string.bucket_suffix.result}"
+  for_each = var.s3_buckets
+  bucket   = "${each.value}-${random_string.bucket_suffix.result}"
 
-    tags = {
-      Name        = "${each.value} Bucket"
-      Environment = var.environment
-      ManagedBy   = "Terraform"
-      Layer       = each.key    # Adds a tag for 'raw' or 'processed'
-    }
+  tags = {
+    Name        = "${each.value} Bucket"
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+    Layer       = each.key # Adds a tag for 'raw' or 'processed'
+  }
 }
 
 # Allow ACL usage for logging requirements
@@ -148,7 +148,7 @@ resource "aws_s3_bucket_public_access_block" "data_lake_public_access" {
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
-  restrict_public_buckets = true 
+  restrict_public_buckets = true
 }
 
 # ========================================
