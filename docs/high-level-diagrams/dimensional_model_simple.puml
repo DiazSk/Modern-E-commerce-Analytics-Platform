@@ -24,11 +24,11 @@ entity "dim_products" as dim_products DIMTABLE {
 
 entity "dim_date" as dim_date DIMTABLE {
     * date_key <<PK>>
-    date
+    date_day
 }
 
 entity "fact_orders" as fact_orders FACTTABLE {
-    * order_key <<PK>>
+    * order_item_key <<PK>>
     customer_key <<FK>>
     product_key <<FK>>
     date_key <<FK>>
@@ -46,6 +46,8 @@ dim_date ||--o{ fact_orders
 
 note bottom
     Fact orders at line-item grain powering BI dashboards
+    
+    <i>PostgreSQL 14 | 4 dashboards | 66K+ records</i>
 end note
 
 @enduml

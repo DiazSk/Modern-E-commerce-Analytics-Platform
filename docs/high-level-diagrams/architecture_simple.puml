@@ -29,9 +29,9 @@ package "S3 Data Lake" LIGHTGREEN {
     folder "Raw Buckets" as s3
 }
 
-package "dbt + Snowflake" LIGHTPURPLE {
+package "dbt + PostgreSQL" LIGHTPURPLE {
     component "Staging & Marts" as dbt
-    database "Snowflake" as snowflake
+    database "PostgreSQL 14" as postgres
 }
 
 package "Metabase BI" LIGHTRED {
@@ -49,8 +49,8 @@ pg -down-> airflow : "SQL"
 events -down-> airflow : "Batch"
 airflow -down-> s3 : "Landing"
 s3 -down-> dbt : "Transform"
-dbt -down-> snowflake : "Models"
-snowflake -down-> bi : "Insights"
+dbt -down-> postgres : "Models"
+postgres -down-> bi : "Insights"
 
 ge -left-> dbt : "Validate"
 monitoring -left-> airflow : "Alerts"
@@ -58,6 +58,8 @@ terraform -down-> s3 : "Provision"
 
 note bottom
     Flow: Source → Ingest → Store → Transform → Visualize
+    
+    <i>Current: PostgreSQL | Future: Snowflake-ready</i>
 end note
 
 @enduml
