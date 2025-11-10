@@ -1,0 +1,223 @@
+# ==============================================================================
+# dbt Profile Configuration Template
+# ==============================================================================
+# IMPORTANT: This is a TEMPLATE file. Do NOT commit actual credentials!
+#
+# Copy this file to: ~/.dbt/profiles.yml (Linux/Mac) or %USERPROFILE%\.dbt\profiles.yml (Windows)
+# Then replace all <PLACEHOLDER> values with your actual credentials.
+# ==============================================================================
+
+# Profile name (must match 'profile' in dbt_project.yml)
+ecommerce_analytics:
+
+  # Default target (use 'dev' for local development, 'prod' for production)
+  target: dev
+
+  # Output configuration
+  outputs:
+
+    # =========================================================================
+    # DEVELOPMENT ENVIRONMENT
+    # =========================================================================
+    # For local testing and development
+    dev:
+      type: snowflake
+      account: <YOUR_SNOWFLAKE_ACCOUNT>  # e.g., xy12345.us-east-1
+
+      # Authentication
+      user: <YOUR_USERNAME>
+      password: <YOUR_PASSWORD>
+      # Alternatively, use key-pair authentication (more secure):
+      # authenticator: externalbrowser  # For SSO
+      # private_key_path: /path/to/private_key.p8
+      # private_key_passphrase: <PASSPHRASE>
+
+      # Snowflake resource configuration
+      role: <YOUR_ROLE>              # e.g., DEVELOPER, ANALYST
+      warehouse: <YOUR_WAREHOUSE>    # e.g., COMPUTE_WH, DEV_WH
+      database: <YOUR_DATABASE>      # e.g., ECOMMERCE_DEV
+      schema: <YOUR_SCHEMA>          # e.g., DBT_DEV, ANALYTICS_DEV
+
+      # Connection settings
+      threads: 4                     # Parallel model execution (1-8)
+      client_session_keep_alive: false
+      query_tag: dbt_dev             # For query tracking in Snowflake
+
+      # Retry configuration
+      connect_retries: 3
+      connect_timeout: 30
+      retry_on_database_errors: true
+
+    # =========================================================================
+    # STAGING ENVIRONMENT (Optional)
+    # =========================================================================
+    # For integration testing and validation
+    staging:
+      type: snowflake
+      account: <YOUR_SNOWFLAKE_ACCOUNT>
+
+      user: <YOUR_USERNAME>
+      password: <YOUR_PASSWORD>
+
+      role: <YOUR_ROLE>
+      warehouse: <YOUR_WAREHOUSE>    # e.g., COMPUTE_WH
+      database: ECOMMERCE_STAGING
+      schema: ANALYTICS_STG
+
+      threads: 4
+      query_tag: dbt_staging
+
+    # =========================================================================
+    # PRODUCTION ENVIRONMENT
+    # =========================================================================
+    # For production data warehouse (use with caution!)
+    prod:
+      type: snowflake
+      account: <YOUR_SNOWFLAKE_ACCOUNT>
+
+      # RECOMMENDED: Use key-pair auth for production
+      user: <SERVICE_ACCOUNT_USER>
+      authenticator: externalbrowser
+      # OR use private key:
+      # private_key_path: /secure/path/private_key.p8
+      # private_key_passphrase: <PASSPHRASE>
+
+      role: TRANSFORMER              # Production role with limited permissions
+      warehouse: PROD_TRANSFORM_WH   # Dedicated warehouse
+      database: ECOMMERCE_PROD
+      schema: ANALYTICS
+
+      threads: 8                     # More threads for production
+      query_tag: dbt_production
+
+      # Production optimizations
+      client_session_keep_alive: true
+      connect_retries: 5
+
+# ==============================================================================
+# ALTERNATIVE: PostgreSQL Local Development (Optional)
+# ==============================================================================
+# Uncomment this section if you want to test dbt transformations locally
+# using PostgreSQL instead of Snowflake
+# ==============================================================================
+# ecommerce_analytics_local:
+#   target: dev
+#   outputs:
+#     dev:
+#       type: postgres
+#       host: localhost
+#       port: 5432
+#       user: airflow
+#       password: airflow
+#       database: ecommerce_db
+#       schema: dbt_dev
+#       threads: 4
+#       keepalives_idle: 0
+
+# ==============================================================================
+# SETUP INSTRUCTIONS
+# ==============================================================================
+#
+# 1. CREATE SNOWFLAKE RESOURCES (if not already created)
+# ------------------------------------------------------------------------------
+# Run these SQL commands in Snowflake web UI (using ACCOUNTADMIN role):
+#
+# -- Create warehouse for dbt transformations
+# CREATE WAREHOUSE IF NOT EXISTS DBT_WH
+#   WITH WAREHOUSE_SIZE = 'X-SMALL'
+#   AUTO_SUSPEND = 60
+#   AUTO_RESUME = TRUE
+#   INITIALLY_SUSPENDED = TRUE;
+#
+# -- Create database for development
+# CREATE DATABASE IF NOT EXISTS ECOMMERCE_DEV;
+#
+# -- Create schema for dbt models
+# CREATE SCHEMA IF NOT EXISTS ECOMMERCE_DEV.DBT_DEV;
+#
+# -- Create role for dbt transformations
+# CREATE ROLE IF NOT EXISTS DBT_ROLE;
+#
+# -- Grant permissions
+# GRANT USAGE ON WAREHOUSE DBT_WH TO ROLE DBT_ROLE;
+# GRANT ALL ON DATABASE ECOMMERCE_DEV TO ROLE DBT_ROLE;
+# GRANT ALL ON SCHEMA ECOMMERCE_DEV.DBT_DEV TO ROLE DBT_ROLE;
+#
+# -- Assign role to your user
+# GRANT ROLE DBT_ROLE TO USER <YOUR_USERNAME>;
+#
+# 2. COPY THIS FILE TO ~/.dbt/profiles.yml
+# ------------------------------------------------------------------------------
+# Linux/Mac:
+#   mkdir -p ~/.dbt
+#   cp profiles.yml.example ~/.dbt/profiles.yml
+#
+# Windows:
+#   mkdir %USERPROFILE%\.dbt
+#   copy profiles.yml.example %USERPROFILE%\.dbt\profiles.yml
+#
+# 3. EDIT ~/.dbt/profiles.yml WITH YOUR CREDENTIALS
+# ------------------------------------------------------------------------------
+# Replace all <PLACEHOLDER> values with actual credentials
+#
+# 4. TEST CONNECTION
+# ------------------------------------------------------------------------------
+# cd transform/
+# dbt debug
+#
+# Should see: "All checks passed!"
+#
+# 5. VERIFY CONFIGURATION
+# ------------------------------------------------------------------------------
+# dbt run --select stg_orders --target dev --full-refresh
+#
+# ==============================================================================
+# SECURITY BEST PRACTICES
+# ==============================================================================
+#
+# ✅ DO:
+# - Store profiles.yml in home directory (not in project)
+# - Use environment variables for sensitive values
+# - Use key-pair authentication for production
+# - Limit role permissions (principle of least privilege)
+# - Use separate warehouses for dev/staging/prod
+# - Rotate credentials regularly
+#
+# ❌ DON'T:
+# - Commit profiles.yml to git (it's in .gitignore)
+# - Share credentials via email/slack
+# - Use same credentials for dev and prod
+# - Store plaintext passwords in CI/CD
+# - Use ACCOUNTADMIN role for dbt
+#
+# ==============================================================================
+# ENVIRONMENT VARIABLES (Optional but recommended)
+# ==============================================================================
+#
+# Instead of hardcoding credentials, use environment variables:
+#
+# export DBT_SNOWFLAKE_ACCOUNT=xy12345.us-east-1
+# export DBT_SNOWFLAKE_USER=myuser
+# export DBT_SNOWFLAKE_PASSWORD=mypassword
+# export DBT_SNOWFLAKE_ROLE=DBT_ROLE
+# export DBT_SNOWFLAKE_WAREHOUSE=DBT_WH
+# export DBT_SNOWFLAKE_DATABASE=ECOMMERCE_DEV
+# export DBT_SNOWFLAKE_SCHEMA=DBT_DEV
+#
+# Then reference in profiles.yml:
+#
+# ecommerce_analytics:
+#   target: dev
+#   outputs:
+#     dev:
+#       type: snowflake
+#       account: "{{ env_var('DBT_SNOWFLAKE_ACCOUNT') }}"
+#       user: "{{ env_var('DBT_SNOWFLAKE_USER') }}"
+#       password: "{{ env_var('DBT_SNOWFLAKE_PASSWORD') }}"
+#       role: "{{ env_var('DBT_SNOWFLAKE_ROLE') }}"
+#       warehouse: "{{ env_var('DBT_SNOWFLAKE_WAREHOUSE') }}"
+#       database: "{{ env_var('DBT_SNOWFLAKE_DATABASE') }}"
+#       schema: "{{ env_var('DBT_SNOWFLAKE_SCHEMA') }}"
+#       threads: 4
+#
+# ==============================================================================

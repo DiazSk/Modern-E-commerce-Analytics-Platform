@@ -1,0 +1,65 @@
+@startuml E-Commerce Analytics Overview
+
+!define LIGHTBLUE #E3F2FD
+!define LIGHTORANGE #FFCC80
+!define LIGHTGREEN #C8E6C9
+!define LIGHTPURPLE #B39DDB
+!define LIGHTRED #FFCDD2
+!define LIGHTGREY #EEEEEE
+
+skinparam backgroundColor white
+skinparam defaultTextAlignment center
+skinparam ArrowThickness 2
+skinparam ComponentStyle rectangle
+skinparam defaultFontSize 14
+
+title High-Level E-Commerce Analytics Flow
+
+package "Data Sources" LIGHTBLUE {
+    component "FakeStore API" as api
+    database "PostgreSQL" as pg
+    component "Clickstream Events" as events
+}
+
+package "Airflow Ingestion" LIGHTORANGE {
+    component "Daily Pipelines" as airflow
+}
+
+package "S3 Data Lake" LIGHTGREEN {
+    folder "Raw Buckets" as s3
+}
+
+package "dbt + PostgreSQL" LIGHTPURPLE {
+    component "Staging & Marts" as dbt
+    database "PostgreSQL 14" as postgres
+}
+
+package "Metabase BI" LIGHTRED {
+    component "Dashboards" as bi
+}
+
+package "Quality & Ops" LIGHTGREY {
+    component "Great Expectations" as ge
+    component "Monitoring" as monitoring
+    component "Terraform" as terraform
+}
+
+api -down-> airflow : "REST"
+pg -down-> airflow : "SQL"
+events -down-> airflow : "Batch"
+airflow -down-> s3 : "Landing"
+s3 -down-> dbt : "Transform"
+dbt -down-> postgres : "Models"
+postgres -down-> bi : "Insights"
+
+ge -left-> dbt : "Validate"
+monitoring -left-> airflow : "Alerts"
+terraform -down-> s3 : "Provision"
+
+note bottom
+    Flow: Source → Ingest → Store → Transform → Visualize
+
+    <i>Current: PostgreSQL | Future: Snowflake-ready</i>
+end note
+
+@enduml

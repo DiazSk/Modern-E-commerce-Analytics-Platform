@@ -1,0 +1,39 @@
+# ==============================================================================
+# dbt Profile for Local PostgreSQL Development
+# ==============================================================================
+# Copy this file to: %USERPROFILE%\.dbt\profiles.yml (Windows)
+# ==============================================================================
+
+ecommerce_analytics:
+  target: dev_local
+
+  outputs:
+    # =========================================================================
+    # LOCAL POSTGRESQL DEVELOPMENT (Week 3)
+    # =========================================================================
+    dev_local:
+      type: postgres
+      host: localhost
+      port: 5433  # ecommerce-postgres-source port
+      user: ecommerce_user
+      password: ecommerce_pass
+      database: ecommerce
+      schema: public
+      threads: 4
+      keepalives_idle: 0
+      connect_timeout: 10
+
+    # =========================================================================
+    # SNOWFLAKE DEVELOPMENT (Week 4+)
+    # =========================================================================
+    # Uncomment this when Snowflake is ready
+    # dev:
+    #   type: snowflake
+    #   account: <YOUR_ACCOUNT>
+    #   user: <YOUR_USER>
+    #   password: <YOUR_PASSWORD>
+    #   role: DBT_ROLE
+    #   warehouse: DBT_WH
+    #   database: ECOMMERCE_DEV
+    #   schema: DBT_DEV
+    #   threads: 4

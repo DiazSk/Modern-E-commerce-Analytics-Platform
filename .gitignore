@@ -1,92 +1,289 @@
-# Virtual environments
-.venv/
+# ============================================
+# Modern E-Commerce Analytics Platform
+# Git Ignore File
+# ============================================
+
+# ==========================================
+# CREDENTIALS AND SECRETS (CRITICAL!)
+# ==========================================
+.env
+.env.*
+*.env
+*_credentials.json
+*_credentials.txt
+credentials/
+secrets/
+.secrets/
+
+# AWS
+.aws/
+aws_credentials.txt
+**/aws_access_key*
+**/aws_secret*
+
+# Snowflake
+snowflake_credentials.json
+
+# dbt profiles (contains credentials)
+profiles.yml
+.dbt/
+
+# ==========================================
+# PYTHON
+# ==========================================
+# Virtual Environment
 venv/
 env/
 ENV/
-pyenv/
-pyvenv.cfg
-pip-wheel-metadata/
+.venv
+.virtualenv
+vevn/
 
-# Python artifacts
+# Python cache
 __pycache__/
 *.py[cod]
 *$py.class
-*.pyo
-*.pyd
-*.pyc
+*.so
+.Python
 
-# Build / distribution
+# Distribution / packaging
 build/
+develop-eggs/
 dist/
-*.egg
-*.egg-info/
+downloads/
+eggs/
 .eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
 
-# IDEs / editors
-.vscode/
-.idea/
-*.sublime-project
-*.sublime-workspace
+# PyInstaller
+*.manifest
+*.spec
 
-# OS files
-.DS_Store
-Thumbs.db
-
-# Environment / secrets
-.env
-.env.*
-credentials.yml.enc
-secrets.json
-*.pem
-
-# Logs and runtime files
-*.log
-logs/
-airflow.db
-airflow.log
-airflow-webserver.pid
-gunicorn.pid
-
-# Test / coverage / caches
-.coverage
-coverage.xml
-htmlcov/
+# Unit test / coverage
 .pytest_cache/
-.mypy_cache/
-.cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+.hypothesis/
 
-# Jupyter
+# Jupyter Notebook
 .ipynb_checkpoints
 *.ipynb
 
-# Docker (ignore local runtime artifacts, not project-compose files tracked in repo)
-*.local.env
-docker/*.log
+# IPython
+profile_default/
+ipython_config.py
 
-# Terraform
-.terraform/
-*.tfstate
-*.tfstate.backup
-terraform.tfstate
-terraform.tfstate.backup
-.terraform.lock.hcl
+# pyenv
+.python-version
 
-# AWS / CLI local credentials
-.aws/
-aws_credentials
-aws_profile
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
 
+# ==========================================
+# AIRFLOW
+# ==========================================
+# Airflow logs
+logs/
+airflow/logs/
+
+# Airflow database (if using SQLite locally)
+airflow.db
+airflow.cfg
+webserver_config.py
+standalone_admin_password.txt
+
+# Airflow scheduler PID
+airflow-scheduler.pid
+airflow-webserver.pid
+
+# ==========================================
+# DBT
+# ==========================================
 # dbt artifacts
 target/
-dbt_modules/
 dbt_packages/
-ecommerce_analytics/target/
+dbt_modules/
+logs/
 
-# Node
-node_modules/
+# dbt compiled files
+**/target/
+**/dbt_packages/
+**/dbt_modules/
 
-# Misc
-.vagrant/
+# ==========================================
+# DOCKER
+# ==========================================
+# Docker volumes (handled by docker-compose)
+postgres-data/
+redis-data/
+
+# ==========================================
+# TERRAFORM
+# ==========================================
+# Terraform state files
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+
+# Terraform variable files (may contain secrets)
+*.tfvars
+*.tfvars.json
+terraform.tfvars
+terraform.tfvars.json
+
+# ==========================================
+# IDE / EDITORS
+# ==========================================
+# VSCode
+.vscode/
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# ==========================================
+# OPERATING SYSTEM
+# ==========================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# Linux
+.directory
+.Trash-*
+
+# ==========================================
+# DATA FILES (Large files)
+# ==========================================
+# CSV files (generated data)
+*.csv
+!scripts/sample_data.csv
+data/
+
+# Large data files
+*.parquet
+*.json.gz
+*.csv.gz
+*.zip
+*.tar.gz
+
+# Test files in root
+test_*.csv
+test_*.json
+
+# ==========================================
+# LOGS
+# ==========================================
+*.log
+*.out
+*.err
+logs/
+log/
+
+# ==========================================
+# TEMPORARY FILES
+# ==========================================
+tmp/
+temp/
+*.tmp
 *.bak
 *.swp
-*~
+*~.nib
+
+# ==========================================
+# DOCUMENTATION BUILD
+# ==========================================
+site/
+_site/
+.sass-cache/
+.jekyll-cache/
+.jekyll-metadata
+
+# ==========================================
+# GREAT EXPECTATIONS
+# ==========================================
+uncommitted/
+.ge_store_backend_id
+
+# Duplicate GE folder (we use gx/)
+great_expectations/
+
+# ==========================================
+# NOTES
+# ==========================================
+# What to commit:
+# - Source code (.py, .sql, .yaml)
+# - Configuration templates (.env.example)
+# - Documentation (.md, diagrams)
+# - Requirements (requirements.txt)
+# - Infrastructure as code (Terraform .tf files)
+# - Tests
+#
+# What NOT to commit:
+# - Credentials (.env, profiles.yml)
+# - Generated data (CSVs, logs)
+# - IDE settings
+# - Build artifacts
+# - Terraform state files
+# ==========================================
