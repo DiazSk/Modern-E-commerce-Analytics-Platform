@@ -3,22 +3,25 @@
         materialized='incremental',
         unique_key='order_item_key',
         tags=['fact', 'core', 'orders', 'incremental'],
-        on_schema_change='fail',
-
-        -- Query Optimization Configuration
-        -- Partitioning: Divides data by order_date for efficient date filtering
-        -- Clustering: Organizes data within partitions by frequently accessed columns
-        -- These configurations are database-specific (Snowflake example shown)
-
-        -- Uncomment for Snowflake:
-        -- cluster_by=['customer_key', 'product_key'],
-        -- partition_by={
-        --     'field': 'order_date',
-        --     'data_type': 'date',
-        --     'granularity': 'day'
-        -- }
+        on_schema_change='fail'
     )
 }}
+
+-- ==============================================================================
+-- Query Optimization Configuration
+-- ==============================================================================
+-- Partitioning: Divides data by order_date for efficient date filtering
+-- Clustering: Organizes data within partitions by frequently accessed columns
+-- These configurations are database-specific (Snowflake example shown)
+--
+-- To enable optimizations, uncomment and add to the config() block above:
+-- cluster_by=['customer_key', 'product_key'],
+-- partition_by={
+--     'field': 'order_date',
+--     'data_type': 'date',
+--     'granularity': 'day'
+-- }
+-- ==============================================================================
 
 -- ==============================================================================
 -- Fact Model: Orders (Optimized)
