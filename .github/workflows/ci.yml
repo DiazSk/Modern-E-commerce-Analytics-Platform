@@ -64,7 +64,26 @@ jobs:
           python-version: '3.10'
 
       - name: Install dbt
-        run: pip install dbt-postgres
+        run: pip install dbt-snowflake
+
+      - name: Create CI profiles.yml
+        run: |
+          mkdir -p ~/.dbt
+          cat > ~/.dbt/profiles.yml <<EOF
+          ecommerce_analytics:
+            target: ci
+            outputs:
+              ci:
+                type: snowflake
+                account: ci-account
+                user: ci-user
+                password: ci-password
+                role: ci-role
+                warehouse: ci-warehouse
+                database: ci-database
+                schema: ci-schema
+                threads: 1
+          EOF
 
       - name: dbt Parse
         run: dbt parse
