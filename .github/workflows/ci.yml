@@ -85,6 +85,10 @@ jobs:
                 threads: 1
           EOF
 
+      - name: Install dbt Dependencies
+        run: dbt deps
+        working-directory: ./transform
+
       - name: dbt Parse
         run: dbt parse
         working-directory: ./transform
