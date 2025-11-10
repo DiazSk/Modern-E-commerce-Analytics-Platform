@@ -10,7 +10,8 @@ def process_data(data):
         result.append(processed)
     return result
 
-# Helper function to transform individual items 
+
+# Helper function to transform individual items
 def transform_item(item):
     """
     Transform a single data item
@@ -19,13 +20,14 @@ def transform_item(item):
     transformed = item
     return transformed
 
+
 # Main execution
 if __name__ == "__main__":
     # Sample data
     data = [1, 2, 3, 4, 5]
-    
+
     # Process the data
     result = process_data(data)
-    
+
     # Print results
     print(f"Processed data: {result}")

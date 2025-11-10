@@ -4,8 +4,8 @@ A production-grade data engineering platform demonstrating end-to-end analytics 
 
 ![Architecture Overview](docs/high-level-diagrams/high_level_architecture_diagram.png)
 
-**Status:** 🎉 **ALL 6 WEEKS COMPLETE** ✅  
-**Timeline:** 6 weeks | **Progress:** 💯 100% Complete  
+**Status:** 🎉 **ALL 6 WEEKS COMPLETE** ✅
+**Timeline:** 6 weeks | **Progress:** 💯 100% Complete
 **Final Release:** `v1.0.0`
 
 ---
@@ -43,15 +43,15 @@ Data Sources → Ingestion Layer → Raw Storage → Transformation Layer → Da
 
 ### Technology Stack
 
-**Languages:** Python 3.11, SQL  
-**Orchestration:** Apache Airflow 2.7.3  
-**Transformation:** dbt 1.7.4  
-**Data Warehouse:** PostgreSQL 14 (warehouse-agnostic dbt models designed for cloud migration)  
-**Storage:** AWS S3 (data lake with lifecycle policies)  
-**Source Database:** PostgreSQL 14  
-**Data Quality:** Great Expectations 0.18.8  
-**Visualization:** Metabase  
-**Containerization:** Docker, Docker Compose  
+**Languages:** Python 3.11, SQL
+**Orchestration:** Apache Airflow 2.7.3
+**Transformation:** dbt 1.7.4
+**Data Warehouse:** PostgreSQL 14 (warehouse-agnostic dbt models designed for cloud migration)
+**Storage:** AWS S3 (data lake with lifecycle policies)
+**Source Database:** PostgreSQL 14
+**Data Quality:** Great Expectations 0.18.8
+**Visualization:** Metabase
+**Containerization:** Docker, Docker Compose
 **Infrastructure as Code:** Terraform 1.2+
 
 **Architecture Design Note:** All dbt transformation models use ANSI-compliant SQL and warehouse-agnostic patterns, enabling seamless migration to cloud platforms (Snowflake, BigQuery, Redshift) by simply updating connection profiles.
@@ -452,10 +452,10 @@ Modern-E-commerce-Analytics-Platform/
 
 ## 📧 Contact
 
-**Developer:** Zaid Shaikh  
-**Email:** zaid07sk@gmail.com  
-**GitHub:** [@DiazSk](https://github.com/DiazSk)  
-**LinkedIn:** [Zaid Shaikh](https://www.linkedin.com/in/zaidshaikhscientist/)  
+**Developer:** Zaid Shaikh
+**Email:** zaid07sk@gmail.com
+**GitHub:** [@DiazSk](https://github.com/DiazSk)
+**LinkedIn:** [Zaid Shaikh](https://www.linkedin.com/in/zaidshaikhscientist/)
 **Project Repository:** [Modern-E-commerce-Analytics-Platform](https://github.com/DiazSk/Modern-E-commerce-Analytics-Platform)
 
 ---
@@ -466,6 +466,6 @@ This project is created for portfolio and educational purposes.
 
 ---
 
-**Last Updated:** November 10, 2025  
-**Project Status:** 🎉 **100% COMPLETE - ALL 6 WEEKS DELIVERED** ✅  
+**Last Updated:** November 10, 2025
+**Project Status:** 🎉 **100% COMPLETE - ALL 6 WEEKS DELIVERED** ✅
 **Final Release:** `v1.0.0` | **Ready for Production & Interviews!** 💼🚀

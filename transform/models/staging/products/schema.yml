@@ -4,60 +4,60 @@ models:
   - name: stg_products
     description: |
       Cleaned and standardized product catalog data from FakeStore API.
-      
+
       **Grain**: One row per product
       **Source**: postgres_ecommerce.products
       **Materialization**: View
-    
+
     columns:
       - name: product_id
         description: "Unique product identifier (Primary Key)"
         tests:
           - unique
           - not_null
-      
+
       - name: product_name
         description: "Product name (renamed from title)"
         tests:
           - not_null
-      
+
       - name: category
         description: "Product category"
-      
+
       - name: price
         description: "Product price"
         tests:
           - not_null
-      
+
       - name: description
         description: "Product description"
-      
+
       - name: image_url
         description: "Product image URL (renamed from image)"
-      
+
       - name: rating
         description: "Average rating (0-5)"
-      
+
       - name: rating_count
         description: "Number of ratings received"
-      
+
       - name: ingestion_timestamp
         description: "API ingestion timestamp"
-      
+
       - name: ingestion_date
         description: "API ingestion date"
-      
+
       - name: data_source
         description: "Source system (fakestoreapi)"
-      
+
       - name: created_at
         description: "Database record creation time"
-      
+
       - name: is_invalid_price
         description: "Flag: true if price <= 0"
-      
+
       - name: is_invalid_rating
         description: "Flag: true if rating outside 0-5 range"
-      
+
       - name: is_missing_category
         description: "Flag: true if category is null/empty"

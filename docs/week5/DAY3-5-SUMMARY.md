@@ -14,7 +14,7 @@
 
 **Usage**: `python scripts/init_great_expectations.py`
 
-### 2. scripts/create_expectations.py  
+### 2. scripts/create_expectations.py
 **Purpose**: Create comprehensive data quality checks
 **Lines**: 450
 **What it does**:
@@ -114,9 +114,9 @@ airflow tasks test data_quality_validation validate_data_quality 2025-11-03
 ## 🎓 Resume Bullet (Copy-Paste)
 
 ```
-• Implemented comprehensive data quality framework using Great Expectations 
-  with 15+ validation rules covering schema integrity, referential 
-  constraints, and business logic, integrated with Airflow for automated 
+• Implemented comprehensive data quality framework using Great Expectations
+  with 15+ validation rules covering schema integrity, referential
+  constraints, and business logic, integrated with Airflow for automated
   daily checks with email alerting on failures
 ```
 
@@ -133,7 +133,7 @@ airflow tasks test data_quality_validation validate_data_quality 2025-11-03
 For Affine documentation:
 1. ✅ Initialization output (terminal)
 2. ✅ Expectation creation output showing 15 checks
-3. ✅ Checkpoint run showing 100% success  
+3. ✅ Checkpoint run showing 100% success
 4. ✅ Data docs homepage (browser)
 5. ✅ Airflow DAG graph view
 6. ✅ Airflow task logs
@@ -151,7 +151,7 @@ git commit -m "feat(week5): implement Great Expectations integration
 
 - Initialize Great Expectations with PostgreSQL datasource
 - Create comprehensive expectation suite (15+ checks)
-- Integrate with Airflow for automated validation  
+- Integrate with Airflow for automated validation
 - Configure data docs generation
 - Add email alerting on failures
 

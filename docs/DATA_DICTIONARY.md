@@ -2,8 +2,8 @@
 
 **Complete reference for all tables, columns, and relationships**
 
-**Last Updated:** November 6, 2025  
-**Database:** PostgreSQL 14  
+**Last Updated:** November 6, 2025
+**Database:** PostgreSQL 14
 **Schema:** public
 
 ---
@@ -48,8 +48,8 @@
 | `created_at` | TIMESTAMP | NO | Record creation timestamp | Auto-generated | `2024-03-15 10:30:45` |
 | `updated_at` | TIMESTAMP | NO | Last update timestamp | Auto-updated via trigger | `2024-06-01 14:22:10` |
 
-**Primary Key:** `customer_id`  
-**Unique Constraints:** `email`  
+**Primary Key:** `customer_id`
+**Unique Constraints:** `email`
 **Indexes:** `idx_customers_email`, `idx_customers_segment`, `idx_customers_is_current`
 
 **Business Logic:**
@@ -77,8 +77,8 @@
 | `created_at` | TIMESTAMP | NO | Record creation | Auto-generated | `2025-10-15 14:23:45` |
 | `updated_at` | TIMESTAMP | NO | Last update | Auto-updated via trigger | `2025-10-16 09:15:22` |
 
-**Primary Key:** `order_id`  
-**Foreign Keys:** `customer_id` → `customers(customer_id)`  
+**Primary Key:** `order_id`
+**Foreign Keys:** `customer_id` → `customers(customer_id)`
 **Indexes:** `idx_orders_customer_id`, `idx_orders_order_date`, `idx_orders_status`, `idx_orders_date_customer` (composite)
 
 **Business Logic:**
@@ -105,8 +105,8 @@
 | `line_total` | DECIMAL(10,2) | NO | Calculated total | GENERATED: quantity * unit_price - discount | `54.98` |
 | `created_at` | TIMESTAMP | NO | Record creation | Auto-generated | `2025-10-15 14:23:45` |
 
-**Primary Key:** `order_item_id`  
-**Foreign Keys:** 
+**Primary Key:** `order_item_id`
+**Foreign Keys:**
 - `order_id` → `orders(order_id)` ON DELETE CASCADE
 - `product_id` → `products(product_id)` (logical, not enforced)
 
@@ -140,7 +140,7 @@
 | `data_source` | VARCHAR(50) | YES | Source system | Always 'fakestoreapi' | `fakestoreapi` |
 | `created_at` | TIMESTAMP | YES | Record creation | First seen in database | `2025-11-02 23:42:41` |
 
-**Primary Key:** `product_id`  
+**Primary Key:** `product_id`
 **Indexes:** `idx_products_category`, `idx_products_price`
 
 **⚠️ CRITICAL NOTES:**
@@ -180,8 +180,8 @@ SELECT p.rating FROM products p;  -- Column doesn't exist!
 | `browser` | VARCHAR(50) | YES | Browser used | Chrome, Safari, Firefox, Edge | `Chrome` |
 | `country` | VARCHAR(50) | YES | User location | ISO country code | `USA` |
 
-**Primary Key:** `event_id`  
-**Foreign Keys:** `product_id` → `products(product_id)` (logical)  
+**Primary Key:** `event_id`
+**Foreign Keys:** `product_id` → `products(product_id)` (logical)
 **Indexes:** `idx_events_timestamp`, `idx_events_type`, `idx_events_session`
 
 **Business Logic:**
@@ -348,7 +348,7 @@ Platinum: $5,000+         (5% of customers - VIP)
 UPDATE customers
 SET customer_segment = 'gold',
     segment_start_date = CURRENT_DATE
-WHERE total_lifetime_spend >= 1000 
+WHERE total_lifetime_spend >= 1000
   AND customer_segment != 'gold';
 ```
 
@@ -440,7 +440,7 @@ Expected conversion rates:
 
 ### Customer Lifetime Value (CLV)
 ```sql
-SELECT 
+SELECT
     customer_id,
     SUM(oi.quantity * oi.unit_price) AS lifetime_value
 FROM customers c
@@ -451,7 +451,7 @@ GROUP BY customer_id;
 
 ### Top Products by Revenue
 ```sql
-SELECT 
+SELECT
     p.title,
     SUM(oi.quantity * oi.unit_price) AS total_revenue
 FROM products p
@@ -467,7 +467,7 @@ WITH first_orders AS (
     SELECT customer_id, MIN(order_date) AS first_order
     FROM orders GROUP BY customer_id
 )
-SELECT 
+SELECT
     DATE_TRUNC('month', first_order) AS cohort,
     COUNT(DISTINCT CASE WHEN o.order_date <= first_order + INTERVAL '30 days' THEN o.customer_id END) AS month_0,
     COUNT(DISTINCT CASE WHEN o.order_date <= first_order + INTERVAL '60 days' THEN o.customer_id END) AS month_1
@@ -537,7 +537,7 @@ GROUP BY cohort;
 CREATE POLICY sales_rep_policy ON orders
     FOR SELECT
     USING (customer_id IN (
-        SELECT customer_id FROM customer_assignments 
+        SELECT customer_id FROM customer_assignments
         WHERE sales_rep_id = current_user_id()
     ));
 ```
@@ -561,7 +561,7 @@ CREATE POLICY sales_rep_policy ON orders
 
 ---
 
-**This data dictionary is your schema reference!**  
+**This data dictionary is your schema reference!**
 **Use it when writing queries to avoid "column does not exist" errors!** 🎯
 
 *Last Updated: November 6, 2025 | Week 6 Complete*

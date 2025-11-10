@@ -4,12 +4,12 @@
         unique_key='order_item_key',
         tags=['fact', 'core', 'orders', 'incremental'],
         on_schema_change='fail',
-        
+
         -- Query Optimization Configuration
         -- Partitioning: Divides data by order_date for efficient date filtering
         -- Clustering: Organizes data within partitions by frequently accessed columns
         -- These configurations are database-specific (Snowflake example shown)
-        
+
         -- Uncomment for Snowflake:
         -- cluster_by=['customer_key', 'product_key'],
         -- partition_by={
@@ -24,7 +24,7 @@
 -- Fact Model: Orders (Optimized)
 -- ==============================================================================
 -- Purpose: Transaction-level fact table for order analytics with query optimization
--- 
+--
 -- Features:
 --   - Incremental loading for performance
 --   - Foreign keys to all dimension tables
@@ -131,7 +131,7 @@ QUERY PERFORMANCE BENCHMARKS
 
 TEST QUERY: Customer orders in last 30 days with aggregations
 ```sql
-SELECT 
+SELECT
     c.customer_id,
     c.full_name,
     COUNT(DISTINCT f.order_id) as order_count,
@@ -224,22 +224,22 @@ DO NOT USE WHEN:
 INTERVIEW TALKING POINTS
 --------------------------------------------------------------------------------
 
-1. "I implemented a two-tier optimization strategy: date-based partitioning 
+1. "I implemented a two-tier optimization strategy: date-based partitioning
    for temporal filtering and multi-column clustering for join optimization."
 
-2. "Through query profiling, I identified that 99% of analytical queries 
+2. "Through query profiling, I identified that 99% of analytical queries
    filtered by date range, making order_date the ideal partition key."
 
 3. "The clustering strategy targets customer and product joins, which represent
    85% of our query workload."
 
-4. "I documented 74% improvement in query performance and 85% reduction in 
+4. "I documented 74% improvement in query performance and 85% reduction in
    data scanned, translating to $1,860 annual cost savings."
 
 5. "The optimization required balancing read performance gains against write
    overhead and metadata management complexity."
 
-6. "I established monitoring for partition growth and clustering depth to 
+6. "I established monitoring for partition growth and clustering depth to
    ensure sustained performance."
 
 ================================================================================
@@ -253,7 +253,7 @@ INTERVIEW TALKING POINTS
 -- ==============================================================================
 
 with orders as (
-    
+
     select * from {{ ref('stg_orders') }}
     {% if is_incremental() %}
         where order_date > (
@@ -265,27 +265,27 @@ with orders as (
 ),
 
 order_items as (
-    
+
     select * from {{ ref('stg_order_items') }}
 
 ),
 
 customers as (
-    
+
     select * from {{ ref('dim_customers') }}
     where is_current = true
 
 ),
 
 products as (
-    
+
     select * from {{ ref('dim_products') }}
 
 ),
 
 dates as (
-    
-    select distinct date_key, date_day 
+
+    select distinct date_key, date_day
     from {{ ref('dim_date') }}
 
 ),
@@ -295,26 +295,26 @@ joined as (
     select
         -- Unique Key for Fact Table
         {{ dbt_utils.generate_surrogate_key(['o.order_id', 'oi.product_id']) }} as order_item_key,
-        
+
         -- Foreign Keys to Dimensions
         c.customer_key,
         p.product_key,
         d.date_key,
-        
+
         -- Degenerate Dimensions (stored in fact)
         o.order_id,
         oi.order_item_id,
-        
+
         -- Date/Time Attributes
         cast(o.order_date as date) as order_date,
         o.order_date as order_timestamp,
         extract(hour from o.order_date) as order_hour,
         extract(dow from o.order_date) as order_day_of_week,
-        
+
         -- Order Attributes
         o.order_status,
         o.payment_method,
-        
+
         -- Measures (Additive)
         oi.quantity,
         oi.unit_price,
@@ -322,15 +322,15 @@ joined as (
         oi.gross_line_total as gross_amount,
         (oi.gross_line_total - coalesce(oi.discount_amount, 0)) as line_total,
         o.order_total,
-        
+
         -- Derived Measures
-        case 
-            when oi.discount_amount > 0 then true 
-            else false 
-        end as has_discount,
-        
         case
-            when oi.discount_amount > 0 
+            when oi.discount_amount > 0 then true
+            else false
+        end as has_discount,
+
+        case
+            when oi.discount_amount > 0
             then (oi.discount_amount / nullif(oi.quantity * oi.unit_price, 0)) * 100
             else 0
         end as discount_percentage,
@@ -338,13 +338,13 @@ joined as (
         oi.gross_line_total - coalesce(oi.discount_amount, 0) as net_revenue
 
     from orders o
-    inner join order_items oi 
+    inner join order_items oi
         on o.order_id = oi.order_id
-    inner join customers c 
+    inner join customers c
         on o.customer_id = c.customer_id
-    inner join products p 
+    inner join products p
         on oi.product_id = p.product_id
-    inner join dates d 
+    inner join dates d
         on cast(o.order_date as date) = d.date_day
 
 )

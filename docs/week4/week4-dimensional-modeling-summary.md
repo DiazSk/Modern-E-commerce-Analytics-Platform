@@ -1,7 +1,7 @@
 # Week 4: Dimensional Modeling - Implementation Summary
 
-**Duration**: November 10-16, 2024  
-**Status**: ✅ COMPLETED  
+**Duration**: November 10-16, 2024
+**Status**: ✅ COMPLETED
 **Git Tag**: `v0.4-week4-dimensional-modeling`
 
 ---
@@ -167,7 +167,7 @@ Created `schema.yml` files with 50+ tests:
 
 **Referential Integrity Tests**: 3
 - fact_orders → dim_customers
-- fact_orders → dim_products  
+- fact_orders → dim_products
 - fact_orders → dim_date
 
 **Business Logic Tests**: 15+

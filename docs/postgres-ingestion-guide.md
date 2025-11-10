@@ -353,10 +353,10 @@ python scripts/setup_airflow_connections.py
 # Check what dates have orders
 docker exec -it ecommerce-postgres-source psql -U ecommerce_user -d ecommerce
 
-SELECT DATE(order_date) as order_day, COUNT(*) 
-FROM orders 
-GROUP BY order_day 
-ORDER BY order_day DESC 
+SELECT DATE(order_date) as order_day, COUNT(*)
+FROM orders
+GROUP BY order_day
+ORDER BY order_day DESC
 LIMIT 10;
 
 # Trigger DAG with a date that has orders
@@ -483,7 +483,7 @@ orders_json = context['ti'].xcom_pull(key='orders_data', task_ids='extract_order
 
 ```sql
 -- Orders per day (in PostgreSQL)
-SELECT 
+SELECT
     DATE(order_date) as date,
     COUNT(*) as order_count,
     ROUND(AVG(order_total), 2) as avg_value
@@ -573,6 +573,6 @@ git push origin feature/postgres-ingestion
 
 ---
 
-**Last Updated:** Week 2, Day 3  
-**Status:** PostgreSQL Ingestion DAG Complete  
+**Last Updated:** Week 2, Day 3
+**Status:** PostgreSQL Ingestion DAG Complete
 **Next:** API Ingestion DAG

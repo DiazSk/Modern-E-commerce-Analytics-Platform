@@ -31,7 +31,7 @@ Tracks historical changes in customer attributes over time.
 customer_key | customer_id | segment | valid_from | valid_to   | is_current
 -------------|-------------|---------|------------|------------|------------
 1            | C001        | New     | 2023-01-01 | 2023-06-01 | False
-2            | C001        | Regular | 2023-06-01 | 2024-01-01 | False  
+2            | C001        | Regular | 2023-06-01 | 2024-01-01 | False
 3            | C001        | VIP     | 2024-01-01 | NULL       | True
 ```
 

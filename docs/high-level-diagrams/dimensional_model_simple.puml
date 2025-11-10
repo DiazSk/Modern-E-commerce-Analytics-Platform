@@ -46,7 +46,7 @@ dim_date ||--o{ fact_orders
 
 note bottom
     Fact orders at line-item grain powering BI dashboards
-    
+
     <i>PostgreSQL 14 | 4 dashboards | 66K+ records</i>
 end note
 

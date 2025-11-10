@@ -309,6 +309,6 @@ git push origin v0.2-week2-complete
 
 ---
 
-**Last Updated:** Week 2, Day 6-7  
-**Status:** Clickstream Ingestion DAG Created  
+**Last Updated:** Week 2, Day 6-7
+**Status:** Clickstream Ingestion DAG Created
 **Next:** Test, Verify, Complete Week 2

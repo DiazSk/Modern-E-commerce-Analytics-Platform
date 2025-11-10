@@ -2,9 +2,9 @@
 
 **Modern E-Commerce Analytics Platform - Final Validation**
 
-**Audit Date:** November 7, 2025  
-**Auditor:** Automated + Manual Validation  
-**Status:** ✅ PASSED  
+**Audit Date:** November 7, 2025
+**Auditor:** Automated + Manual Validation
+**Status:** ✅ PASSED
 **Overall Quality Grade:** A (96.3% Success Rate)
 
 ---
@@ -20,7 +20,7 @@
 - **Schema Compliance:** 100% (matches expectations)
 
 ### Recommendation
-✅ **APPROVED FOR PRODUCTION USE**  
+✅ **APPROVED FOR PRODUCTION USE**
 Data quality meets enterprise standards for analytics workloads.
 
 ---
@@ -31,7 +31,7 @@ Data quality meets enterprise standards for analytics workloads.
 
 **Query Used:**
 ```sql
-SELECT 
+SELECT
     'customers' AS table_name,
     COUNT(*) AS actual_count,
     1000 AS expected_count,
@@ -131,11 +131,11 @@ WHERE e.product_id IS NOT NULL
 
 **customers Table:**
 ```sql
-SELECT 
+SELECT
     column_name,
     data_type,
     is_nullable,
-    CASE 
+    CASE
         WHEN column_name = 'customer_id' AND data_type = 'integer' THEN '✅ PASS'
         WHEN column_name = 'email' AND data_type = 'character varying' THEN '✅ PASS'
         WHEN column_name = 'customer_segment' AND data_type = 'character varying' THEN '✅ PASS'
@@ -176,7 +176,7 @@ rating_count  | integer   ✅ CORRECT
 
 **Orders Table:**
 ```sql
-SELECT 
+SELECT
     MIN(order_total) AS min_total,
     MAX(order_total) AS max_total,
     ROUND(AVG(order_total)::numeric, 2) AS avg_total,
@@ -201,7 +201,7 @@ min_total | max_total | avg_total | stddev
 
 **Products Table:**
 ```sql
-SELECT 
+SELECT
     MIN(rating_rate) AS min_rating,
     MAX(rating_rate) AS max_rating,
     ROUND(AVG(rating_rate)::numeric, 2) AS avg_rating
@@ -226,7 +226,7 @@ min_rating | max_rating | avg_rating
 
 **Orders Date Range:**
 ```sql
-SELECT 
+SELECT
     MIN(order_date) AS earliest_order,
     MAX(order_date) AS latest_order,
     MAX(order_date) - MIN(order_date) AS date_span
@@ -249,7 +249,7 @@ earliest_order      | latest_order        | date_span
 
 **Events Hourly Distribution:**
 ```sql
-SELECT 
+SELECT
     MIN(EXTRACT(HOUR FROM event_timestamp)) AS min_hour,
     MAX(EXTRACT(HOUR FROM event_timestamp)) AS max_hour,
     COUNT(DISTINCT EXTRACT(HOUR FROM event_timestamp)) AS distinct_hours
@@ -276,7 +276,7 @@ min_hour | max_hour | distinct_hours
 
 **Query:**
 ```sql
-SELECT 
+SELECT
     customer_segment,
     COUNT(*) AS count,
     ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER(), 2) AS percentage
@@ -307,7 +307,7 @@ platinum         | 47    | 4.7%
 
 **Query:**
 ```sql
-SELECT 
+SELECT
     order_status,
     COUNT(*) AS count,
     ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER(), 2) AS percentage
@@ -338,10 +338,10 @@ returned     | 97    | 1.9%
 
 ### Test Suite Summary
 
-**Total Expectations:** 130+  
-**Passed:** 125  
-**Failed:** 0  
-**Warnings:** 5  
+**Total Expectations:** 130+
+**Passed:** 125
+**Failed:** 0
+**Warnings:** 5
 **Pass Rate:** 96.3% ✅
 
 ### Test Categories
@@ -421,7 +421,7 @@ Action: Acceptable
 
 **Test Query:**
 ```sql
-SELECT 
+SELECT
     'customers.customer_id' AS column_check,
     COUNT(*) AS total_rows,
     COUNT(customer_id) AS non_null_count,
@@ -464,7 +464,7 @@ FROM order_items;
 
 **Products Table:**
 ```sql
-SELECT 
+SELECT
     COUNT(*) AS total_products,
     COUNT(description) AS has_description,
     COUNT(rating_rate) AS has_rating,
@@ -490,7 +490,7 @@ total_products | has_description | has_rating | has_review_count
 **Test Query:**
 ```sql
 WITH order_totals AS (
-    SELECT 
+    SELECT
         o.order_id,
         o.order_total AS stated_total,
         ROUND(SUM(oi.quantity * oi.unit_price - oi.discount_amount)::numeric, 2) AS calculated_total,
@@ -499,7 +499,7 @@ WITH order_totals AS (
     JOIN order_items oi ON o.order_id = oi.order_id
     GROUP BY o.order_id, o.order_total
 )
-SELECT 
+SELECT
     COUNT(*) AS total_orders,
     COUNT(CASE WHEN difference < 0.01 THEN 1 END) AS matching_totals,
     COUNT(CASE WHEN difference >= 0.01 THEN 1 END) AS mismatched_totals,
@@ -524,7 +524,7 @@ total_orders | matching_totals | mismatched_totals | match_rate
 
 **Test: Only ONE current record per customer**
 ```sql
-SELECT 
+SELECT
     customer_id,
     COUNT(*) AS current_records
 FROM customers
@@ -533,7 +533,7 @@ GROUP BY customer_id
 HAVING COUNT(*) > 1;
 ```
 
-**Result:** 0 rows ✅  
+**Result:** 0 rows ✅
 **Status:** ✅ PASS - Each customer has exactly one current record
 
 ---
@@ -547,7 +547,7 @@ WHERE segment_end_date IS NOT NULL
   AND segment_end_date <= segment_start_date;
 ```
 
-**Result:** 0 invalid ranges ✅  
+**Result:** 0 invalid ranges ✅
 **Status:** ✅ PASS - All date ranges logical
 
 ---
@@ -557,7 +557,7 @@ WHERE segment_end_date IS NOT NULL
 **Test:**
 ```sql
 -- Check for negative prices, quantities, totals
-SELECT 
+SELECT
     'products.price' AS check_column,
     COUNT(CASE WHEN price < 0 THEN 1 END) AS negative_count,
     CASE WHEN COUNT(CASE WHEN price < 0 THEN 1 END) = 0 THEN '✅ PASS' ELSE '❌ FAIL' END AS status
@@ -622,7 +622,7 @@ FROM order_items;
 
 **customers.email (Must Be Unique):**
 ```sql
-SELECT 
+SELECT
     COUNT(*) AS total_customers,
     COUNT(DISTINCT email) AS unique_emails,
     COUNT(*) - COUNT(DISTINCT email) AS duplicates,
@@ -647,11 +647,11 @@ total_customers | unique_emails | duplicates | status
 
 **Query:**
 ```sql
-SELECT 
+SELECT
     'products' AS table_name,
     MAX(ingestion_timestamp) AS last_ingestion,
     CURRENT_TIMESTAMP - MAX(ingestion_timestamp) AS age,
-    CASE 
+    CASE
         WHEN CURRENT_TIMESTAMP - MAX(ingestion_timestamp) < INTERVAL '24 hours' THEN '✅ FRESH'
         ELSE '⚠️ STALE'
     END AS freshness
@@ -680,30 +680,30 @@ FROM events;
 
 ### Issue 1: Products Rating Column ✅ RESOLVED
 
-**Found:** Week 6 Day 1  
-**Problem:** Queries used `p.rating` but column is `p.rating_rate`  
-**Impact:** 4 queries failing with "column does not exist"  
-**Resolution:** Updated all queries to use correct column names  
+**Found:** Week 6 Day 1
+**Problem:** Queries used `p.rating` but column is `p.rating_rate`
+**Impact:** 4 queries failing with "column does not exist"
+**Resolution:** Updated all queries to use correct column names
 **Validation:** ✅ All product queries now working (100% success)
 
 ---
 
 ### Issue 2: Events Timestamp Distribution ✅ RESOLVED
 
-**Found:** Week 6 Day 2  
-**Problem:** All 50,000 events at midnight (hour 0)  
-**Impact:** Hourly analysis impossible  
-**Resolution:** UPDATE query adding random realistic hours  
+**Found:** Week 6 Day 2
+**Problem:** All 50,000 events at midnight (hour 0)
+**Impact:** Hourly analysis impossible
+**Resolution:** UPDATE query adding random realistic hours
 **Validation:** ✅ Full 24-hour distribution achieved
 
 ---
 
 ### Issue 3: Metabase Alias Errors ✅ RESOLVED
 
-**Found:** Week 6 Day 2  
-**Problem:** GROUP BY doesn't accept column aliases  
-**Impact:** 6 customer segmentation queries failing  
-**Resolution:** Refactored to CTE pattern with explicit columns  
+**Found:** Week 6 Day 2
+**Problem:** GROUP BY doesn't accept column aliases
+**Impact:** 6 customer segmentation queries failing
+**Resolution:** Refactored to CTE pattern with explicit columns
 **Validation:** ✅ All customer analytics queries working
 
 ---
@@ -743,7 +743,7 @@ WITH segment_counts AS (
 )
 SELECT SUM(count) AS total_from_segments,
     (SELECT COUNT(*) FROM customers WHERE is_current = TRUE) AS total_customers,
-    CASE WHEN SUM(count) = (SELECT COUNT(*) FROM customers WHERE is_current = TRUE) 
+    CASE WHEN SUM(count) = (SELECT COUNT(*) FROM customers WHERE is_current = TRUE)
          THEN '✅ PASS' ELSE '❌ FAIL' END AS status
 FROM segment_counts;
 ```
@@ -763,14 +763,14 @@ total_from_segments | total_customers | status
 
 **Test: Purchase events <= Add to Cart <= Page Views**
 ```sql
-SELECT 
+SELECT
     COUNT(CASE WHEN event_type = 'page_view' THEN 1 END) AS page_views,
     COUNT(CASE WHEN event_type = 'add_to_cart' THEN 1 END) AS add_to_cart,
     COUNT(CASE WHEN event_type = 'purchase' THEN 1 END) AS purchases,
-    CASE 
-        WHEN COUNT(CASE WHEN event_type = 'purchase' THEN 1 END) <= 
+    CASE
+        WHEN COUNT(CASE WHEN event_type = 'purchase' THEN 1 END) <=
              COUNT(CASE WHEN event_type = 'add_to_cart' THEN 1 END)
-         AND COUNT(CASE WHEN event_type = 'add_to_cart' THEN 1 END) <= 
+         AND COUNT(CASE WHEN event_type = 'add_to_cart' THEN 1 END) <=
              COUNT(CASE WHEN event_type = 'page_view' THEN 1 END)
          THEN '✅ PASS (Logical funnel)'
          ELSE '❌ FAIL (Funnel violation)'
@@ -865,12 +865,12 @@ STATUS:               PRODUCTION-READY ✅
 **Order Totals:**
 ```sql
 WITH stats AS (
-    SELECT 
+    SELECT
         AVG(order_total) AS mean,
         STDDEV(order_total) AS stddev
     FROM orders
 )
-SELECT 
+SELECT
     COUNT(*) AS total_orders,
     COUNT(CASE WHEN order_total > mean + (3 * stddev) THEN 1 END) AS outliers,
     ROUND(100.0 * COUNT(CASE WHEN order_total > mean + (3 * stddev) THEN 1 END) / COUNT(*), 2) AS outlier_pct
@@ -972,5 +972,5 @@ total_orders | outliers | outlier_pct
 
 ---
 
-*Data Quality Audit - Week 6 Day 5*  
+*Data Quality Audit - Week 6 Day 5*
 *Status: PASSED | Grade: A (96.3%) | Ready for Production* 🚀

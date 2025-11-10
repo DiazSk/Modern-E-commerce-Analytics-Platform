@@ -57,12 +57,12 @@ note right of dim_customers
     • Customer segment changes tracked
     • Historical analysis enabled
     • Multiple rows per customer_id
-    
+
     <b>Example:</b>
     customer_id=1001
     ├─ bronze (2024-01-01 to 2024-06-01)
     └─ silver (2024-06-01 to current)
-    
+
     <b>Data Quality Flags:</b>
     • is_missing_email, is_missing_phone
     • Used for data profiling
@@ -98,7 +98,7 @@ note bottom of dim_products
     • Overwrites on change
     • Historical price not tracked
     • One row per product_id
-    
+
     <b>Derived Fields:</b>
     • price_tier: Budget/Mid-Range/Premium
     • rating_category: Poor/Fair/Good/Very Good/Excellent
@@ -171,24 +171,24 @@ entity "fact_orders\n<size:10><b>FACT TABLE</b></size>" as fact_orders FACTTABLE
 note bottom of fact_orders
     <b>Grain:</b> One row per order line item
     (order_id + product_id combination)
-    
+
     <b>Example:</b>
     Order #1234 with 3 products = 3 rows
-    
+
     <b>Optimization (PostgreSQL 14):</b>
     • B-tree indexes on foreign keys
     • Partial index: is_current = TRUE
     • Query time: 4.2s → 1.1s (74% faster)
     • Data scanned: 85% reduction
-    
+
     <b>Degenerate Dimensions:</b>
     Attributes without separate dimension tables
-    
+
     <b>Incremental Loading:</b>
     • Loads based on order_timestamp
     • Unique key: order_item_key
     • Strategy: Upsert on conflict
-    
+
     <b>Indexes (PostgreSQL):</b>
     <code>
     CREATE INDEX idx_customer_current
@@ -217,22 +217,22 @@ dim_date ||--o{ fact_orders : "1:N\ndate_key"
 ' ============================================
 note bottom
     <b>Key Business Questions Answered:</b>
-    
+
     <b>Customer Analytics:</b>
     • Who are top customers by revenue?
     • How has customer segment distribution changed?
     • Average order value by segment?
-    
+
     <b>Product Analytics:</b>
     • Which products/categories drive revenue?
     • Correlation between rating and sales?
     • Underperforming products?
-    
+
     <b>Time-based Analytics:</b>
     • Monthly/quarterly revenue trends?
     • Day of week sales patterns?
     • Seasonal purchasing behavior?
-    
+
     <b>Cohort Analysis:</b>
     • Retention rates by registration cohort
     • Customer lifetime value by segment
@@ -246,7 +246,7 @@ legend bottom
     <b>SAMPLE QUERY - Customer LTV:</b>
     ----
     <code>
-    SELECT 
+    SELECT
         c.customer_id,
         c.full_name,
         c.customer_segment,

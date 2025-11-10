@@ -138,7 +138,7 @@ dags/
 
 #### Great Expectations
 - **Purpose**: Advanced, Python-based data validation
-- **Strengths**: 
+- **Strengths**:
   - Complex validation rules
   - Rich reporting and documentation
   - Integration with various data sources
@@ -199,7 +199,7 @@ dags/
    ```bash
    # Windows
    scripts\create_week5_branches.bat
-   
+
    # Linux/Mac
    bash scripts/create_week5_branches.sh
    ```

@@ -50,12 +50,12 @@ transform/
    - Light transformations
    - Column renaming, type casting
    - Materialized as views
-   
+
 2. **Intermediate** (`models/intermediate/`)
    - Complex business logic
    - Joins, deduplication, calculations
    - Materialized as views (or tables if needed)
-   
+
 3. **Marts** (`models/marts/`)
    - Final analytics models
    - Optimized for query performance
@@ -91,7 +91,7 @@ dbt --version
    # Windows
    mkdir %USERPROFILE%\.dbt
    copy profiles.yml.example %USERPROFILE%\.dbt\profiles.yml
-   
+
    # Mac/Linux
    mkdir -p ~/.dbt
    cp profiles.yml.example ~/.dbt/profiles.yml
@@ -118,7 +118,7 @@ dbt --version
    ```bash
    dbt debug
    ```
-   
+
    Expected output:
    ```
    All checks passed!
@@ -228,7 +228,7 @@ models:
         tests:
           - unique
           - not_null
-      
+
       - name: customer_id
         description: "Foreign key to customers"
         tests:
@@ -236,13 +236,13 @@ models:
           - relationships:
               to: ref('stg_customers')
               field: customer_id
-      
+
       - name: order_status
         description: "Order status code"
         tests:
           - accepted_values:
               values: ['pending', 'processing', 'shipped', 'delivered', 'cancelled']
-      
+
       - name: total_amount
         description: "Total order amount"
         tests:
@@ -298,20 +298,20 @@ models:
   - name: stg_orders
     description: |
       Staging model for orders from PostgreSQL source.
-      
+
       This model:
       - Cleans column names to snake_case
       - Casts data types appropriately
       - Standardizes timestamps to UTC
       - Filters out test/invalid orders
-      
+
       **Grain:** One row per order
       **Update Frequency:** Daily incremental
-    
+
     columns:
       - name: order_id
         description: "Primary key - unique order identifier"
-      
+
       - name: order_date
         description: "Date the order was placed (UTC)"
 ```
@@ -371,13 +371,13 @@ jobs:
 
 - **Staging:** `stg_<source>_<entity>.sql`
   - Example: `stg_postgres_orders.sql`
-  
+
 - **Intermediate:** `int_<domain>_<description>.sql`
   - Example: `int_orders_enriched.sql`
-  
+
 - **Marts - Facts:** `fact_<entity>.sql`
   - Example: `fact_orders.sql`
-  
+
 - **Marts - Dimensions:** `dim_<entity>.sql`
   - Example: `dim_customers.sql`
 
@@ -448,7 +448,7 @@ select * from final
 packages:
   - package: dbt-labs/dbt_utils
     version: 1.1.1
-  
+
   - package: calogica/dbt_expectations
     version: 0.9.0
 ```
@@ -503,8 +503,8 @@ dbt deps
 
 ## 📞 Support
 
-**Documentation:** [dbt Docs](https://docs.getdbt.com/)  
-**Community:** [dbt Slack](https://www.getdbt.com/community/join-the-community/)  
+**Documentation:** [dbt Docs](https://docs.getdbt.com/)
+**Community:** [dbt Slack](https://www.getdbt.com/community/join-the-community/)
 **Project Repo:** [GitHub](https://github.com/DiazSk/Modern-E-commerce-Analytics-Platform)
 
 ---
@@ -515,6 +515,6 @@ This project is created for portfolio and educational purposes.
 
 ---
 
-**Last Updated:** November 2, 2024  
-**dbt Version:** 1.6.14  
+**Last Updated:** November 2, 2024
+**dbt Version:** 1.6.14
 **Target Warehouse:** Snowflake

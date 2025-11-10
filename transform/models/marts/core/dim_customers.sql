@@ -10,7 +10,7 @@
 -- Dimension Model: Customers (SCD Type 2)
 -- ==============================================================================
 -- Purpose: Slowly Changing Dimension Type 2 for customer tracking
--- 
+--
 -- Features:
 --   - Tracks customer segment changes over time
 --   - Maintains historical records with effective dates
@@ -27,7 +27,7 @@
 -- ==============================================================================
 
 with source_customers as (
-    
+
     select * from {{ ref('stg_customers') }}
 
 ),
@@ -37,32 +37,32 @@ customers_with_history as (
     select
         -- Surrogate Key (unique per customer segment change)
         {{ dbt_utils.generate_surrogate_key(['customer_id', 'segment_start_date']) }} as customer_key,
-        
+
         -- Natural Key
         customer_id,
-        
+
         -- Customer Identity
         email,
         first_name,
         last_name,
         full_name,
         phone,
-        
+
         -- Customer Segmentation (SCD Type 2 attribute)
         customer_segment,
-        
+
         -- SCD Type 2 Tracking
         segment_start_date as effective_date,
         coalesce(segment_end_date, '9999-12-31'::date) as expiration_date,
         is_current,
-        
+
         -- Registration Info
         registration_date,
-        
+
         -- Metadata
         created_at,
         updated_at,
-        
+
         -- Data Quality Flags
         is_missing_email,
         is_missing_phone

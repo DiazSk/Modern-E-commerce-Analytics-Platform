@@ -9,7 +9,7 @@
 
 ### Q1: Total Revenue - All Time ✅
 ```sql
-SELECT 
+SELECT
     ROUND(COALESCE(SUM(oi.quantity * oi.unit_price), 0)::numeric, 2) AS total_revenue
 FROM order_items oi;
 ```
@@ -19,7 +19,7 @@ FROM order_items oi;
 
 ### Q2: Total Revenue - Last Month ✅
 ```sql
-SELECT 
+SELECT
     ROUND(COALESCE(SUM(oi.quantity * oi.unit_price), 0)::numeric, 2) AS total_revenue
 FROM order_items oi
 JOIN orders o ON oi.order_id = o.order_id
@@ -31,7 +31,7 @@ WHERE DATE_TRUNC('month', o.order_date) = DATE_TRUNC('month', CURRENT_DATE - INT
 
 ### Q3: Total Orders - All Time ✅
 ```sql
-SELECT 
+SELECT
     COUNT(DISTINCT order_id) AS total_orders
 FROM orders;
 ```
@@ -41,10 +41,10 @@ FROM orders;
 
 ### Q4: Average Order Value ✅
 ```sql
-SELECT 
+SELECT
     ROUND(AVG(order_total)::numeric, 2) AS avg_order_value
 FROM (
-    SELECT 
+    SELECT
         o.order_id,
         SUM(oi.quantity * oi.unit_price) AS order_total
     FROM orders o
@@ -58,7 +58,7 @@ FROM (
 
 ### Q5: Active Customer Count ✅
 ```sql
-SELECT 
+SELECT
     COUNT(DISTINCT customer_id) AS active_customers
 FROM orders
 WHERE order_date >= CURRENT_DATE - INTERVAL '30 days';
@@ -69,7 +69,7 @@ WHERE order_date >= CURRENT_DATE - INTERVAL '30 days';
 
 ### Q6: Revenue Trend - Last 12 Months ✅
 ```sql
-SELECT 
+SELECT
     DATE_TRUNC('month', o.order_date) AS month,
     ROUND(SUM(oi.quantity * oi.unit_price)::numeric, 2) AS revenue
 FROM orders o
@@ -86,7 +86,7 @@ ORDER BY month;
 
 ### Q7: Daily Orders Trend ✅
 ```sql
-SELECT 
+SELECT
     DATE(o.order_date) AS order_date,
     COUNT(DISTINCT o.order_id) AS order_count
 FROM orders o
@@ -100,7 +100,7 @@ ORDER BY order_date;
 
 ### Q8: Top 5 Categories by Revenue ✅
 ```sql
-SELECT 
+SELECT
     p.category,
     ROUND(SUM(oi.quantity * oi.unit_price)::numeric, 2) AS total_revenue
 FROM products p
@@ -118,7 +118,7 @@ LIMIT 5;
 ### Q1: Customer Lifetime Value Distribution ✅ FIXED!
 ```sql
 WITH customer_totals AS (
-    SELECT 
+    SELECT
         c.customer_id,
         COALESCE(SUM(oi.quantity * oi.unit_price), 0) AS total_spent
     FROM customers c
@@ -127,10 +127,10 @@ WITH customer_totals AS (
     GROUP BY c.customer_id
 ),
 bracketed_customers AS (
-    SELECT 
+    SELECT
         customer_id,
         total_spent,
-        CASE 
+        CASE
             WHEN total_spent = 0 THEN 0
             WHEN total_spent < 100 THEN 1
             WHEN total_spent < 500 THEN 2
@@ -138,7 +138,7 @@ bracketed_customers AS (
             WHEN total_spent < 5000 THEN 4
             ELSE 5
         END AS bracket_order,
-        CASE 
+        CASE
             WHEN total_spent = 0 THEN 'No Orders'
             WHEN total_spent < 100 THEN '< $100'
             WHEN total_spent < 500 THEN '$100-$500'
@@ -148,7 +148,7 @@ bracketed_customers AS (
         END AS spending_bracket
     FROM customer_totals
 )
-SELECT 
+SELECT
     spending_bracket,
     COUNT(*) AS customer_count
 FROM bracketed_customers
@@ -162,7 +162,7 @@ ORDER BY bracket_order;
 ### Q2: Customer Segments ✅ FIXED!
 ```sql
 WITH customer_totals AS (
-    SELECT 
+    SELECT
         c.customer_id,
         COALESCE(SUM(oi.quantity * oi.unit_price), 0) AS total_spent
     FROM customers c
@@ -171,16 +171,16 @@ WITH customer_totals AS (
     GROUP BY c.customer_id
 ),
 segmented_customers AS (
-    SELECT 
+    SELECT
         customer_id,
         total_spent,
-        CASE 
+        CASE
             WHEN total_spent >= 5000 THEN 1
             WHEN total_spent >= 1000 THEN 2
             WHEN total_spent >= 500 THEN 3
             ELSE 4
         END AS segment_order,
-        CASE 
+        CASE
             WHEN total_spent >= 5000 THEN 'VIP'
             WHEN total_spent >= 1000 THEN 'High Value'
             WHEN total_spent >= 500 THEN 'Medium Value'
@@ -188,7 +188,7 @@ segmented_customers AS (
         END AS customer_segment
     FROM customer_totals
 )
-SELECT 
+SELECT
     customer_segment,
     COUNT(*) AS customer_count
 FROM segmented_customers
@@ -205,7 +205,7 @@ ORDER BY segment_order;
 
 ### Q3: Top 20 Customers by Revenue ✅
 ```sql
-SELECT 
+SELECT
     c.customer_id,
     c.first_name || ' ' || c.last_name AS customer_name,
     c.email,
@@ -225,7 +225,7 @@ LIMIT 20;
 ### Q4: Customer Order Frequency ✅
 ```sql
 WITH customer_orders AS (
-    SELECT 
+    SELECT
         c.customer_id,
         COUNT(DISTINCT o.order_id) AS order_count
     FROM customers c
@@ -233,10 +233,10 @@ WITH customer_orders AS (
     GROUP BY c.customer_id
 ),
 frequency_groups AS (
-    SELECT 
+    SELECT
         customer_id,
         order_count,
-        CASE 
+        CASE
             WHEN order_count = 0 THEN 0
             WHEN order_count = 1 THEN 1
             WHEN order_count <= 3 THEN 2
@@ -244,7 +244,7 @@ frequency_groups AS (
             WHEN order_count <= 10 THEN 4
             ELSE 5
         END AS frequency_order,
-        CASE 
+        CASE
             WHEN order_count = 0 THEN 'No Orders'
             WHEN order_count = 1 THEN '1 Order'
             WHEN order_count <= 3 THEN '2-3 Orders'
@@ -254,7 +254,7 @@ frequency_groups AS (
         END AS order_frequency
     FROM customer_orders
 )
-SELECT 
+SELECT
     order_frequency,
     COUNT(*) AS customer_count
 FROM frequency_groups
@@ -269,7 +269,7 @@ ORDER BY frequency_order;
 
 ### Q1: Top 10 Products by Revenue ✅
 ```sql
-SELECT 
+SELECT
     p.title AS product_name,
     p.category,
     COUNT(DISTINCT oi.order_id) AS order_count,
@@ -287,7 +287,7 @@ LIMIT 10;
 
 ### Q2: Category Performance ✅
 ```sql
-SELECT 
+SELECT
     p.category,
     COUNT(DISTINCT oi.order_id) AS order_count,
     SUM(oi.quantity) AS units_sold,
@@ -304,7 +304,7 @@ ORDER BY total_revenue DESC;
 
 ### Q3: Product Rating vs Sales ✅ FIXED!
 ```sql
-SELECT 
+SELECT
     p.title AS product_name,
     p.category,
     p.rating_rate AS product_rating,
@@ -329,7 +329,7 @@ LIMIT 30;
 
 ### Q4: Slow-Moving Inventory ✅ FIXED!
 ```sql
-SELECT 
+SELECT
     p.title AS product_name,
     p.category,
     ROUND(p.price::numeric, 2) AS price,
@@ -355,7 +355,7 @@ ORDER BY units_sold ASC, price DESC;
 
 ### Q1: Event Type Distribution ✅
 ```sql
-SELECT 
+SELECT
     event_type,
     COUNT(*) AS event_count,
     ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER(), 2) AS percentage
@@ -369,7 +369,7 @@ ORDER BY event_count DESC;
 
 ### Q2: Device Type Performance ✅
 ```sql
-SELECT 
+SELECT
     device_type,
     COUNT(*) AS total_events,
     COUNT(DISTINCT session_id) AS unique_sessions,
@@ -386,7 +386,7 @@ ORDER BY total_events DESC;
 
 ### Q3: Hourly Activity Pattern ✅
 ```sql
-SELECT 
+SELECT
     EXTRACT(HOUR FROM event_timestamp) AS hour_of_day,
     COUNT(*) AS event_count,
     COUNT(DISTINCT session_id) AS unique_sessions
@@ -400,7 +400,7 @@ ORDER BY hour_of_day;
 
 ### Q4: Daily Event Trends ✅
 ```sql
-SELECT 
+SELECT
     DATE(event_timestamp) AS event_date,
     COUNT(*) AS total_events,
     COUNT(DISTINCT session_id) AS unique_sessions,
@@ -418,13 +418,13 @@ LIMIT 30;
 
 ### Orders by Day of Week ✅
 ```sql
-SELECT 
+SELECT
     TO_CHAR(order_date, 'Day') AS day_name,
     EXTRACT(DOW FROM order_date) AS day_number,
     COUNT(*) AS order_count,
     ROUND(AVG(order_total)::numeric, 2) AS avg_order_value
 FROM (
-    SELECT 
+    SELECT
         o.order_date,
         o.order_id,
         SUM(oi.quantity * oi.unit_price) AS order_total
@@ -440,10 +440,10 @@ ORDER BY day_number;
 
 ### Revenue by Category with Percentage ✅
 ```sql
-SELECT 
+SELECT
     p.category,
     ROUND(SUM(oi.quantity * oi.unit_price)::numeric, 2) AS total_revenue,
-    ROUND(100.0 * SUM(oi.quantity * oi.unit_price) / 
+    ROUND(100.0 * SUM(oi.quantity * oi.unit_price) /
         SUM(SUM(oi.quantity * oi.unit_price)) OVER(), 2) AS revenue_percentage
 FROM products p
 JOIN order_items oi ON p.product_id = oi.product_id
@@ -455,7 +455,7 @@ ORDER BY total_revenue DESC;
 
 ### Monthly Revenue Summary ✅
 ```sql
-SELECT 
+SELECT
     TO_CHAR(DATE_TRUNC('month', o.order_date), 'YYYY-MM') AS month,
     COUNT(DISTINCT o.order_id) AS order_count,
     COUNT(DISTINCT o.customer_id) AS customer_count,

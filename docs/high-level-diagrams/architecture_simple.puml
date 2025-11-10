@@ -58,7 +58,7 @@ terraform -down-> s3 : "Provision"
 
 note bottom
     Flow: Source → Ingest → Store → Transform → Visualize
-    
+
     <i>Current: PostgreSQL | Future: Snowflake-ready</i>
 end note
 

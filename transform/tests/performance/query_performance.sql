@@ -3,7 +3,7 @@
 -- ==============================================================================
 -- Purpose: Benchmark query performance before and after optimization
 -- Database: PostgreSQL / Snowflake / DuckDB compatible
--- 
+--
 -- Usage:
 --   1. Run queries in "BEFORE OPTIMIZATION" section
 --   2. Record execution times and data scanned
@@ -59,7 +59,7 @@ BOTTLENECKS IDENTIFIED:
 */
 
 -- Query: Customer orders in last 30 days
-SELECT 
+SELECT
     c.customer_id,
     c.full_name,
     c.customer_segment,
@@ -69,11 +69,11 @@ SELECT
     MIN(f.order_date) as first_order_date,
     MAX(f.order_date) as last_order_date
 FROM fact_orders f
-INNER JOIN dim_customers c 
+INNER JOIN dim_customers c
     ON f.customer_key = c.customer_key
 WHERE f.order_date >= CURRENT_DATE - INTERVAL '30 days'
     AND c.is_current = true
-GROUP BY 
+GROUP BY
     c.customer_id,
     c.full_name,
     c.customer_segment
@@ -144,7 +144,7 @@ PERFORMANCE METRICS:
 - Memory Spilled: 120 MB
 */
 
-SELECT 
+SELECT
     p.category,
     p.price_tier,
     DATE_TRUNC('month', f.order_date) as order_month,
@@ -155,15 +155,15 @@ SELECT
     SUM(f.discount_amount) as total_discounts,
     ROUND(SUM(f.discount_amount) / NULLIF(SUM(f.gross_amount), 0) * 100, 2) as discount_percentage
 FROM fact_orders f
-INNER JOIN dim_products p 
+INNER JOIN dim_products p
     ON f.product_key = p.product_key
 WHERE f.order_date >= CURRENT_DATE - INTERVAL '6 months'
     AND f.order_status = 'delivered'
-GROUP BY 
+GROUP BY
     p.category,
     p.price_tier,
     DATE_TRUNC('month', f.order_date)
-ORDER BY 
+ORDER BY
     order_month DESC,
     revenue DESC;
 
@@ -203,7 +203,7 @@ PERFORMANCE METRICS:
 */
 
 WITH first_purchase AS (
-    SELECT 
+    SELECT
         customer_key,
         MIN(order_date) as first_order_date,
         DATE_TRUNC('month', MIN(order_date)) as cohort_month
@@ -212,34 +212,34 @@ WITH first_purchase AS (
     GROUP BY customer_key
 ),
 monthly_activity AS (
-    SELECT 
+    SELECT
         f.customer_key,
         DATE_TRUNC('month', f.order_date) as activity_month,
         SUM(f.line_total) as monthly_revenue
     FROM fact_orders f
     WHERE f.order_status = 'delivered'
         AND f.order_date >= CURRENT_DATE - INTERVAL '12 months'
-    GROUP BY 
+    GROUP BY
         f.customer_key,
         DATE_TRUNC('month', f.order_date)
 )
-SELECT 
+SELECT
     fp.cohort_month,
     ma.activity_month,
     COUNT(DISTINCT ma.customer_key) as active_customers,
     SUM(ma.monthly_revenue) as cohort_revenue,
     ROUND(AVG(ma.monthly_revenue), 2) as avg_customer_revenue,
     -- Months since first purchase
-    EXTRACT(YEAR FROM AGE(ma.activity_month, fp.cohort_month)) * 12 + 
+    EXTRACT(YEAR FROM AGE(ma.activity_month, fp.cohort_month)) * 12 +
     EXTRACT(MONTH FROM AGE(ma.activity_month, fp.cohort_month)) as months_since_first_purchase
 FROM first_purchase fp
-INNER JOIN monthly_activity ma 
+INNER JOIN monthly_activity ma
     ON fp.customer_key = ma.customer_key
 WHERE ma.activity_month >= fp.cohort_month
-GROUP BY 
+GROUP BY
     fp.cohort_month,
     ma.activity_month
-ORDER BY 
+ORDER BY
     fp.cohort_month,
     ma.activity_month;
 
@@ -273,7 +273,7 @@ PERFORMANCE METRICS:
 - Data Scanned: 1.2 GB (full table scan)
 */
 
-SELECT 
+SELECT
     COUNT(DISTINCT order_id) as today_orders,
     SUM(line_total) as today_revenue,
     COUNT(DISTINCT customer_key) as unique_customers,
@@ -319,7 +319,7 @@ PERFORMANCE METRICS:
 - Data Scanned: 1.5 GB
 */
 
-SELECT 
+SELECT
     p.product_id,
     p.product_name,
     p.category,
@@ -331,14 +331,14 @@ SELECT
     SUM(f.discount_amount) / NULLIF(SUM(f.gross_amount), 0) * 100 as discount_rate,
     COUNT(DISTINCT f.customer_key) as unique_customers
 FROM fact_orders f
-INNER JOIN dim_products p 
+INNER JOIN dim_products p
     ON f.product_key = p.product_key
-INNER JOIN dim_customers c 
+INNER JOIN dim_customers c
     ON f.customer_key = c.customer_key
 WHERE f.order_date >= CURRENT_DATE - INTERVAL '90 days'
     AND c.is_current = true
     AND f.order_status = 'delivered'
-GROUP BY 
+GROUP BY
     p.product_id,
     p.product_name,
     p.category,
@@ -409,15 +409,15 @@ RECOMMENDED MONITORING
 1. Query Performance Dashboard
    - Track average execution times by query pattern
    - Alert on queries exceeding 5-second threshold
-   
+
 2. Partition Health
    - Monitor partition count and size distribution
    - Alert on partition skew (> 2x size variance)
-   
+
 3. Clustering Depth
    - Track clustering depth (Snowflake)
    - Schedule re-clustering if depth exceeds 4
-   
+
 4. Cost Tracking
    - Monitor daily data scanned trends
    - Compare against baseline to quantify optimization value

@@ -14,88 +14,88 @@ models:
   - name: stg_orders_customers
     description: |
       Cleaned and standardized customer data from PostgreSQL source.
-      
+
       This staging model performs light transformations:
       - Type casting for dates and timestamps
       - Creation of full_name field
       - Addition of data quality flags
       - No business logic or aggregations
-      
+
       **Grain**: One row per customer
       **Source**: postgres_ecommerce.customers
       **Materialization**: View
       **Update Frequency**: Daily
-    
+
     columns:
       - name: customer_id
         description: "Unique customer identifier (Primary Key)"
         tests:
           - unique
           - not_null
-      
+
       - name: email
         description: "Customer email address"
         tests:
           - unique
           - not_null
-      
+
       - name: first_name
         description: "Customer first name"
         tests:
           - not_null
-      
+
       - name: last_name
         description: "Customer last name"
         tests:
           - not_null
-      
+
       - name: full_name
         description: "Concatenated first and last name"
         tests:
           - not_null
-      
+
       - name: phone
         description: "Customer phone number"
-      
+
       - name: address
         description: "Customer street address"
-      
+
       - name: city
         description: "Customer city"
-      
+
       - name: state
         description: "Customer state/province"
-      
+
       - name: country
         description: "Customer country"
-      
+
       - name: postal_code
         description: "Customer postal/ZIP code"
-      
+
       - name: registration_date
         description: "Date customer registered (cast to date type)"
         tests:
           - not_null
-      
+
       - name: customer_segment
         description: "Customer value segment (bronze, silver, gold)"
         tests:
           - not_null
           - accepted_values:
               values: ['bronze', 'silver', 'gold', 'platinum']
-      
+
       - name: created_at
         description: "Record creation timestamp"
-      
+
       - name: updated_at
         description: "Record last update timestamp"
-      
+
       - name: is_missing_email
         description: "Data quality flag: true if email is null or empty"
-      
+
       - name: is_missing_phone
         description: "Data quality flag: true if phone is null or empty"
-      
+
       - name: is_incomplete_address
         description: "Data quality flag: true if address components are missing"
 
@@ -105,26 +105,26 @@ models:
   - name: stg_orders_orders
     description: |
       Cleaned and standardized order header data from PostgreSQL source.
-      
+
       This staging model performs:
       - Type casting for dates, timestamps, and decimals
       - Date component extraction for partitioning
       - Order size categorization
       - Data quality flags
       - No aggregations or joins
-      
+
       **Grain**: One row per order
       **Source**: postgres_ecommerce.orders
       **Materialization**: View
       **Update Frequency**: Daily
-    
+
     columns:
       - name: order_id
         description: "Unique order identifier (Primary Key)"
         tests:
           - unique
           - not_null
-      
+
       - name: customer_id
         description: "Foreign key to stg_orders_customers"
         tests:
@@ -132,54 +132,54 @@ models:
           - relationships:
               to: ref('stg_orders_customers')
               field: customer_id
-      
+
       - name: order_date
         description: "Order timestamp (full datetime)"
         tests:
           - not_null
-      
+
       - name: order_total
         description: "Total order amount (decimal)"
         tests:
           - not_null
-      
+
       - name: payment_method
         description: "Payment method used"
         tests:
           - accepted_values:
               values: ['credit_card', 'debit_card', 'paypal', 'bank_transfer']
-      
+
       - name: shipping_address
         description: "Full shipping address"
-      
+
       - name: order_status
         description: "Current order status"
         tests:
           - not_null
           - accepted_values:
               values: ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'returned']
-      
+
       - name: order_date_only
         description: "Order date (date type, no time component)"
-      
+
       - name: order_year
         description: "Extracted year from order_date"
-      
+
       - name: order_month
         description: "Extracted month from order_date (1-12)"
-      
+
       - name: order_day
         description: "Extracted day from order_date (1-31)"
-      
+
       - name: order_day_of_week
         description: "Day of week (0=Sunday, 6=Saturday)"
-      
+
       - name: order_day_name
         description: "Day name (Monday, Tuesday, etc.)"
-      
+
       - name: order_month_name
         description: "Month name (January, February, etc.)"
-      
+
       - name: order_size_category
         description: |
           Order size classification:
@@ -190,22 +190,22 @@ models:
         tests:
           - accepted_values:
               values: ['small', 'medium', 'large', 'enterprise']
-      
+
       - name: created_at
         description: "Record creation timestamp"
-      
+
       - name: updated_at
         description: "Record last update timestamp"
-      
+
       - name: is_negative_total
         description: "Data quality flag: true if order_total < 0"
-      
+
       - name: is_missing_shipping_address
         description: "Data quality flag: true if shipping address is missing"
-      
+
       - name: is_cancelled
         description: "Flag: true if order status is cancelled"
-      
+
       - name: is_business_day
         description: "Flag: true if order placed on weekday (Mon-Fri)"
 
@@ -215,26 +215,26 @@ models:
   - name: stg_orders_order_items
     description: |
       Cleaned and standardized order line item data from PostgreSQL source.
-      
+
       This staging model performs:
       - Type casting for integers and decimals
       - Calculation of derived metrics (discount %, gross totals)
       - Discount tier classification
       - Comprehensive data quality flags
       - No aggregations
-      
+
       **Grain**: One row per order line item
       **Source**: postgres_ecommerce.order_items
       **Materialization**: View
       **Update Frequency**: Daily
-    
+
     columns:
       - name: order_item_id
         description: "Unique order line item identifier (Primary Key)"
         tests:
           - unique
           - not_null
-      
+
       - name: order_id
         description: "Foreign key to stg_orders_orders"
         tests:
@@ -242,52 +242,52 @@ models:
           - relationships:
               to: ref('stg_orders_orders')
               field: order_id
-      
+
       - name: product_id
         description: "Product identifier (no FK constraint yet)"
-      
+
       - name: quantity
         description: "Quantity ordered"
         tests:
           - not_null
-      
+
       - name: unit_price
         description: "Price per unit"
         tests:
           - not_null
-      
+
       - name: discount_amount
         description: "Discount amount applied"
-      
+
       - name: line_total
         description: "Total for this line (quantity * price - discount)"
         tests:
           - not_null
-      
+
       - name: created_at
         description: "Record creation timestamp"
-      
+
       - name: gross_line_total
         description: "Calculated: quantity * unit_price (before discount)"
-      
+
       - name: discount_percentage
         description: "Calculated: (discount / gross_line_total) * 100"
-      
+
       - name: has_line_total_mismatch
         description: "Data quality flag: true if line_total calculation doesn't match"
-      
+
       - name: is_invalid_quantity
         description: "Data quality flag: true if quantity <= 0"
-      
+
       - name: is_invalid_price
         description: "Data quality flag: true if unit_price <= 0"
-      
+
       - name: is_negative_discount
         description: "Data quality flag: true if discount < 0"
-      
+
       - name: is_excessive_discount
         description: "Data quality flag: true if discount > gross_line_total"
-      
+
       - name: discount_tier
         description: |
           Discount tier classification:
@@ -303,27 +303,27 @@ models:
 # ==============================================================================
 # Testing Strategy
 # ==============================================================================
-# 
+#
 # Tests are organized by priority:
-# 
+#
 # **Critical Tests (not_null, unique)**:
 # - Primary keys must be unique and not null
 # - Foreign keys must not be null
 # - Business-critical fields must not be null
-# 
+#
 # **Referential Integrity (relationships)**:
 # - order_items.order_id → orders.order_id
 # - orders.customer_id → customers.customer_id
-# 
+#
 # **Data Quality (accepted_values)**:
 # - Enum fields have valid values only
 # - Calculated fields have expected categories
-# 
+#
 # **Custom Flags**:
 # - Data quality flags help identify records needing attention
 # - Used in intermediate layer for filtering/handling
-# 
+#
 # Run tests with:
 #   dbt test --select stg_orders_*
-# 
+#
 # ==============================================================================

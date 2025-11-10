@@ -203,7 +203,7 @@ GROUP BY order_status
 ORDER BY count DESC;
 
 -- Sample order with items
-SELECT 
+SELECT
     o.order_id,
     c.first_name || ' ' || c.last_name AS customer,
     o.order_date,
@@ -409,7 +409,7 @@ git add docs/week2/
 git commit -m "feat: implement synthetic data generation
 
 - Generate 1K customers with SCD Type 2 segment tracking
-- Generate 5K orders with realistic temporal patterns  
+- Generate 5K orders with realistic temporal patterns
 - Generate 10K order items with proper foreign keys
 - Generate 50K clickstream events (CSV export)
 - Implement PostgreSQL bulk loading with execute_values
@@ -440,6 +440,6 @@ git push origin feature/data-generation
 
 ---
 
-**Last Updated:** Week 2, Day 1  
-**Status:** Data Generation Complete ✅  
+**Last Updated:** Week 2, Day 1
+**Status:** Data Generation Complete ✅
 **Next:** Airflow DAG Development

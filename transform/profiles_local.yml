@@ -6,7 +6,7 @@
 
 ecommerce_analytics:
   target: dev_local
-  
+
   outputs:
     # =========================================================================
     # LOCAL POSTGRESQL DEVELOPMENT (Week 3)
@@ -22,7 +22,7 @@ ecommerce_analytics:
       threads: 4
       keepalives_idle: 0
       connect_timeout: 10
-      
+
     # =========================================================================
     # SNOWFLAKE DEVELOPMENT (Week 4+)
     # =========================================================================

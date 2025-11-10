@@ -20,10 +20,10 @@
 
 ### Example 1: Building BI Dashboards Under Time Constraint
 
-**Situation:**  
+**Situation:**
 E-commerce analytics platform needed real-time business intelligence for a $692,000 annual revenue business. Leadership was making decisions based on weekly manual Excel reports that took hours to compile. As part of my 6-week portfolio project targeting MAANG data engineering roles, I needed to demonstrate end-to-end BI implementation within a 2-day timeline for Week 6 deliverables.
 
-**Task:**  
+**Task:**
 Design and implement comprehensive BI dashboards covering four stakeholder groups (executives, product team, marketing, and growth team) with professional-quality visualizations, real-time auto-refresh capabilities, and actionable business insights. The dashboards needed to be portfolio-ready and demonstrate production-grade data engineering skills.
 
 **Action:**
@@ -63,10 +63,10 @@ Design and implement comprehensive BI dashboards covering four stakeholder group
 
 ### Example 2: Schema Investigation & Root Cause Debugging
 
-**Situation:**  
+**Situation:**
 While building the Product Performance dashboard's rating analysis visualization in Metabase, queries were failing with "column p.rating does not exist Position: 182" error. Initial project documentation and API structure suggested a single `rating` column should exist. This was blocking implementation of a critical scatter plot showing product rating vs sales correlation.
 
-**Task:**  
+**Task:**
 Debug the root cause of the schema mismatch without applying patches or workarounds, identify the correct database structure, update all affected queries with proper column references, and document findings to prevent future errors. The solution needed to maintain full analytical capability including both rating value and review count dimensions.
 
 **Action:**
@@ -101,10 +101,10 @@ Debug the root cause of the schema mismatch without applying patches or workarou
 
 ### Example 3: Solving Metabase SQL Alias Limitation
 
-**Situation:**  
+**Situation:**
 Customer segmentation queries in Metabase were failing with "column customer_segment does not exist Position: 709" errors when using CASE statements for bucketing customers into VIP, High Value, Medium Value, and Low Value tiers. This was blocking implementation of the Customer Analytics dashboard, a critical component demonstrating customer segmentation skills for MAANG interviews.
 
-**Task:**  
+**Task:**
 Resolve Metabase's SQL parser limitation that doesn't recognize column aliases in GROUP BY and ORDER BY clauses, without simplifying the segmentation logic or losing analytical capability. The solution needed to work within Metabase's constraints while maintaining complex multi-tier customer bucketing with proper ordering.
 
 **Action:**
@@ -137,7 +137,7 @@ Resolve Metabase's SQL parser limitation that doesn't recognize column aliases i
 -- Reusable CTE template for complex bucketing
 WITH base_data AS (SELECT ... FROM ...),
 bucketed_data AS (
-    SELECT 
+    SELECT
         ...,
         CASE ... END AS sort_order,    -- For ordering
         CASE ... END AS display_label  -- For display
@@ -153,10 +153,10 @@ ORDER BY sort_order;
 
 ### Example 4: Data Quality Validation & Timestamp Distribution
 
-**Situation:**  
+**Situation:**
 Hourly activity pattern dashboard was showing all 50,000 events occurring at hour 0 (midnight), making traffic analysis impossible. The line chart displayed a single data point instead of the expected 24-hour distribution. This suggested either a data generation issue or timestamp column problem, blocking funnel analysis deliverables.
 
-**Task:**  
+**Task:**
 Investigate why events lacked hourly distribution, determine if issue was in data generation script or database loading process, implement fix that creates realistic business hour patterns, and validate distribution matches expected e-commerce traffic patterns (daytime peak, nighttime lull).
 
 **Action:**
@@ -168,7 +168,7 @@ Investigate why events lacked hourly distribution, determine if issue was in dat
 - Wrote UPDATE query adding random realistic hours/minutes/seconds to each event:
   ```sql
   UPDATE events
-  SET event_timestamp = event_timestamp + 
+  SET event_timestamp = event_timestamp +
       ((RANDOM() * 23)::INTEGER || ' hours')::INTERVAL +
       ((RANDOM() * 59)::INTEGER || ' minutes')::INTERVAL;
   ```
@@ -194,10 +194,10 @@ Investigate why events lacked hourly distribution, determine if issue was in dat
 
 ### Example 5: Performance Optimization Through Strategic Indexing
 
-**Situation:**  
+**Situation:**
 Initial dashboard queries were executing in 2-5 seconds, creating poor user experience with noticeable lag when switching between dashboards. For a portfolio project targeting MAANG roles, this demonstrated lack of production-grade optimization awareness. The 5,000 order dataset, while small, was exhibiting full table scan behavior suggesting scalability issues.
 
-**Task:**  
+**Task:**
 Diagnose query performance bottlenecks, identify high-value indexing opportunities, implement strategic indexes without over-indexing, and demonstrate quantifiable performance improvements with before/after metrics.
 
 **Action:**
@@ -245,10 +245,10 @@ Diagnose query performance bottlenecks, identify high-value indexing opportuniti
 
 ### Example 6: End-to-End Pipeline Ownership
 
-**Situation:**  
+**Situation:**
 Building a complete modern data platform from scratch as 6-week portfolio project demonstrating MAANG-level data engineering skills. Needed to show ownership across full stack: infrastructure, ingestion, transformation, quality, and visualization - not just isolated components.
 
-**Task:**  
+**Task:**
 Design and implement production-grade e-commerce analytics platform processing realistic data volumes (1,000 customers, 5,000 orders, 50,000 events) with proper architecture, testing, documentation, and business value demonstration.
 
 **Action:**
@@ -348,12 +348,12 @@ The entire platform is production-ready, handling 50,000 events daily with 96% d
 
 ### Q1: "Walk me through your project architecture."
 
-**Answer:**  
-"The platform follows a modern data stack architecture with five layers. 
+**Answer:**
+"The platform follows a modern data stack architecture with five layers.
 
-First, the ingestion layer uses Apache Airflow to extract from three sources: FakeStore REST API for products, PostgreSQL replication for transactional data, and event streams for clickstream data. 
+First, the ingestion layer uses Apache Airflow to extract from three sources: FakeStore REST API for products, PostgreSQL replication for transactional data, and event streams for clickstream data.
 
-Second, raw data lands in AWS S3 partitioned by date for cost-efficient storage. 
+Second, raw data lands in AWS S3 partitioned by date for cost-efficient storage.
 
 Third, dbt transforms raw data into a star schema with fact_orders at the center and dimensions for customers, products, and dates. Customer dimension implements SCD Type 2 to track segment changes over time.
 
@@ -367,7 +367,7 @@ All components run in Docker for local development, with Terraform configuration
 
 ### Q2: "What was the most challenging technical problem you solved?"
 
-**Answer:**  
+**Answer:**
 "The most interesting challenge was Metabase's SQL parser limitation with column aliases. When I tried to create customer segmentation using CASE statements, queries failed with 'column customer_segment does not exist' errors.
 
 I debugged systematically - first testing the SQL directly in PostgreSQL where it worked fine, then researching Metabase's documentation. I found that Metabase treats GROUP BY aliases as literal strings, not column references.
@@ -382,8 +382,8 @@ The solution became a reusable pattern I applied across 6 queries. It also impro
 
 ### Q3: "How did you ensure data quality?"
 
-**Answer:**  
-"I implemented multiple quality layers. 
+**Answer:**
+"I implemented multiple quality layers.
 
 First, Great Expectations validates data at ingestion with 130+ automated tests - schema validation, statistical distribution checks, and referential integrity. We achieved 96.3% pass rate.
 
@@ -401,7 +401,7 @@ For example, when the hourly chart showed only hour 0, I immediately knew timest
 
 ### Q4: "How would you improve this for production?"
 
-**Answer:**  
+**Answer:**
 "Four key areas:
 
 First, security. I'd implement row-level security in PostgreSQL so sales reps only see their customers. Add OAuth/SSO for Metabase, not basic auth. Encrypt sensitive PII fields.
@@ -418,7 +418,7 @@ The current implementation is production-ready for a startup (<10M rows), but th
 
 ### Q5: "Why did you choose these specific technologies?"
 
-**Answer:**  
+**Answer:**
 "I selected tools based on industry adoption and learning value for MAANG roles.
 
 Airflow for orchestration because it's the de facto standard - used at Airbnb, Twitter, and many data teams. Its Python-based DAGs are intuitive and the community is massive.
@@ -437,7 +437,7 @@ The full stack demonstrates breadth while each component demonstrates depth."
 
 ### Q6: "Tell me about your git workflow and project organization."
 
-**Answer:**  
+**Answer:**
 "I followed professional git practices with feature branch workflow. Each week started as a feature branch from develop: `feature/week-1-infrastructure`, `feature/week-2-ingestion`, etc.
 
 Within each week, I made small, incremental commits with semantic messages following conventional commits: `feat:`, `fix:`, `docs:`, `refactor:`. For example: `feat(dbt): add customer dimension with SCD Type 2`.
@@ -456,7 +456,7 @@ This mirrors real production workflows and makes the codebase portfolio-ready. A
 
 **Interviewer might ask:** "Explain your customer SCD Type 2 design."
 
-**Answer:**  
+**Answer:**
 "Customer dimension uses SCD Type 2 to track segment changes over time. Each customer can have multiple rows - one per segment change.
 
 The key fields are:
@@ -481,7 +481,7 @@ The tradeoff is storage (multiple rows per customer) but with only 1,000 custome
 
 **Interviewer might ask:** "Why star schema instead of normalized tables?"
 
-**Answer:**  
+**Answer:**
 "I chose star schema for three reasons:
 
 First, query simplicity. BI queries typically aggregate across dimensions - 'revenue by category by month'. Star schema means simpler JOINs: fact_orders → dim_products → dim_date. Normalized schemas require multiple hops: orders → order_items → products → categories.
@@ -500,7 +500,7 @@ I considered snowflake schema (normalizing dimensions further) but the complexit
 
 **Interviewer might ask:** "How do you handle data freshness efficiently?"
 
-**Answer:**  
+**Answer:**
 "I use incremental loading for fact tables and full refresh for dimensions, with different strategies per source.
 
 For fact_orders, I use dbt's incremental materialization with a filter:
@@ -528,10 +528,10 @@ I also implemented idempotency - all loads can be re-run safely without duplicat
 
 ### Version 1: Impact-Focused (Recommended for ATS)
 ```
-Built production-grade business intelligence platform analyzing $692K e-commerce 
-revenue with 16 professional Metabase visualizations, reducing executive reporting 
-time from hours to real-time and identifying $3,450 in inventory optimization plus 
-$50K+ customer upselling opportunities through advanced SQL analytics (CTEs, window 
+Built production-grade business intelligence platform analyzing $692K e-commerce
+revenue with 16 professional Metabase visualizations, reducing executive reporting
+time from hours to real-time and identifying $3,450 in inventory optimization plus
+$50K+ customer upselling opportunities through advanced SQL analytics (CTEs, window
 functions, 20+ optimized queries)
 ```
 
@@ -539,10 +539,10 @@ functions, 20+ optimized queries)
 
 ### Version 2: Technical-Focused (For Engineering-Heavy Roles)
 ```
-Designed end-to-end data pipeline processing 66K+ records using Apache Airflow 
-orchestration, dbt transformations (star schema, SCD Type 2), and PostgreSQL 
-warehouse; implemented Great Expectations data quality framework achieving 96.3% 
-test pass rate; solved Metabase SQL alias limitations through CTE architectural 
+Designed end-to-end data pipeline processing 66K+ records using Apache Airflow
+orchestration, dbt transformations (star schema, SCD Type 2), and PostgreSQL
+warehouse; implemented Great Expectations data quality framework achieving 96.3%
+test pass rate; solved Metabase SQL alias limitations through CTE architectural
 patterns; optimized query performance 67% through strategic indexing
 ```
 
@@ -550,10 +550,10 @@ patterns; optimized query performance 67% through strategic indexing
 
 ### Version 3: Business-Focused (For Data Analyst Roles)
 ```
-Created 3 executive dashboards for $692K e-commerce business enabling data-driven 
-decisions: identified 75% of 1,000 customers as low-value ($50K+ upselling potential), 
-flagged $3,450 slow-moving inventory for clearance, segmented top 20% of customers 
-driving 60-70% of revenue for retention programs, and analyzed hourly traffic patterns 
+Created 3 executive dashboards for $692K e-commerce business enabling data-driven
+decisions: identified 75% of 1,000 customers as low-value ($50K+ upselling potential),
+flagged $3,450 slow-moving inventory for clearance, segmented top 20% of customers
+driving 60-70% of revenue for retention programs, and analyzed hourly traffic patterns
 (3 PM peak) optimizing promotion timing for 15-20% conversion improvement
 ```
 
@@ -561,11 +561,11 @@ driving 60-70% of revenue for retention programs, and analyzed hourly traffic pa
 
 ### Version 4: Full-Stack (For Senior Roles)
 ```
-Architected modern analytics platform with Docker-orchestrated infrastructure (Airflow, 
-PostgreSQL, Redis, Metabase), AWS S3 data lake, dbt dimensional modeling, Great 
-Expectations quality gates (130+ tests), and production BI dashboards; demonstrated 
-end-to-end ownership from infrastructure through visualization delivering $692K revenue 
-analytics with 67% query performance improvement and $53K+ business opportunity 
+Architected modern analytics platform with Docker-orchestrated infrastructure (Airflow,
+PostgreSQL, Redis, Metabase), AWS S3 data lake, dbt dimensional modeling, Great
+Expectations quality gates (130+ tests), and production BI dashboards; demonstrated
+end-to-end ownership from infrastructure through visualization delivering $692K revenue
+analytics with 67% query performance improvement and $53K+ business opportunity
 identification
 ```
 
@@ -624,8 +624,8 @@ identification
 
 ---
 
-**Use these STAR examples in interviews!**  
-**Practice the demo script until smooth!**  
+**Use these STAR examples in interviews!**
+**Practice the demo script until smooth!**
 **You're ready for MAANG interviews!** 🎯🚀
 
 *Interview Preparation Guide - Week 6 Complete*

@@ -13,44 +13,44 @@ models:
         tests:
           - unique
           - not_null
-      
+
       - name: date_day
         description: "Natural date key"
         tests:
           - unique
           - not_null
-      
+
       - name: year
         description: "Four-digit year (e.g., 2023)"
         tests:
           - not_null
-      
+
       - name: quarter
         description: "Quarter of the year (1-4)"
         tests:
           - not_null
           - accepted_values:
               values: [1, 2, 3, 4]
-      
+
       - name: month
         description: "Month number (1-12)"
         tests:
           - not_null
           - accepted_values:
               values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-      
+
       - name: day
         description: "Day of month (1-31)"
         tests:
           - not_null
-      
+
       - name: is_weekend
         description: "Boolean flag for weekend days (Saturday/Sunday)"
         tests:
           - not_null
           - accepted_values:
               values: [true, false]
-      
+
       - name: is_weekday
         description: "Boolean flag for weekdays (Monday-Friday)"
         tests:
@@ -70,41 +70,41 @@ models:
         tests:
           - unique
           - not_null
-      
+
       - name: customer_id
         description: "Natural key for customer"
         tests:
           - not_null
-      
+
       - name: email
         description: "Customer email address"
         tests:
           - not_null
-      
+
       - name: full_name
         description: "Concatenated first and last name"
         tests:
           - not_null
-      
+
       - name: customer_segment
         description: "Customer segment classification"
         tests:
           - not_null
           - accepted_values:
               values: ['bronze', 'silver', 'gold', 'platinum']
-      
+
       - name: is_current
         description: "Flag indicating if this is the current active record"
         tests:
           - not_null
           - accepted_values:
               values: [true, false]
-      
+
       - name: effective_date
         description: "Date when this version became effective"
         tests:
           - not_null
-      
+
       - name: expiration_date
         description: "Date when this version expired (9999-12-31 for current records)"
         tests:
@@ -122,35 +122,35 @@ models:
         tests:
           - unique
           - not_null
-      
+
       - name: product_id
         description: "Natural key for product"
         tests:
           - unique
           - not_null
-      
+
       - name: product_name
         description: "Product title/name"
         tests:
           - not_null
-      
+
       - name: category
         description: "Product category"
         tests:
           - not_null
-      
+
       - name: price
         description: "Product price"
         tests:
           - not_null
-      
+
       - name: price_tier
         description: "Derived price category (Budget/Mid-Range/Premium)"
         tests:
           - not_null
           - accepted_values:
               values: ['Budget', 'Mid-Range', 'Premium']
-      
+
       - name: rating_category
         description: "Derived rating classification"
         tests:
@@ -171,7 +171,7 @@ models:
         tests:
           - unique
           - not_null
-      
+
       - name: customer_key
         description: "Foreign key to dim_customers"
         tests:
@@ -179,7 +179,7 @@ models:
           - relationships:
               to: ref('dim_customers')
               field: customer_key
-      
+
       - name: product_key
         description: "Foreign key to dim_products"
         tests:
@@ -187,7 +187,7 @@ models:
           - relationships:
               to: ref('dim_products')
               field: product_key
-      
+
       - name: date_key
         description: "Foreign key to dim_date"
         tests:
@@ -195,32 +195,32 @@ models:
           - relationships:
               to: ref('dim_date')
               field: date_key
-      
+
       - name: order_id
         description: "Degenerate dimension - order identifier"
         tests:
           - not_null
-      
+
       - name: order_timestamp
         description: "Timestamp when order was placed"
         tests:
           - not_null
-      
+
       - name: quantity
         description: "Number of items ordered"
         tests:
           - not_null
-      
+
       - name: unit_price
         description: "Price per unit"
         tests:
           - not_null
-      
+
       - name: line_total
         description: "Total for this line item (quantity * unit_price - discount)"
         tests:
           - not_null
-      
+
       - name: order_status
         description: "Current status of the order"
         tests:

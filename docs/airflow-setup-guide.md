@@ -6,10 +6,10 @@ This guide covers setting up Airflow connections and testing the PostgreSQL inge
 
 ## Prerequisites
 
-✅ Docker services running  
-✅ Data loaded in PostgreSQL  
-✅ AWS S3 buckets created  
-✅ .env file configured  
+✅ Docker services running
+✅ Data loaded in PostgreSQL
+✅ AWS S3 buckets created
+✅ .env file configured
 
 ---
 
@@ -317,10 +317,10 @@ docker logs ecommerce-airflow-scheduler | tail -50
 - Use dates from: **2023-10-29** to **2025-10-28**
 - Check order count first:
 ```sql
-SELECT DATE(order_date), COUNT(*) 
-FROM orders 
-GROUP BY DATE(order_date) 
-ORDER BY DATE(order_date) DESC 
+SELECT DATE(order_date), COUNT(*)
+FROM orders
+GROUP BY DATE(order_date)
+ORDER BY DATE(order_date) DESC
 LIMIT 10;
 ```
 
@@ -492,6 +492,6 @@ After PostgreSQL ingestion is working:
 
 ---
 
-**Last Updated:** Week 2, Day 3  
-**Status:** PostgreSQL Ingestion Setup  
+**Last Updated:** Week 2, Day 3
+**Status:** PostgreSQL Ingestion Setup
 **Next:** Test DAG and Verify S3 Upload

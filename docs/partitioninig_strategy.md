@@ -192,12 +192,12 @@ CLUSTER BY (customer_id, is_current)
 Snowflake automatically prunes partitions based on WHERE clauses:
 ```sql
 -- ✅ Good: Uses partition pruning
-SELECT * FROM fact_orders 
+SELECT * FROM fact_orders
 WHERE order_date BETWEEN '2025-01-01' AND '2025-01-31';
 -- Scans only 31 partitions
 
 -- ❌ Bad: No partition pruning
-SELECT * FROM fact_orders 
+SELECT * FROM fact_orders
 WHERE YEAR(order_date) = 2025;
 -- Scans all partitions (function on partition key prevents pruning)
 ```

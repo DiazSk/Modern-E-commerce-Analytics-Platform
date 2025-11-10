@@ -70,7 +70,7 @@ EXPLAIN (ANALYZE, BUFFERS, VERBOSE, COSTS, TIMING)
 SELECT ...;
 
 -- Check table statistics
-SELECT 
+SELECT
     schemaname,
     tablename,
     pg_size_pretty(pg_total_relation_size(schemaname||'.'||tablename)) as size
@@ -94,7 +94,7 @@ SELECT * FROM TABLE(INFORMATION_SCHEMA.QUERY_HISTORY())
 WHERE QUERY_ID = '<query_id>';
 
 -- View detailed metrics
-SELECT 
+SELECT
     QUERY_ID,
     EXECUTION_TIME,
     BYTES_SCANNED,
@@ -173,7 +173,7 @@ CREATE TABLE fact_orders (
 PARTITION BY (DATE_TRUNC('day', order_date));
 
 -- PostgreSQL example with BRIN index
-CREATE INDEX idx_orders_date_brin 
+CREATE INDEX idx_orders_date_brin
 ON fact_orders USING BRIN (order_date);
 ```
 
@@ -185,7 +185,7 @@ ON fact_orders USING BRIN (order_date);
 ### 2. Clustering by customer_key, product_key
 ```sql
 -- Snowflake example
-ALTER TABLE fact_orders 
+ALTER TABLE fact_orders
 CLUSTER BY (customer_key, product_key);
 
 -- PostgreSQL example with CLUSTER command
@@ -273,7 +273,7 @@ IMPROVEMENTS:
 
 3. Check partition distribution:
    ```sql
-   SELECT 
+   SELECT
        DATE_TRUNC('month', order_date) as partition_month,
        COUNT(*) as row_count,
        pg_size_pretty(pg_total_relation_size(tablename)) as size

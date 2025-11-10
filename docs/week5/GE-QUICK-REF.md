@@ -151,6 +151,6 @@ great_expectations checkpoint run orders_checkpoint
 
 ---
 
-**Quick Start**: `python scripts/init_great_expectations.py`  
-**Run Validation**: `great_expectations checkpoint run orders_checkpoint`  
+**Quick Start**: `python scripts/init_great_expectations.py`
+**Run Validation**: `great_expectations checkpoint run orders_checkpoint`
 **View Results**: Data docs at `uncommitted/data_docs/local_site/index.html`

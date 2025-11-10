@@ -3,7 +3,7 @@
 
 **ONE FILE TO RULE THEM ALL!** 🎯
 
-**Status:** ✅ PRODUCTION-READY | **Dashboards:** 3 Complete | **Visualizations:** 16 Professional  
+**Status:** ✅ PRODUCTION-READY | **Dashboards:** 3 Complete | **Visualizations:** 16 Professional
 **Last Updated:** November 6, 2025 | **Achievement:** $692k Revenue Analysis with Portfolio-Quality Dashboards
 
 ---
@@ -265,7 +265,7 @@ You'll see Metabase home page with "E-Commerce Analytics" database available.
 
 **SQL Query:**
 ```sql
-SELECT 
+SELECT
     ROUND(COALESCE(SUM(oi.quantity * oi.unit_price), 0)::numeric, 2) AS total_revenue
 FROM order_items oi;
 ```
@@ -277,7 +277,7 @@ FROM order_items oi;
 4. Click **[▶ Execute]** (or Ctrl+Enter)
 5. Expected result: `692072.36`
 6. Visualization: Change to **"Number"**
-7. Settings (⚙️): 
+7. Settings (⚙️):
    - Style: **Currency**
    - Currency: **USD**
    - Decimal places: **2**
@@ -293,14 +293,14 @@ FROM order_items oi;
 
 **SQL Query:**
 ```sql
-SELECT 
+SELECT
     ROUND(COALESCE(SUM(oi.quantity * oi.unit_price), 0)::numeric, 2) AS total_revenue
 FROM order_items oi
 JOIN orders o ON oi.order_id = o.order_id
 WHERE DATE_TRUNC('month', o.order_date) = DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month');
 ```
 
-**Visualization:** Number → Currency (USD)  
+**Visualization:** Number → Currency (USD)
 **Your Result:** `$30,099.38` ✅
 
 **Comparison:** +17.4% growth month-over-month!
@@ -311,12 +311,12 @@ WHERE DATE_TRUNC('month', o.order_date) = DATE_TRUNC('month', CURRENT_DATE - INT
 
 **SQL Query:**
 ```sql
-SELECT 
+SELECT
     COUNT(DISTINCT order_id) AS total_orders
 FROM orders;
 ```
 
-**Visualization:** Number (no currency format)  
+**Visualization:** Number (no currency format)
 **Your Result:** `5,000` ✅
 
 ---
@@ -325,10 +325,10 @@ FROM orders;
 
 **SQL Query:**
 ```sql
-SELECT 
+SELECT
     ROUND(AVG(order_total)::numeric, 2) AS avg_order_value
 FROM (
-    SELECT 
+    SELECT
         o.order_id,
         SUM(oi.quantity * oi.unit_price) AS order_total
     FROM orders o
@@ -337,7 +337,7 @@ FROM (
 ) AS order_totals;
 ```
 
-**Visualization:** Number → Currency (USD)  
+**Visualization:** Number → Currency (USD)
 **Your Result:** `$138.41` ✅
 
 ---
@@ -346,13 +346,13 @@ FROM (
 
 **SQL Query:**
 ```sql
-SELECT 
+SELECT
     COUNT(DISTINCT customer_id) AS active_customers
 FROM orders
 WHERE order_date >= CURRENT_DATE - INTERVAL '30 days';
 ```
 
-**Visualization:** Number  
+**Visualization:** Number
 **Your Result:** `126` ✅
 
 ---
@@ -361,7 +361,7 @@ WHERE order_date >= CURRENT_DATE - INTERVAL '30 days';
 
 **SQL Query:**
 ```sql
-SELECT 
+SELECT
     DATE_TRUNC('month', o.order_date) AS month,
     ROUND(SUM(oi.quantity * oi.unit_price)::numeric, 2) AS revenue
 FROM orders o
@@ -387,7 +387,7 @@ ORDER BY month;
 
 **SQL Query:**
 ```sql
-SELECT 
+SELECT
     DATE(o.order_date) AS order_date,
     COUNT(DISTINCT o.order_id) AS order_count
 FROM orders o
@@ -396,7 +396,7 @@ GROUP BY DATE(o.order_date)
 ORDER BY order_date;
 ```
 
-**Visualization:** Line Chart  
+**Visualization:** Line Chart
 **Your Result:** Shows daily volatility (3-14 orders per day) ✅
 
 ---
@@ -405,7 +405,7 @@ ORDER BY order_date;
 
 **SQL Query:**
 ```sql
-SELECT 
+SELECT
     p.category,
     ROUND(SUM(oi.quantity * oi.unit_price)::numeric, 2) AS total_revenue
 FROM products p
@@ -415,7 +415,7 @@ ORDER BY total_revenue DESC
 LIMIT 5;
 ```
 
-**Visualization:** Bar Chart (Vertical)  
+**Visualization:** Bar Chart (Vertical)
 **Your Results:**
 1. Women's clothing: ~$24,000
 2. Electronics: ~$22,000
@@ -460,7 +460,7 @@ LIMIT 5;
 
 **SQL Query:**
 ```sql
-SELECT 
+SELECT
     p.title AS product_name,
     p.category,
     COUNT(DISTINCT oi.order_id) AS order_count,
@@ -492,7 +492,7 @@ LIMIT 10;
 
 **SQL Query:**
 ```sql
-SELECT 
+SELECT
     p.category,
     COUNT(DISTINCT oi.order_id) AS order_count,
     SUM(oi.quantity) AS units_sold,
@@ -526,7 +526,7 @@ ORDER BY total_revenue DESC;
 
 **SQL Query:**
 ```sql
-SELECT 
+SELECT
     p.title AS product_name,
     p.category,
     p.rating_rate AS product_rating,
@@ -560,13 +560,13 @@ LIMIT 30;
 
 **SQL Query:**
 ```sql
-SELECT 
+SELECT
     p.title AS product_name,
     p.category,
     ROUND(p.price, 2) AS price,
     p.rating_rate AS rating,
     COALESCE(SUM(oi.quantity), 0) AS units_sold,
-    CASE 
+    CASE
         WHEN COALESCE(SUM(oi.quantity), 0) = 0 THEN 'No Sales'
         WHEN COALESCE(SUM(oi.quantity), 0) < 60 THEN 'Critical'
         WHEN COALESCE(SUM(oi.quantity), 0) < 80 THEN 'Slow'
@@ -625,7 +625,7 @@ LIMIT 15;
 **SQL Query:**
 ```sql
 WITH customer_totals AS (
-    SELECT 
+    SELECT
         c.customer_id,
         COALESCE(SUM(oi.quantity * oi.unit_price), 0) AS total_spent
     FROM customers c
@@ -634,8 +634,8 @@ WITH customer_totals AS (
     GROUP BY c.customer_id
 ),
 bracketed_customers AS (
-    SELECT 
-        CASE 
+    SELECT
+        CASE
             WHEN total_spent = 0 THEN 0
             WHEN total_spent < 100 THEN 1
             WHEN total_spent < 500 THEN 2
@@ -643,7 +643,7 @@ bracketed_customers AS (
             WHEN total_spent < 5000 THEN 4
             ELSE 5
         END AS bracket_order,
-        CASE 
+        CASE
             WHEN total_spent = 0 THEN 'No Orders'
             WHEN total_spent < 100 THEN '< $100'
             WHEN total_spent < 500 THEN '$100-$500'
@@ -653,7 +653,7 @@ bracketed_customers AS (
         END AS spending_bracket
     FROM customer_totals
 )
-SELECT 
+SELECT
     spending_bracket,
     COUNT(*) AS customer_count
 FROM bracketed_customers
@@ -684,7 +684,7 @@ ORDER BY bracket_order;
 **SQL Query:**
 ```sql
 WITH customer_totals AS (
-    SELECT 
+    SELECT
         c.customer_id,
         COALESCE(SUM(oi.quantity * oi.unit_price), 0) AS total_spent
     FROM customers c
@@ -693,14 +693,14 @@ WITH customer_totals AS (
     GROUP BY c.customer_id
 ),
 segmented_customers AS (
-    SELECT 
-        CASE 
+    SELECT
+        CASE
             WHEN total_spent >= 5000 THEN 1
             WHEN total_spent >= 1000 THEN 2
             WHEN total_spent >= 500 THEN 3
             ELSE 4
         END AS segment_order,
-        CASE 
+        CASE
             WHEN total_spent >= 5000 THEN 'VIP'
             WHEN total_spent >= 1000 THEN 'High Value'
             WHEN total_spent >= 500 THEN 'Medium Value'
@@ -708,7 +708,7 @@ segmented_customers AS (
         END AS customer_segment
     FROM customer_totals
 )
-SELECT 
+SELECT
     customer_segment,
     COUNT(*) AS customer_count
 FROM segmented_customers
@@ -741,7 +741,7 @@ ORDER BY segment_order;
 
 **SQL Query:**
 ```sql
-SELECT 
+SELECT
     c.customer_id,
     c.first_name || ' ' || c.last_name AS customer_name,
     c.email,
@@ -779,7 +779,7 @@ LIMIT 20;
 **SQL Query:**
 ```sql
 WITH customer_orders AS (
-    SELECT 
+    SELECT
         c.customer_id,
         COUNT(DISTINCT o.order_id) AS order_count
     FROM customers c
@@ -787,8 +787,8 @@ WITH customer_orders AS (
     GROUP BY c.customer_id
 ),
 frequency_groups AS (
-    SELECT 
-        CASE 
+    SELECT
+        CASE
             WHEN order_count = 0 THEN 0
             WHEN order_count = 1 THEN 1
             WHEN order_count <= 3 THEN 2
@@ -796,7 +796,7 @@ frequency_groups AS (
             WHEN order_count <= 10 THEN 4
             ELSE 5
         END AS frequency_order,
-        CASE 
+        CASE
             WHEN order_count = 0 THEN 'No Orders'
             WHEN order_count = 1 THEN '1 Order'
             WHEN order_count <= 3 THEN '2-3 Orders'
@@ -806,7 +806,7 @@ frequency_groups AS (
         END AS order_frequency
     FROM customer_orders
 )
-SELECT 
+SELECT
     order_frequency,
     COUNT(*) AS customer_count
 FROM frequency_groups
@@ -814,7 +814,7 @@ GROUP BY order_frequency, frequency_order
 ORDER BY frequency_order;
 ```
 
-**Visualization:** Donut Chart (beautiful!)  
+**Visualization:** Donut Chart (beautiful!)
 **Your Distribution:**
 - **1 Order:** 29.6% (one-time buyers - need nurturing!)
 - **2-3 Orders:** 24.7% (growing engagement)
@@ -836,7 +836,7 @@ ORDER BY frequency_order;
 
 **SQL Query:**
 ```sql
-SELECT 
+SELECT
     event_type,
     COUNT(*) AS event_count,
     ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER(), 2) AS percentage
@@ -845,7 +845,7 @@ GROUP BY event_type
 ORDER BY event_count DESC;
 ```
 
-**Visualization:** Pie Chart  
+**Visualization:** Pie Chart
 **Expected Distribution:**
 - Purchase: 33.61% (~16,800 events)
 - Page View: 33.37% (~16,700 events)
@@ -857,7 +857,7 @@ ORDER BY event_count DESC;
 
 **SQL Query:**
 ```sql
-SELECT 
+SELECT
     device_type,
     COUNT(*) AS total_events,
     COUNT(DISTINCT session_id) AS unique_sessions,
@@ -877,7 +877,7 @@ ORDER BY total_events DESC;
 
 **SQL Query:**
 ```sql
-SELECT 
+SELECT
     EXTRACT(HOUR FROM event_timestamp) AS hour_of_day,
     COUNT(*) AS event_count,
     COUNT(DISTINCT session_id) AS unique_sessions
@@ -886,7 +886,7 @@ GROUP BY EXTRACT(HOUR FROM event_timestamp)
 ORDER BY hour_of_day;
 ```
 
-**Visualization:** Line Chart (beautiful smooth curve!)  
+**Visualization:** Line Chart (beautiful smooth curve!)
 **Your Peak Hours:**
 - **Hour 15 (3 PM):** 2,284 events (PEAK!)
 - **Hour 22 (10 PM):** 2,271 events (Evening peak)
@@ -906,7 +906,7 @@ ORDER BY hour_of_day;
 
 **SQL Query:**
 ```sql
-SELECT 
+SELECT
     DATE(event_timestamp) AS event_date,
     COUNT(*) AS total_events,
     COUNT(DISTINCT session_id) AS unique_sessions
@@ -1019,7 +1019,7 @@ All CTE-based queries provided in previous sections!
 
 ### Orders by Day of Week
 ```sql
-SELECT 
+SELECT
     TO_CHAR(order_date, 'Day') AS day_name,
     EXTRACT(DOW FROM order_date) AS day_number,
     COUNT(*) AS order_count,
@@ -1031,7 +1031,7 @@ ORDER BY day_number;
 
 ### Revenue by Payment Method
 ```sql
-SELECT 
+SELECT
     payment_method,
     COUNT(DISTINCT order_id) AS order_count,
     ROUND(SUM(order_total)::numeric, 2) AS total_revenue
@@ -1045,7 +1045,7 @@ ORDER BY total_revenue DESC;
 WITH first_orders AS (
     SELECT customer_id, MIN(order_date) AS first_date FROM orders GROUP BY customer_id
 )
-SELECT 
+SELECT
     CASE WHEN o.order_date = fo.first_date THEN 'New' ELSE 'Returning' END AS customer_type,
     COUNT(DISTINCT o.customer_id) AS customers
 FROM orders o JOIN first_orders fo ON o.customer_id = fo.customer_id
@@ -1137,7 +1137,7 @@ SELECT p.rating_rate AS product_rating, p.rating_count FROM products p;
 
 **Always check schema:**
 ```sql
-SELECT column_name, data_type FROM information_schema.columns 
+SELECT column_name, data_type FROM information_schema.columns
 WHERE table_name = 'products';
 ```
 
@@ -1180,7 +1180,7 @@ SELECT MIN(order_date), MAX(order_date) FROM orders;
 ```sql
 -- Add realistic hour distribution
 UPDATE events
-SET event_timestamp = event_timestamp + 
+SET event_timestamp = event_timestamp +
     ((RANDOM() * 23)::INTEGER || ' hours')::INTERVAL +
     ((RANDOM() * 59)::INTEGER || ' minutes')::INTERVAL +
     ((RANDOM() * 59)::INTEGER || ' seconds')::INTERVAL;
@@ -1188,7 +1188,7 @@ SET event_timestamp = event_timestamp +
 
 **Verify:**
 ```sql
-SELECT EXTRACT(HOUR FROM event_timestamp) AS hour, COUNT(*) 
+SELECT EXTRACT(HOUR FROM event_timestamp) AS hour, COUNT(*)
 FROM events GROUP BY hour ORDER BY hour;
 -- Should show 24 rows (hours 0-23)
 ```
@@ -1308,9 +1308,9 @@ CREATE INDEX IF NOT EXISTS idx_customers_registration ON customers(registration_
 
 **Verify Indexes:**
 ```sql
-SELECT tablename, indexname, indexdef 
-FROM pg_indexes 
-WHERE schemaname = 'public' 
+SELECT tablename, indexname, indexdef
+FROM pg_indexes
+WHERE schemaname = 'public'
 ORDER BY tablename;
 ```
 
@@ -1320,20 +1320,20 @@ ORDER BY tablename;
 
 ### Creating Dashboards
 
-**Step 1:** Click **[+ New]** (top right)  
-**Step 2:** Select **"Dashboard"**  
-**Step 3:** Enter name and description  
+**Step 1:** Click **[+ New]** (top right)
+**Step 2:** Select **"Dashboard"**
+**Step 3:** Enter name and description
 **Step 4:** Click **"Create"**
 
 ### Adding Questions
 
-**Step 1:** On dashboard, click **"+ Add a question"**  
-**Step 2:** Select **"Native query"** (for SQL)  
-**Step 3:** Paste SQL in editor  
-**Step 4:** Click **[▶ Execute]** or press **Ctrl+Enter**  
-**Step 5:** Select visualization type (Number, Line, Bar, etc.)  
-**Step 6:** Configure settings (⚙️)  
-**Step 7:** Click **"Save"**  
+**Step 1:** On dashboard, click **"+ Add a question"**
+**Step 2:** Select **"Native query"** (for SQL)
+**Step 3:** Paste SQL in editor
+**Step 4:** Click **[▶ Execute]** or press **Ctrl+Enter**
+**Step 5:** Select visualization type (Number, Line, Bar, etc.)
+**Step 6:** Configure settings (⚙️)
+**Step 7:** Click **"Save"**
 **Step 8:** **"Yes please!"** to add to dashboard
 
 ### Visualization Types
@@ -1771,7 +1771,7 @@ Modern E-Commerce Analytics Platform
 Business Intelligence Dashboards
 
 📊 3 Production Dashboards
-📈 16 Professional Visualizations  
+📈 16 Professional Visualizations
 💰 $692k Revenue Analyzed
 👥 1,000 Customers Segmented
 ```
@@ -1806,25 +1806,25 @@ Business Intelligence Dashboards
 
 **Option 1: Impact-Focused**
 ```
-Built production-ready BI dashboards analyzing $692k e-commerce revenue with 16 
-professional visualizations using Metabase and PostgreSQL, reducing reporting 
-time from hours to seconds and identifying $3,450 in inventory optimization 
+Built production-ready BI dashboards analyzing $692k e-commerce revenue with 16
+professional visualizations using Metabase and PostgreSQL, reducing reporting
+time from hours to seconds and identifying $3,450 in inventory optimization
 opportunities plus $50k+ in customer upselling potential
 ```
 
 **Option 2: Technical-Focused**
 ```
-Designed and implemented 3 comprehensive BI dashboards with 20+ optimized 
-PostgreSQL queries (CTEs, window functions, complex joins) handling 5,000 orders 
-and 50,000 events; solved Metabase alias limitations with CTE patterns and 
+Designed and implemented 3 comprehensive BI dashboards with 20+ optimized
+PostgreSQL queries (CTEs, window functions, complex joins) handling 5,000 orders
+and 50,000 events; solved Metabase alias limitations with CTE patterns and
 improved query performance 3x through strategic indexing
 ```
 
 **Option 3: Business-Focused**
 ```
-Created executive dashboards for $692k e-commerce business enabling data-driven 
-decisions across product management (slow-inventory alerts), marketing (customer 
-segmentation with 75% upselling opportunity), and operations (hourly traffic 
+Created executive dashboards for $692k e-commerce business enabling data-driven
+decisions across product management (slow-inventory alerts), marketing (customer
+segmentation with 75% upselling opportunity), and operations (hourly traffic
 optimization for 15-20% conversion improvement)
 ```
 
@@ -1841,7 +1841,7 @@ Built 3 production-ready BI dashboards analyzing $692k in revenue:
 → Real-time business metrics reducing reporting from hours to seconds
 → 12-month revenue trend tracking ($24k to $33k growth)
 
-📦 Product Performance Dashboard  
+📦 Product Performance Dashboard
 → Identified $3,450 in slow-moving inventory for clearance
 → Multi-metric category analysis showing women's clothing dominance
 
@@ -1855,7 +1855,7 @@ Built 3 production-ready BI dashboards analyzing $692k in revenue:
 • 3x performance improvement through strategic indexing
 • 100% query success rate, zero errors
 
-This project showcases end-to-end data engineering - from schema design through 
+This project showcases end-to-end data engineering - from schema design through
 production-quality visualizations. Portfolio ready for MAANG interviews! 🚀
 
 #DataEngineering #BusinessIntelligence #Analytics #PostgreSQL #Metabase #Portfolio
@@ -1979,14 +1979,14 @@ Dates: >= CURRENT_DATE - INTERVAL '90 days'
 
 ## 🎊 CONGRATULATIONS - YOU'VE ACHIEVED
 
-**Dashboards:** 3 production-ready  
-**Visualizations:** 16 professional charts  
-**SQL Queries:** 20+ optimized  
-**Revenue Analyzed:** $692,072.36  
-**Inventory Optimized:** $3,450  
-**Upselling Opportunity:** $50,000+  
-**Query Performance:** 3s → <1s  
-**Portfolio Quality:** MAANG-ready  
+**Dashboards:** 3 production-ready
+**Visualizations:** 16 professional charts
+**SQL Queries:** 20+ optimized
+**Revenue Analyzed:** $692,072.36
+**Inventory Optimized:** $3,450
+**Upselling Opportunity:** $50,000+
+**Query Performance:** 3s → <1s
+**Portfolio Quality:** MAANG-ready
 
 **Skills Demonstrated:**
 - ✅ End-to-end data engineering
@@ -2057,12 +2057,12 @@ Dates: >= CURRENT_DATE - INTERVAL '90 days'
 
 ---
 
-**THIS IS THE ONLY FILE YOU NEED!**  
+**THIS IS THE ONLY FILE YOU NEED!**
 **Everything from setup to interview success in ONE comprehensive guide!** 🎯✨
 
 ---
 
-*Last Updated: November 6, 2025*  
-*Week 6 Day 1-2: Business Intelligence & Visualization - COMPLETE!*  
-*Status: Production-Ready | Portfolio-Quality | Interview-Ready*  
+*Last Updated: November 6, 2025*
+*Week 6 Day 1-2: Business Intelligence & Visualization - COMPLETE!*
+*Status: Production-Ready | Portfolio-Quality | Interview-Ready*
 *Achievement: $692k Revenue Analysis | 16 Professional Visualizations | MAANG-Ready!* 🚀

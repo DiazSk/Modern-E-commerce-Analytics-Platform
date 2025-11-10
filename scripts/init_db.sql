@@ -23,17 +23,17 @@ CREATE TABLE customers (
     last_name VARCHAR(100) NOT NULL,
     phone VARCHAR(20),
     registration_date DATE NOT NULL DEFAULT CURRENT_DATE,
-    
+
     -- For SCD Type 2 tracking
     customer_segment VARCHAR(20) NOT NULL DEFAULT 'bronze',
     segment_start_date DATE NOT NULL DEFAULT CURRENT_DATE,
     segment_end_date DATE,
     is_current BOOLEAN DEFAULT TRUE,
-    
+
     -- Audit fields
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    
+
     -- Constraints
     CONSTRAINT chk_segment CHECK (customer_segment IN ('bronze', 'silver', 'gold', 'platinum')),
     CONSTRAINT chk_dates CHECK (segment_end_date IS NULL OR segment_end_date > segment_start_date)
@@ -56,11 +56,11 @@ CREATE TABLE orders (
     payment_method VARCHAR(50) NOT NULL,
     shipping_address TEXT,
     order_status VARCHAR(20) NOT NULL DEFAULT 'pending',
-    
+
     -- Audit fields
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    
+
     -- Constraints
     CONSTRAINT chk_order_total CHECK (order_total >= 0),
     CONSTRAINT chk_payment_method CHECK (payment_method IN ('credit_card', 'debit_card', 'paypal', 'apple_pay', 'google_pay')),
@@ -83,13 +83,13 @@ CREATE TABLE order_items (
     quantity INTEGER NOT NULL,
     unit_price DECIMAL(10,2) NOT NULL,
     discount_amount DECIMAL(10,2) DEFAULT 0.00,
-    
+
     -- Calculated field (for convenience)
     line_total DECIMAL(10,2) GENERATED ALWAYS AS (quantity * unit_price - discount_amount) STORED,
-    
+
     -- Audit fields
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    
+
     -- Constraints
     CONSTRAINT chk_quantity CHECK (quantity > 0),
     CONSTRAINT chk_unit_price CHECK (unit_price >= 0),
@@ -132,7 +132,7 @@ VALUES (1, 99.99, 'credit_card', 'completed', '123 Test St, Test City, TC 12345'
 
 -- Insert order items
 INSERT INTO order_items (order_id, product_id, quantity, unit_price, discount_amount)
-VALUES 
+VALUES
     (1, 1, 2, 39.99, 5.00),
     (1, 2, 1, 24.99, 0.00);
 
@@ -151,7 +151,7 @@ SELECT COUNT(*) AS order_item_count FROM order_items;
 
 -- View: Complete order details with customer info
 CREATE OR REPLACE VIEW vw_order_details AS
-SELECT 
+SELECT
     o.order_id,
     o.order_date,
     c.customer_id,
@@ -173,7 +173,7 @@ INNER JOIN order_items oi ON o.order_id = oi.order_id;
 
 -- View: Customer summary statistics
 CREATE OR REPLACE VIEW vw_customer_summary AS
-SELECT 
+SELECT
     c.customer_id,
     c.email,
     c.first_name || ' ' || c.last_name AS customer_name,
@@ -197,7 +197,7 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO ecommerce_user;
 -- ==========================================
 -- COMPLETION MESSAGE
 -- ==========================================
-SELECT 
+SELECT
     'PostgreSQL source database setup complete!' AS message,
     'Tables created: customers, orders, order_items' AS tables,
     'Views created: vw_order_details, vw_customer_summary' AS views,

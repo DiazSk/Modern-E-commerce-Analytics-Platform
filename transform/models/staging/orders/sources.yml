@@ -13,26 +13,26 @@ sources:
     description: |
       E-commerce operational database (PostgreSQL).
       Contains transactional data for customers, orders, and order line items.
-      
+
       **Database**: ecommerce
       **Schema**: public
       **Update Frequency**: Daily incremental loads via Airflow DAGs
       **Data Retention**: Full historical data
-    
+
     # Database configuration
     database: ecommerce
     schema: public
-    
+
     # Source freshness checks (optional for local dev)
     # freshness:
     #   warn_after: {count: 24, period: hour}
     #   error_after: {count: 48, period: hour}
-    
+
     # Metadata
     meta:
       owner: "data_engineering"
       contact: "zaid07sk@gmail.com"
-    
+
     # Tables in this source
     tables:
       # =======================================================================
@@ -41,12 +41,12 @@ sources:
       - name: customers
         description: |
           Customer master table containing customer profile information.
-          
+
           **Grain**: One row per customer
           **Primary Key**: customer_id
           **Update Pattern**: Slowly changing dimension (customer segment can change)
           **Row Count**: ~1,000 customers
-        
+
         # Columns documentation
         columns:
           - name: customer_id
@@ -54,46 +54,46 @@ sources:
             tests:
               - unique
               - not_null
-          
+
           - name: email
             description: "Customer email address (unique)"
             tests:
               - unique
               - not_null
-          
+
           - name: first_name
             description: "Customer first name"
             tests:
               - not_null
-          
+
           - name: last_name
             description: "Customer last name"
             tests:
               - not_null
-          
+
           - name: phone
             description: "Customer phone number"
-          
+
           - name: address
             description: "Customer street address"
-          
+
           - name: city
             description: "Customer city"
-          
+
           - name: state
             description: "Customer state/province"
-          
+
           - name: country
             description: "Customer country"
-          
+
           - name: postal_code
             description: "Customer postal/ZIP code"
-          
+
           - name: registration_date
             description: "Date customer registered on platform"
             tests:
               - not_null
-          
+
           - name: customer_segment
             description: |
               Customer value segment (bronze/silver/gold).
@@ -102,33 +102,33 @@ sources:
               - not_null
               - accepted_values:
                   values: ['bronze', 'silver', 'gold']
-          
+
           - name: created_at
             description: "Record creation timestamp"
-          
+
           - name: updated_at
             description: "Record last update timestamp"
-      
+
       # =======================================================================
       # ORDERS TABLE
       # =======================================================================
       - name: orders
         description: |
           Order header table containing order-level information.
-          
+
           **Grain**: One row per order
           **Primary Key**: order_id
           **Foreign Keys**: customer_id -> customers.customer_id
           **Update Pattern**: Incremental daily loads
           **Row Count**: ~5,000 orders
-        
+
         columns:
           - name: order_id
             description: "Unique order identifier (Primary Key)"
             tests:
               - unique
               - not_null
-          
+
           - name: customer_id
             description: "Foreign key to customers table"
             tests:
@@ -136,27 +136,27 @@ sources:
               - relationships:
                   to: source('postgres_ecommerce', 'customers')
                   field: customer_id
-          
+
           - name: order_date
             description: "Date and time the order was placed"
             tests:
               - not_null
-          
+
           - name: order_total
             description: "Total order amount (sum of all line items)"
             tests:
               - not_null
-          
+
           - name: payment_method
             description: |
               Payment method used (credit_card/debit_card/paypal/bank_transfer)
             tests:
               - accepted_values:
                   values: ['credit_card', 'debit_card', 'paypal', 'bank_transfer']
-          
+
           - name: shipping_address
             description: "Full shipping address for the order"
-          
+
           - name: order_status
             description: |
               Current order status
@@ -165,33 +165,33 @@ sources:
               - not_null
               - accepted_values:
                   values: ['pending', 'processing', 'shipped', 'delivered', 'cancelled']
-          
+
           - name: created_at
             description: "Record creation timestamp"
-          
+
           - name: updated_at
             description: "Record last update timestamp"
-      
+
       # =======================================================================
       # ORDER ITEMS TABLE
       # =======================================================================
       - name: order_items
         description: |
           Order line items table containing product-level details for each order.
-          
+
           **Grain**: One row per order line item (order_id + product_id combination)
           **Primary Key**: order_item_id
           **Foreign Keys**: order_id -> orders.order_id
           **Update Pattern**: Immutable (no updates after creation)
           **Row Count**: ~9,994 line items
-        
+
         columns:
           - name: order_item_id
             description: "Unique order line item identifier (Primary Key)"
             tests:
               - unique
               - not_null
-          
+
           - name: order_id
             description: "Foreign key to orders table"
             tests:
@@ -199,64 +199,64 @@ sources:
               - relationships:
                   to: source('postgres_ecommerce', 'orders')
                   field: order_id
-          
+
           - name: product_id
             description: |
-              Product identifier. 
+              Product identifier.
               Note: No products dimension table yet (will come from API data)
-          
+
           - name: product_name
             description: "Product name (denormalized for convenience)"
-          
+
           - name: category
             description: "Product category"
-          
+
           - name: quantity
             description: "Quantity ordered"
             tests:
               - not_null
-          
+
           - name: unit_price
             description: "Price per unit"
             tests:
               - not_null
-          
+
           - name: discount
             description: "Discount amount applied to line item"
-          
+
           - name: line_total
             description: "Total for this line item (quantity * unit_price - discount)"
             tests:
               - not_null
-          
+
           - name: created_at
             description: "Record creation timestamp"
 
 # ==============================================================================
 # Source Testing Strategy
 # ==============================================================================
-# 
+#
 # We're using dbt's built-in tests to validate source data quality:
-# 
+#
 # 1. **Uniqueness**: Primary keys are unique
 # 2. **Not Null**: Critical fields have no null values
 # 3. **Relationships**: Foreign keys reference valid parent records
 # 4. **Accepted Values**: Enum fields have valid values only
-# 
+#
 # Run source tests with:
 #   dbt test --select source:postgres_ecommerce
-# 
+#
 # ==============================================================================
 # Source Freshness Checks (Future Enhancement)
 # ==============================================================================
-# 
+#
 # Once Airflow DAGs are running on schedule, enable freshness checks:
-# 
+#
 # freshness:
 #   warn_after: {count: 24, period: hour}
 #   error_after: {count: 48, period: hour}
-# 
+#
 # Run freshness checks with:
 #   dbt source freshness
-# 
+#
 # ==============================================================================

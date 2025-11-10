@@ -2,8 +2,8 @@
 
 > **Purpose:** Document key architectural and technology choices for the Modern E-Commerce Analytics Platform
 
-**Last Updated:** January 20, 2025  
-**Version:** 1.0  
+**Last Updated:** January 20, 2025
+**Version:** 1.0
 **Author:** [Your Name]
 
 ---
@@ -544,7 +544,7 @@ Year 2 (cumulative):
 
 **Configuration:**
 ```sql
-ALTER WAREHOUSE COMPUTE_WH SET 
+ALTER WAREHOUSE COMPUTE_WH SET
   AUTO_SUSPEND = 300  -- 5 minutes
   AUTO_RESUME = TRUE;
 ```
@@ -576,7 +576,7 @@ Savings: $1,400/month (97% vs. always-on!)
 
 ### FC-001: Real-time Streaming Layer
 
-**Current:** Batch processing (daily)  
+**Current:** Batch processing (daily)
 **Future:** Add streaming for real-time dashboards
 
 **Trigger:** Business requirement for real-time metrics
@@ -586,14 +586,14 @@ Savings: $1,400/month (97% vs. always-on!)
 - Spark Structured Streaming
 - Real-time dashboard (Grafana)
 
-**Estimated effort:** 2-3 weeks  
+**Estimated effort:** 2-3 weeks
 **Estimated cost increase:** +$50-100/month
 
 ---
 
 ### FC-002: Machine Learning Integration
 
-**Current:** Analytics only  
+**Current:** Analytics only
 **Future:** ML feature store + prediction models
 
 **Use cases:**
@@ -606,14 +606,14 @@ Savings: $1,400/month (97% vs. always-on!)
 - Feature store (Feast or Tecton)
 - Model serving (SageMaker or Databricks)
 
-**Estimated effort:** 4-6 weeks  
+**Estimated effort:** 4-6 weeks
 **Estimated cost increase:** +$30-80/month
 
 ---
 
 ### FC-003: Data Catalog
 
-**Current:** dbt docs for data lineage  
+**Current:** dbt docs for data lineage
 **Future:** Enterprise data catalog
 
 **Trigger:** Growing team size (5+ data engineers)
@@ -643,6 +643,6 @@ Savings: $1,400/month (97% vs. always-on!)
 
 ---
 
-**Document Owner:** [Your Name]  
-**Review Cycle:** Weekly during project, quarterly after launch  
+**Document Owner:** [Your Name]
+**Review Cycle:** Weekly during project, quarterly after launch
 **Next Review:** 2025-01-27

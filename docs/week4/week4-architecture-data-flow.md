@@ -162,7 +162,7 @@
 -- dim_customers
 {{ dbt_utils.generate_surrogate_key(['customer_id', 'segment_start_date']) }}
 
--- dim_products  
+-- dim_products
 {{ dbt_utils.generate_surrogate_key(['product_id']) }}
 
 -- fact_orders
@@ -239,7 +239,7 @@ sources
 
 **Phase 1**: Staging (Views - Always Run First)
 1. stg_customers
-2. stg_orders  
+2. stg_orders
 3. stg_order_items
 4. stg_products
 5. stg_events

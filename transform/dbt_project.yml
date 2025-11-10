@@ -51,7 +51,7 @@ require-dbt-version: [">=1.6.0", "<2.0.0"]
 
 models:
   ecommerce_analytics:
-    
+
     # =========================================================================
     # STAGING LAYER - Raw data cleaning and standardization
     # =========================================================================
@@ -64,19 +64,19 @@ models:
       +schema: staging
       +docs:
         node_color: "#8BC34A"  # Light green in dbt docs
-      
+
       # Orders staging models
       orders:
         +tags: ["staging", "orders", "daily"]
-      
-      # Products staging models  
+
+      # Products staging models
       products:
         +tags: ["staging", "products", "daily"]
-      
+
       # Events staging models
       events:
         +tags: ["staging", "events", "hourly"]
-    
+
     # =========================================================================
     # INTERMEDIATE LAYER - Business logic transformations
     # =========================================================================
@@ -90,7 +90,7 @@ models:
       +docs:
         node_color: "#FF9800"  # Orange in dbt docs
       +tags: ["intermediate"]
-    
+
     # =========================================================================
     # MARTS LAYER - Analytics-ready dimensional models
     # =========================================================================
@@ -101,31 +101,31 @@ models:
       +materialized: table
       +docs:
         node_color: "#2196F3"  # Blue in dbt docs
-      
+
       # Core fact tables
       core:
         +schema: marts_core
         +tags: ["marts", "fact", "core"]
-        
+
         # Fact tables use incremental materialization for efficiency
         fact_orders:
           +materialized: incremental
           +unique_key: order_item_key
           +on_schema_change: "fail"
-      
+
       # Dimension tables
       dimensions:
         +schema: marts_dimensions
         +tags: ["marts", "dimension"]
-        
+
         # Slowly Changing Dimensions (Type 2)
         dim_customers:
           +materialized: table
           +tags: ["scd_type_2"]
-        
+
         dim_products:
           +materialized: table
-        
+
         dim_date:
           +materialized: table
           +tags: ["date_dimension"]
@@ -161,11 +161,11 @@ snapshots:
 tests:
   ecommerce_analytics:
     +severity: error  # Default: tests fail builds
-    
+
     # Staging tests can be warnings (data quality issues logged but not failing)
     staging:
       +severity: warn
-    
+
     # Marts tests should fail (critical for BI accuracy)
     marts:
       +severity: error
@@ -177,11 +177,11 @@ vars:
   # Project-level variables
   project_start_date: '2023-01-01'
   project_timezone: 'UTC'
-  
+
   # Data quality thresholds
   max_null_percentage: 0.05  # 5% nulls allowed
   min_row_count: 1000
-  
+
   # Business logic constants
   discount_threshold: 0.20  # 20% discount flag
   high_value_order: 100.00  # $100+ orders

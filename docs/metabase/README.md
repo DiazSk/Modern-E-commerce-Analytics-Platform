@@ -23,7 +23,7 @@
 
 ## 🚀 Quick Access
 
-**Metabase URL:** http://localhost:3001  
+**Metabase URL:** http://localhost:3001
 **Start:** `docker-compose up -d`
 
 ---
@@ -33,10 +33,10 @@
 ### Dashboards Complete: 3 of 4
 1. **Executive Dashboard** (8 metrics) ✅
    - $692k revenue, $138 AOV, 126 active customers
-   
+
 2. **Product Performance** (4 metrics) ✅
    - Samsung monitor $6k, WD Drive critical (52 units)
-   
+
 3. **Customer Analytics** (4 metrics) ✅
    - VIP 2.1%, High 18.5%, **Low 75.4% = upselling opportunity!**
 
@@ -62,8 +62,8 @@ docs/metabase/
 
 ## 💾 Next Steps
 
-**Day 3-4:** Update main README, architecture diagram  
-**Day 5:** Final validation, portfolio review  
+**Day 3-4:** Update main README, architecture diagram
+**Day 5:** Final validation, portfolio review
 **Day 6-7:** Optional AWS deployment
 
 ---

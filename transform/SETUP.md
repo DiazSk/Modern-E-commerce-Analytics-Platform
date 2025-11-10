@@ -4,7 +4,7 @@
 
 This directory contains the dbt (data build tool) transformation layer for the Modern E-Commerce Analytics Platform. dbt transforms raw ingested data into analytics-ready dimensional models.
 
-**Status:** Week 3 - dbt Setup Complete ✅  
+**Status:** Week 3 - dbt Setup Complete ✅
 **Last Updated:** November 2, 2025
 
 ---
@@ -505,7 +505,7 @@ Advanced statistical and data quality tests.
 
 ---
 
-**Project:** Modern E-Commerce Analytics Platform  
-**Developer:** Zaid Shaikh  
-**Last Updated:** November 2, 2025  
+**Project:** Modern E-Commerce Analytics Platform
+**Developer:** Zaid Shaikh
+**Last Updated:** November 2, 2025
 **Status:** Week 3 - dbt Setup Complete ✅

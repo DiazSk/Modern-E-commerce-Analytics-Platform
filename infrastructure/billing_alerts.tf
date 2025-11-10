@@ -146,10 +146,10 @@ output "billing_alert_email" {
 # ==========================================
 # Cost Estimation
 # ==========================================
-# CloudWatch Alarms: 
+# CloudWatch Alarms:
 # - First 10 alarms: FREE
 # - After 10 alarms: $0.10/alarm/month
-# 
+#
 # SNS:
 # - First 1,000 email notifications: FREE
 # - After 1,000: $2 per 100,000 emails

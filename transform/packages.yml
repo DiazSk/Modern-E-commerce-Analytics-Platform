@@ -15,7 +15,7 @@ packages:
     # - star()
     # - pivot()
     # - date_spine()
-  
+
   # Codegen - Generate boilerplate dbt code
   # Documentation: https://hub.getdbt.com/dbt-labs/codegen/latest/
   - package: dbt-labs/codegen
@@ -23,7 +23,7 @@ packages:
     # Useful for:
     # - Generating YAML files from existing tables
     # - Creating base models from sources
-  
+
   # Expectations - Data quality tests
   # Documentation: https://hub.getdbt.com/calogica/dbt_expectations/latest/
   - package: calogica/dbt_expectations
@@ -36,33 +36,33 @@ packages:
 # ==============================================================================
 # Installation Instructions
 # ==============================================================================
-# 
+#
 # 1. Install packages:
 #    dbt deps
-# 
+#
 # 2. Packages will be installed to: dbt_packages/ directory
-# 
+#
 # 3. Reference macros in models:
 #    {{ dbt_utils.surrogate_key(['order_id', 'product_id']) }}
-# 
+#
 # ==============================================================================
 # Common dbt_utils Macros
 # ==============================================================================
-# 
+#
 # Generate surrogate keys:
 # {{ dbt_utils.generate_surrogate_key(['column1', 'column2']) }}
-# 
+#
 # Union multiple tables:
 # {{ dbt_utils.union_relations([ref('table1'), ref('table2')]) }}
-# 
+#
 # Select all columns except some:
 # {{ dbt_utils.star(from=ref('my_model'), except=['column_to_exclude']) }}
-# 
+#
 # Create date spine:
 # {{ dbt_utils.date_spine(
 #     datepart="day",
 #     start_date="cast('2020-01-01' as date)",
 #     end_date="cast('2024-12-31' as date)"
 # ) }}
-# 
+#
 # ==============================================================================

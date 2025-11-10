@@ -2,8 +2,8 @@
 
 **Modern E-Commerce Analytics Platform - Interview Demo Preparation**
 
-**Purpose:** Practice and polish your 5-minute project demo  
-**Target:** MAANG technical interviews and portfolio presentations  
+**Purpose:** Practice and polish your 5-minute project demo
+**Target:** MAANG technical interviews and portfolio presentations
 **Goal:** Confident, smooth delivery with quantifiable impact
 
 ---
@@ -31,7 +31,7 @@
 ### [0:00-0:30] Opening Hook (30 seconds)
 
 **Script:**
-"I built a modern e-commerce analytics platform as a 6-week portfolio project demonstrating production-grade data engineering skills. 
+"I built a modern e-commerce analytics platform as a 6-week portfolio project demonstrating production-grade data engineering skills.
 
 The platform processes $692,000 in annual revenue across 5,000 orders from 1,000 customers, with real-time clickstream tracking of 50,000 events.
 
@@ -123,7 +123,7 @@ On the flip side, our VIP and high-value segments - just 2.1% and 18.5% respecti
 The top customer, Kelsey Walton, has spent over $14,000 across 28 orders. The top 20 customers represent 15-20% of total revenue. They need dedicated account management, exclusive early access to new products, and VIP perks.
 
 [POINT TO ORDER FREQUENCY CHART]
-This frequency distribution shows 19.7% of customers are super loyal with 10 or more orders - nearly 200 customers. These are our retention sweet spot. 
+This frequency distribution shows 19.7% of customers are super loyal with 10 or more orders - nearly 200 customers. These are our retention sweet spot.
 
 Interestingly, 29.6% made only one purchase, and 22.3% registered but never ordered. Each group needs different engagement strategies: loyalty programs for the frequent buyers, re-activation campaigns with comeback discounts for dormant users, and post-purchase nurturing for one-time buyers to get that critical second order."
 
@@ -194,10 +194,10 @@ The platform is production-ready, fully tested with 96% data quality success rat
 
 **Visual Flow:**
 ```
-Opening → Executive (metrics) → Executive (trend) → 
-Executive (categories) → Product (top 10) → Product (multi-metric) → 
-Product (scatter) → Product (slow inventory - PAUSE HERE!) → 
-Customer (segments - PAUSE HERE!) → Customer (top table) → 
+Opening → Executive (metrics) → Executive (trend) →
+Executive (categories) → Product (top 10) → Product (multi-metric) →
+Product (scatter) → Product (slow inventory - PAUSE HERE!) →
+Customer (segments - PAUSE HERE!) → Customer (top table) →
 Customer (frequency) → Close strong!
 ```
 
@@ -705,13 +705,13 @@ Test yourself on all key numbers until instant recall!
 
 ## 🚀 YOU'RE READY WHEN...
 
-✅ You can deliver the full demo smoothly without script  
-✅ Numbers come automatically, no hesitation  
-✅ Dashboard pointing is second nature  
-✅ You finish at 5 minutes consistently  
-✅ Interruption questions don't derail you  
-✅ You're excited (not anxious) to show this  
-✅ Mock interviewer gives positive feedback  
+✅ You can deliver the full demo smoothly without script
+✅ Numbers come automatically, no hesitation
+✅ Dashboard pointing is second nature
+✅ You finish at 5 minutes consistently
+✅ Interruption questions don't derail you
+✅ You're excited (not anxious) to show this
+✅ Mock interviewer gives positive feedback
 
 **If all checked: YOU'RE INTERVIEW-READY!** 🎯🎊
 
@@ -719,5 +719,5 @@ Test yourself on all key numbers until instant recall!
 
 **Practice makes perfect! Do 5+ run-throughs before real interviews!** 💪
 
-*Demo Practice Guide - Week 6 Day 5*  
+*Demo Practice Guide - Week 6 Day 5*
 *Status: Comprehensive | Target: MAANG Interviews | Outcome: Confidence!* 🚀

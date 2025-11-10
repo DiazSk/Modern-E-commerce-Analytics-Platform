@@ -17,7 +17,7 @@ x-airflow-common:
   &airflow-common
   # Use official Airflow image (Production-ready)
   image: apache/airflow:2.7.3-python3.11
-  
+
   # Environment variables for Airflow
   environment:
     &airflow-common-env
@@ -30,15 +30,15 @@ x-airflow-common:
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
     AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session'
     AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: 'true'
-    
+
     # AWS Configuration (from .env file)
     AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
     AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
     AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-us-east-1}
-    
+
     # Python path
     PYTHONPATH: /opt/airflow
-    
+
   # Volume mounts
   volumes:
     - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
@@ -47,10 +47,10 @@ x-airflow-common:
     - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
     - ${AIRFLOW_PROJ_DIR:-.}/scripts:/opt/airflow/scripts
     - ${AIRFLOW_PROJ_DIR:-.}/data:/opt/airflow/data
-  
+
   # User configuration
   user: "${AIRFLOW_UID:-50000}:0"
-  
+
   # Dependencies
   depends_on:
     &airflow-common-depends-on
@@ -63,7 +63,7 @@ x-airflow-common:
 # SERVICES
 # ============================================
 services:
-  
+
   # ==========================================
   # PostgreSQL - Source Database (E-commerce data)
   # ==========================================

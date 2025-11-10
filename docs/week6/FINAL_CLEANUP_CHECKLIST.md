@@ -18,22 +18,22 @@
 
 ### High Priority (Duplicates)
 
-- [ ] `docs/week6/PERFORMANCE_BENCHMARKING.md`  
-  **Reason:** Duplicate of PERFORMANCE_BENCHMARKING_REPORT.md  
+- [ ] `docs/week6/PERFORMANCE_BENCHMARKING.md`
+  **Reason:** Duplicate of PERFORMANCE_BENCHMARKING_REPORT.md
   **Keep:** PERFORMANCE_BENCHMARKING_REPORT.md (more comprehensive)
 
-- [ ] `docs/dimensional_model.md`  
-  **Reason:** Duplicate of week4-dimensional-modeling-summary.md  
+- [ ] `docs/dimensional_model.md`
+  **Reason:** Duplicate of week4-dimensional-modeling-summary.md
   **Keep:** week4-dimensional-modeling-summary.md (detailed)
 
-- [ ] `docs/week5/SCRIPTS-CLEANUP.md`  
-  **Reason:** Duplicate of CLEANUP-GUIDE.md  
+- [ ] `docs/week5/SCRIPTS-CLEANUP.md`
+  **Reason:** Duplicate of CLEANUP-GUIDE.md
   **Keep:** CLEANUP-GUIDE.md (comprehensive)
 
 ### Check These (Potential Redundancy)
 
-- [ ] `docs/metabase/METABASE_TESTED_QUERIES.md`  
-  **Action:** Verify if content is in METABASE_ULTIMATE_GUIDE.md  
+- [ ] `docs/metabase/METABASE_TESTED_QUERIES.md`
+  **Action:** Verify if content is in METABASE_ULTIMATE_GUIDE.md
   **Decision:** If yes → Delete | If no → Keep as query backup
 
 ---

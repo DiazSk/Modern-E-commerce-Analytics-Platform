@@ -250,6 +250,6 @@ After API ingestion is working:
 
 ---
 
-**Last Updated:** Week 2, Day 5  
-**Status:** API Ingestion DAG Created  
+**Last Updated:** Week 2, Day 5
+**Status:** API Ingestion DAG Created
 **Next:** Test and Verify

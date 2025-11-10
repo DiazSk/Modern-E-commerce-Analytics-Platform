@@ -135,21 +135,21 @@ Copy-paste these into PostgreSQL/pgAdmin to validate results:
 ### 1. Check dim_date
 ```sql
 -- Verify date range
-SELECT 
+SELECT
     min(date_day) as first_date,
     max(date_day) as last_date,
     count(*) as total_rows
 FROM analytics.dim_date;
 
 -- Check weekend flag
-SELECT 
+SELECT
     is_weekend,
     count(*) as row_count
 FROM analytics.dim_date
 GROUP BY is_weekend;
 
 -- Sample records
-SELECT * FROM analytics.dim_date 
+SELECT * FROM analytics.dim_date
 WHERE year = 2024 AND month = 11
 ORDER BY date_day
 LIMIT 10;
@@ -158,7 +158,7 @@ LIMIT 10;
 ### 2. Check dim_customers (SCD Type 2)
 ```sql
 -- Verify SCD Type 2 structure
-SELECT 
+SELECT
     customer_id,
     customer_segment,
     effective_date,
@@ -167,7 +167,7 @@ SELECT
     count(*) over (partition by customer_id) as version_count
 FROM analytics.dim_customers
 WHERE customer_id IN (
-    SELECT customer_id 
+    SELECT customer_id
     FROM analytics.dim_customers
     GROUP BY customer_id
     HAVING count(*) > 1  -- Customers with history
@@ -176,7 +176,7 @@ ORDER BY customer_id, effective_date
 LIMIT 20;
 
 -- Check current vs historical records
-SELECT 
+SELECT
     is_current,
     count(*) as record_count
 FROM analytics.dim_customers
@@ -186,7 +186,7 @@ GROUP BY is_current;
 ### 3. Check dim_products
 ```sql
 -- Basic statistics
-SELECT 
+SELECT
     count(*) as total_products,
     count(distinct category) as categories,
     round(avg(price)::numeric, 2) as avg_price,
@@ -195,7 +195,7 @@ SELECT
 FROM analytics.dim_products;
 
 -- Price tier distribution
-SELECT 
+SELECT
     price_tier,
     count(*) as product_count
 FROM analytics.dim_products
@@ -206,7 +206,7 @@ ORDER BY price_tier;
 ### 4. Check fact_orders
 ```sql
 -- Basic statistics
-SELECT 
+SELECT
     count(*) as total_rows,
     count(distinct order_id) as unique_orders,
     count(distinct customer_key) as unique_customers,
@@ -215,7 +215,7 @@ SELECT
 FROM analytics.fact_orders;
 
 -- Orders by status
-SELECT 
+SELECT
     order_status,
     count(*) as order_count,
     sum(line_total) as revenue
@@ -224,7 +224,7 @@ GROUP BY order_status
 ORDER BY revenue DESC;
 
 -- Top 10 customers by revenue
-SELECT 
+SELECT
     c.full_name,
     c.customer_segment,
     count(distinct f.order_id) as total_orders,
@@ -240,7 +240,7 @@ LIMIT 10;
 ### 5. Check customer_lifetime_value
 ```sql
 -- Value segment distribution
-SELECT 
+SELECT
     value_segment,
     count(*) as customer_count,
     sum(total_revenue) as segment_revenue,
@@ -251,7 +251,7 @@ GROUP BY value_segment
 ORDER BY segment_revenue DESC;
 
 -- Recency segment distribution
-SELECT 
+SELECT
     recency_segment,
     count(*) as customer_count
 FROM analytics.customer_lifetime_value
@@ -259,7 +259,7 @@ GROUP BY recency_segment
 ORDER BY customer_count DESC;
 
 -- Top VIP customers
-SELECT 
+SELECT
     full_name,
     email,
     customer_segment,
@@ -277,7 +277,7 @@ LIMIT 10;
 ### 6. Star Schema Join Test
 ```sql
 -- Full star schema query
-SELECT 
+SELECT
     d.year,
     d.month_name,
     c.customer_segment,
@@ -290,7 +290,7 @@ FROM analytics.fact_orders f
 JOIN analytics.dim_date d ON f.date_key = d.date_key
 JOIN analytics.dim_customers c ON f.customer_key = c.customer_key
 JOIN analytics.dim_products p ON f.product_key = p.product_key
-WHERE d.year = 2024 
+WHERE d.year = 2024
   AND c.is_current = true
 GROUP BY d.year, d.month_name, c.customer_segment, p.category
 ORDER BY total_revenue DESC
