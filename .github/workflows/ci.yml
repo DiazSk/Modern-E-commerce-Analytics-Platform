@@ -92,7 +92,3 @@ jobs:
       - name: dbt Parse
         run: dbt parse
         working-directory: ./transform
-
-      - name: dbt Compile
-        run: dbt compile
-        working-directory: ./transform
