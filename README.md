@@ -2,30 +2,22 @@
 
 A production-grade data engineering platform demonstrating end-to-end analytics capabilities from infrastructure provisioning to business intelligence delivery.
 
-![Architecture Overview](docs/high-level-diagrams/high_level_architecture_diagram.png)
-
-**Status:** 🎉 **ALL 6 WEEKS COMPLETE** ✅
-**Timeline:** 6 weeks | **Progress:** 💯 100% Complete
-**Final Release:** `v1.0.0`
+**Status:** ✅ Production-Ready | **Version:** v1.0.0
 
 ---
 
 ## 🎯 Project Overview
 
-### Business Problem
+Build a scalable analytics infrastructure that processes e-commerce transactions, product catalogs, and user behavior data to enable business intelligence and data-driven decision making.
 
-Build a scalable analytics infrastructure that processes e-commerce transactions, product catalogs, and user behavior data to enable business intelligence and machine learning feature engineering.
+### Key Capabilities
 
-### Technical Objective
-
-Demonstrate production-ready data engineering capabilities suitable for FAANG-level technical interviews, including:
-- Infrastructure as Code (Terraform)
-- Workflow orchestration (Apache Airflow)
-- Dimensional modeling (star schema with SCD Type 2)
-- Modern data transformation (dbt)
-- Data warehousing with cloud-ready architecture
-- Data quality frameworks (Great Expectations)
-- Business intelligence dashboards (Metabase)
+- **Infrastructure as Code** - Terraform-managed AWS resources
+- **Workflow Orchestration** - Apache Airflow for data pipelines
+- **Dimensional Modeling** - Star schema with SCD Type 2
+- **Data Transformation** - dbt with 96.3% test pass rate
+- **Data Quality** - Great Expectations framework
+- **Business Intelligence** - Production dashboards with $53K+ opportunity identification
 
 ---
 
@@ -37,9 +29,7 @@ Demonstrate production-ready data engineering capabilities suitable for FAANG-le
 Data Sources → Ingestion Layer → Raw Storage → Transformation Layer → Data Warehouse → BI Dashboards
 ```
 
-![Detailed Architecture](docs/detailed/architecture_diagram.png)
-
-[→ View Architecture Documentation](docs/partitioninig_strategy.md)
+[→ View Architecture Documentation](docs/architecture/)
 
 ### Technology Stack
 
@@ -62,8 +52,6 @@ Data Sources → Ingestion Layer → Raw Storage → Transformation Layer → Da
 
 ### Star Schema Design
 
-![Star Schema](docs/detailed/dimensional_model_diagram.png)
-
 **Grain:** One row per order line item (order_id + product_id combination)
 
 **Fact Table:**
@@ -74,7 +62,7 @@ Data Sources → Ingestion Layer → Raw Storage → Transformation Layer → Da
 - `dim_products` - Product catalog with ratings
 - `dim_date` - Date dimension with fiscal calendar support
 
-[→ View Complete Data Model](docs/dimensional_model.md)
+[→ View Architecture Diagrams](docs/architecture/diagrams/) | [→ Complete Data Dictionary](docs/data-catalog/data-dictionary.md)
 
 ---
 
@@ -147,63 +135,31 @@ Data Sources → Ingestion Layer → Raw Storage → Transformation Layer → Da
 
 ---
 
-## 📅 Complete Project Timeline
+## 🎓 Technical Capabilities
 
-### Week 1: Environment Setup & Architecture ✅ COMPLETE
-**Deliverables:**
-- AWS infrastructure (24 resources via Terraform: 3 S3 buckets + configs + monitoring)
-- Architecture diagrams (detailed + simplified PlantUML)
-- Dimensional model design (star schema with SCD Type 2)
-- Local development environment (11 Docker services)
-- Cost monitoring infrastructure with CloudWatch alarms
+### Infrastructure & DevOps
+- **24 AWS resources** deployed via Terraform
+- **11 Docker services** orchestrated locally
+- CloudWatch monitoring with real-time billing alerts
+- S3 lifecycle policies (56% cost reduction)
 
-**Milestone Tag:** `v0.1-week1-complete`
+### Data Engineering
+- **3 production Airflow DAGs** for multi-source ingestion
+- **13 dbt models** with 146 automated tests (96.3% pass rate)
+- Star schema dimensional model with SCD Type 2
+- Incremental processing with date partitioning
 
-### Week 2: Data Generation & Ingestion ✅ COMPLETE
-**Deliverables:**
-- Synthetic data generation (1,000 customers, 5,000 orders, 9,994 order items, 50,000 events)
-- 3 production Airflow DAGs (API, PostgreSQL, event ingestion)
-- S3 data lake with date partitioning (Hive-style: year/month/day)
-- Incremental loading implementation
+### Data Quality & Performance
+- Great Expectations framework (15 validations)
+- Query optimization: 67% faster, 85% cost reduction
+- Automated testing in CI/CD pipeline
+- Data lineage tracking
 
-**Milestone Tag:** `v0.2-week2-complete`
-
-### Week 3: dbt Transformation Layer ✅ COMPLETE
-**Deliverables:**
-- dbt project configuration (warehouse-agnostic)
-- 8 staging models (orders, products, events domains)
-- Source configurations and schema documentation
-- Data quality tests (146 dbt tests implemented across all models)
-
-**Milestone Tag:** `v0.3-week3-complete`
-
-### Week 4: Dimensional Modeling ✅ COMPLETE
-**Deliverables:**
-- Star schema implementation (1 fact + 3 dimensions)
-- SCD Type 2 for customer dimension
-- Date dimension with fiscal calendar
-- Analytics marts (customer lifetime value)
-
-**Milestone Tag:** `v0.4-week4-complete`
-
-### Week 5: Data Quality & Optimization ✅ COMPLETE
-**Deliverables:**
-- Great Expectations framework integration (15 expectations on fact_orders)
-- 146 dbt data quality tests across staging and marts models
-- 96.3% test pass rate achieved
-- Query performance optimization (67% improvement)
-
-**Milestone Tag:** `v0.5-week5-complete`
-
-### Week 6: Business Intelligence & Documentation ✅ COMPLETE
-**Deliverables:**
-- 4 production Metabase dashboards (Executive, Customer Analytics, Product Performance, Funnel Analysis)
-- 19 professional visualizations
-- Complete dimensional model documentation (see docs/dimensional_model.md)
-- Interview preparation materials (6 STAR examples)
-- Portfolio-ready documentation
-
-**Final Release:** `v1.0.0`
+### Business Intelligence
+- **4 production dashboards** (Executive, Customer, Product, Funnel)
+- **$53,450** in identified business opportunities
+- 100x faster reporting (hours → seconds)
+- Self-service analytics enabled
 
 ---
 
@@ -250,52 +206,39 @@ docker-compose up -d
 # Open http://localhost:3001
 ```
 
-[→ Complete Setup Guides](docs/)
+[→ Complete Setup Guide](docs/development/)
 
 ---
 
-## 📚 Project Structure
+## 📚 Documentation
+
+**[Full Documentation](docs/)** organized by function:
+
+- **[Architecture](docs/architecture/)** - System design, diagrams, ADRs
+- **[Operations](docs/operations/)** - Runbooks, data ingestion guides
+- **[Data Catalog](docs/data-catalog/)** - Schema docs, data dictionary
+- **[Analytics](docs/analytics/)** - BI dashboards, query library
+- **[Development](docs/development/)** - Setup, testing, workflows
+
+## � Project Structure
 
 ```
 Modern-E-commerce-Analytics-Platform/
-├── infrastructure/          # Terraform IaC
-│   ├── main.tf
-│   ├── variables.tf
-│   ├── outputs.tf
-│   ├── backend.tf
-│   └── billing_alerts.tf
+├── infrastructure/          # Terraform IaC (24 AWS resources)
 ├── dags/                    # Airflow DAGs (3 production pipelines)
-├── transform/               # dbt project (warehouse-agnostic)
-│   ├── models/
-│   │   ├── staging/         # 8 source data cleaning models
-│   │   │    └── events/     # Event data staging
-│   │   │    └── orders/     # Orders data staging
-│   │   │    └── products/   # Products data staging
-│   │   ├── marts/           # Business logic layer
-│   │       └── analytics/   # Analytics models (e.g., customer LTV)
-│   │       └── core/        # Dimensional models (fact + dims)
-│   ├── profiles.yml         # Database connections
-│   └── dbt_project.yml
-├── gx/                      # Great Expectations (15 tests)
-├── scripts/                 # Data generation utilities
-├── docs/                    # Complete documentation
-│   ├── screenshots/         # Weekly progress screenshots
-│   ├── detailed/            # Architecture diagrams (PlantUML)
-│   ├── high-level-diagrams/ # Simplified diagrams
-│   ├── metabase/            # BI dashboard guides
-│   ├── week4/               # Week 4 documentation
-│   ├── week5/               # Week 5 documentation
-│   ├── technical_decision.md
-│   ├── dimensional_model.md
-│   ├── partitioninig_strategy.md
-│   ├── airflow-setup-guide.md
-│   ├── api-ingestion-guide.md
-│   ├── postgres-ingestion-guide.md
-│   └── clickstream-ingestion-guide.md
-├── tests/                   # Data quality test suites
+├── transform/               # dbt project (13 models, 146 tests)
+│   ├── models/staging/      # Data cleaning layer
+│   └── models/marts/        # Business logic & dimensional model
+├── scripts/                 # Data generation & utility scripts
+├── docs/                    # Production documentation
+│   ├── architecture/        # System design & ADRs
+│   ├── operations/          # Runbooks & procedures
+│   ├── data-catalog/        # Schema & lineage
+│   ├── analytics/           # BI dashboards
+│   └── development/         # Developer guides
+├── gx/                      # Great Expectations (15 validations)
 ├── docker-compose.yml       # 11-service orchestration
-├── requirements.txt         # 89 Python dependencies
-└── README.md                # This file
+└── requirements.txt         # Python dependencies
 ```
 ---
 
