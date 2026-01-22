@@ -43,9 +43,9 @@ def main():
             cur.execute("SELECT COUNT(*) FROM public.fact_orders")
             count = cur.fetchone()[0]
 
-            print(f"✅ fact_orders EXISTS!")
+            print("✅ fact_orders EXISTS!")
             print(f"✅ Row count: {count:,}")
-            print(f"\n✅ Ready for Great Expectations!")
+            print("\n✅ Ready for Great Expectations!")
 
         else:
             print("❌ fact_orders DOES NOT EXIST")
