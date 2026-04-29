@@ -140,8 +140,3 @@ JOIN dim_products dp ON foi.product_key = dp.product_key
 - [Architecture Overview](../architecture/)
 - [dbt Models](../../transform/models/)
 - [BI Dashboards](../analytics/metabase/)
-
----
-
-**Last Updated:** November 10, 2025
-**Auto-Generated:** Consider using `dbt docs generate` for automated lineage

@@ -13,9 +13,6 @@ Prerequisites:
 
 Usage:
     python scripts/load_data.py
-
-Author: Zaid Shaikh
-Date: October 2025
 ============================================
 """
 

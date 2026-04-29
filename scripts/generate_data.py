@@ -16,9 +16,6 @@ Usage:
 Output:
     - CSV files in data/ directory
     - Direct PostgreSQL insertion (optional)
-
-Author: Zaid Shaikh
-Date: October 2025
 ============================================
 """
 

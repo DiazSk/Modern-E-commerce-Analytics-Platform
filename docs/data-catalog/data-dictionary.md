@@ -2,10 +2,6 @@
 
 **Modern E-Commerce Analytics Platform**
 
-**Version:** 1.0.0
-**Last Updated:** November 10, 2025
-**Author:** Zaid Shaikh
-
 ---
 
 ## 🎯 Overview
@@ -743,14 +739,6 @@ WHERE order_date >= '2025-10-28 00:00:00'
 - **Schema Questions:** Refer to dbt documentation in `transform/models/`
 - **Performance Issues:** Review query execution plans with `EXPLAIN ANALYZE`
 
-### Changelog
-
-| Date | Version | Changes |
-|------|---------|---------|
-| 2025-11-10 | 1.0.0 | Initial comprehensive data dictionary |
-| 2025-10-28 | 0.2.0 | Added fact_events table |
-| 2025-10-20 | 0.1.0 | Core tables documented |
-
 ---
 
 ## 🎯 Quick Reference Card
@@ -777,7 +765,3 @@ JOIN dim_products p ON oi.product_key = p.product_key
 - **Average Order Value:** `AVG(order_total)` = $138.41
 - **Customer Count:** `COUNT(DISTINCT customer_id WHERE is_current = TRUE)` = 1,000
 - **Product Count:** `COUNT(DISTINCT product_id)` = 200
-
----
-
-**End of Data Dictionary** | Version 1.0.0 | Modern E-Commerce Analytics Platform

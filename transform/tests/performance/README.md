@@ -308,9 +308,3 @@ For questions or issues with performance testing:
 2. Verify optimization configs are applied
 3. Review database-specific optimization documentation
 4. Document unexpected behavior for troubleshooting
-
----
-
-**Last Updated**: [Date]
-**Database Platform**: [PostgreSQL/Snowflake/DuckDB]
-**dbt Version**: [Version]

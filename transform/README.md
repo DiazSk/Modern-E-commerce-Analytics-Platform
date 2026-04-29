@@ -471,50 +471,8 @@ dbt deps
 
 ---
 
-## 📈 Project Roadmap
-
-### Week 3: dbt Setup & Staging (Current)
-- [x] Project initialization
-- [x] Folder structure
-- [x] Configuration files
-- [ ] Source definitions
-- [ ] Staging models
-- [ ] Data quality tests
-
-### Week 4: Dimensional Modeling
-- [ ] Fact tables (fact_orders)
-- [ ] Dimension tables (dim_customers, dim_products, dim_date)
-- [ ] SCD Type 2 implementation
-- [ ] Incremental loading strategy
-
-### Week 5: Optimization & Testing
-- [ ] Query performance tuning
-- [ ] Great Expectations integration
-- [ ] CI/CD pipeline setup
-- [ ] Documentation enhancement
-
-### Week 6: Analytics & Dashboards
-- [ ] Metabase integration
-- [ ] Business dashboards
-- [ ] KPI definitions
-- [ ] Final documentation
-
----
-
 ## 📞 Support
 
 **Documentation:** [dbt Docs](https://docs.getdbt.com/)
 **Community:** [dbt Slack](https://www.getdbt.com/community/join-the-community/)
 **Project Repo:** [GitHub](https://github.com/DiazSk/Modern-E-commerce-Analytics-Platform)
-
----
-
-## 📄 License
-
-This project is created for portfolio and educational purposes.
-
----
-
-**Last Updated:** November 2, 2024
-**dbt Version:** 1.6.14
-**Target Warehouse:** Snowflake

@@ -15,7 +15,7 @@ Business intelligence dashboards providing executive insights, customer analytic
 ### [Metabase](./metabase/)
 Complete BI dashboard documentation:
 - **[README.md](./metabase/README.md)** - Setup and overview
-- **[METABASE_ULTIMATE_GUIDE.md](./metabase/METABASE_ULTIMATE_GUIDE.md)** - Comprehensive guide with complete SQL library
+- **[metabase-operations-runbook.md](./metabase/metabase-operations-runbook.md)** - Operational reference with complete SQL library
 
 ### [Dashboard Screenshots](./dashboard-screenshots/)
 Production dashboard visualizations (22 screenshots):
@@ -113,7 +113,7 @@ http://localhost:3001
    - Password: From `.env`
 
 ### Import Dashboards
-See [Metabase Ultimate Guide](./metabase/METABASE_ULTIMATE_GUIDE.md) for complete setup instructions.
+See the [Metabase Operations Runbook](./metabase/metabase-operations-runbook.md) for the complete setup procedure.
 
 ---
 
@@ -187,11 +187,5 @@ See [Metabase Ultimate Guide](./metabase/METABASE_ULTIMATE_GUIDE.md) for complet
 ## 🔗 Related Documentation
 
 - [Data Dictionary](../data-catalog/data-dictionary.md)
-- [SQL Query Library](./metabase/METABASE_ULTIMATE_GUIDE.md#complete-sql-library)
+- [SQL Query Library](./metabase/metabase-operations-runbook.md#6-sql-query-reference)
 - [Architecture Overview](../architecture/)
-
----
-
-**Last Updated:** November 10, 2025
-**Dashboard Count:** 4 production dashboards
-**Query Library:** 20+ tested SQL queries

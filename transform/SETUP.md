@@ -4,9 +4,6 @@
 
 This directory contains the dbt (data build tool) transformation layer for the Modern E-Commerce Analytics Platform. dbt transforms raw ingested data into analytics-ready dimensional models.
 
-**Status:** Week 3 - dbt Setup Complete ✅
-**Last Updated:** November 2, 2025
-
 ---
 
 ## 📁 Project Structure
@@ -94,7 +91,7 @@ transform/
 
 ---
 
-### **Step 1: Configure Snowflake Connection**
+### **Step 1: Configure Snowflake Connection (If creating a cloud data warehouse)**
 
 #### **Create Snowflake Resources**
 
@@ -491,21 +488,3 @@ Advanced statistical and data quality tests.
 **Snowflake + dbt:**
 - [Snowflake dbt Profile](https://docs.getdbt.com/reference/warehouse-profiles/snowflake-profile)
 - [Snowflake Optimization](https://docs.snowflake.com/en/user-guide/tables-clustering-micropartitions.html)
-
----
-
-## 🎓 Next Steps (Week 3+)
-
-- [ ] **Week 3 Feature 2:** Configure source connections to S3
-- [ ] **Week 3 Feature 3:** Build staging models (orders, products, events)
-- [ ] **Week 3 Feature 4:** Implement data quality tests
-- [ ] **Week 4:** Intermediate transformations and dimensional modeling
-- [ ] **Week 5:** Query optimization and performance tuning
-- [ ] **Week 6:** BI dashboards and final documentation
-
----
-
-**Project:** Modern E-Commerce Analytics Platform
-**Developer:** Zaid Shaikh
-**Last Updated:** November 2, 2025
-**Status:** Week 3 - dbt Setup Complete ✅

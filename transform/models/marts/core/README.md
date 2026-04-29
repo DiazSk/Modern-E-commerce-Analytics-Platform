@@ -111,18 +111,3 @@ This directory contains the core dimensional models following Kimball's dimensio
 3. **Partitioning** (Future Enhancement):
    - Could partition fact_orders by date_key
    - Would improve query performance for date-filtered queries
-
-## Resume Bullet Points
-
-- Designed and implemented star schema dimensional model with 3 dimension tables and 1 fact table processing 66,000+ order records
-- Built SCD Type 2 dimension to track customer segment changes over time using dbt transformations
-- Implemented incremental loading strategy for fact table reducing processing time by 80%
-- Created comprehensive date dimension with 1,460 days (4 years) of calendar attributes for time-series analysis
-- Established referential integrity with 30+ data quality tests ensuring data consistency across dimensional model
-
-## Next Steps
-
-After Week 4 completion:
-- Week 5: Advanced analytics and aggregations
-- Week 6: Data visualization and dashboards
-- Create more analytics models in marts/analytics directory

@@ -1,265 +1,237 @@
-# Development Documentation
+# Development Runbook
 
-**Developer Setup and Testing Guides**
+Local-development reference for engineers working on the Modern E-Commerce Analytics Platform.
 
 ---
 
-## 🛠️ Developer Environment Setup
-
-### Prerequisites
+## Prerequisites
 
 **Required:**
+
 - Docker Desktop
 - Git
-- Python 3.9+
-- AWS Account (free tier)
+- Python 3.11
+- AWS account with S3 access (free tier sufficient)
 
-**Optional:**
-- VS Code with extensions
-- DBeaver or pgAdmin
-- Postman (for API testing)
+**Recommended:**
+
+- VS Code with Python and dbt extensions
+- DBeaver or pgAdmin (external client)
 
 ---
 
-## 🚀 Quick Start
+## Local Setup
 
-### 1. Clone Repository
+### 1. Clone the repository
+
 ```bash
 git clone https://github.com/DiazSk/Modern-E-commerce-Analytics-Platform.git
 cd Modern-E-commerce-Analytics-Platform
 ```
 
-### 2. Setup Environment Variables
-```bash
-# Copy example env file
-cp .env.example .env
+### 2. Configure environment variables
 
-# Edit with your credentials
-# Required: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
+```bash
+cp .env.example .env
+# Populate AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, and AIRFLOW__CORE__FERNET_KEY
 ```
 
-### 3. Start Services
+### 3. Start services
+
 ```bash
 docker-compose up -d
 ```
 
-### 4. Initialize Database
-```bash
-# Generate sample data
-python scripts/generate_data.py
+This brings up the consolidated `postgres` container (hosting the `ecommerce`, `airflow_db`, and `metabase_db` logical databases), Redis, the Airflow components, and Metabase.
 
-# Load into PostgreSQL
-python scripts/load_data.py
+### 4. Initialise source data
+
+```bash
+python scripts/generate_data.py    # synthetic CSV generation
+python scripts/load_data.py        # bulk load into PostgreSQL
 ```
 
-### 5. Run dbt Models
+### 5. Run the dbt project
+
 ```bash
 cd transform
-dbt run
-dbt test
+dbt deps
+dbt build
 ```
 
-### 6. Access UIs
-- **Airflow:** http://localhost:8081 (admin/admin123)
-- **Metabase:** http://localhost:3001
-- **pgAdmin:** http://localhost:5050
+### 6. Service endpoints
+
+| Service | URL | Default credentials |
+|---------|-----|---------------------|
+| Airflow | `http://localhost:8081` | `admin` / `admin123` |
+| Metabase | `http://localhost:3001` | Set at first login |
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 Modern-E-commerce-Analytics-Platform/
-├── dags/                    # Airflow DAG definitions
+├── dags/                       # Airflow DAG definitions
 │   ├── ingest_api_products.py
 │   ├── ingest_postgres_orders.py
 │   └── ingest_clickstream_events.py
-├── transform/               # dbt project
+├── transform/                  # dbt project
 │   ├── models/
-│   │   ├── staging/         # Cleaning & standardization
-│   │   └── marts/           # Business logic
+│   │   ├── staging/            # cleaning + standardisation
+│   │   └── marts/              # business logic
 │   ├── tests/
 │   └── dbt_project.yml
-├── scripts/                 # Utility scripts
-│   ├── generate_data.py     # Create sample data
-│   ├── load_data.py         # Load to PostgreSQL
+├── scripts/                    # utility scripts
+│   ├── generate_data.py        # synthetic data generation
+│   ├── load_data.py            # bulk PostgreSQL load
+│   ├── init_db.sql             # source-DB schema bootstrap
+│   ├── init_multi_db.sh        # multi-DB bootstrap for the consolidated postgres container
 │   └── setup_airflow_connections.py
-├── infrastructure/          # Terraform IaC
-├── docs/                    # Documentation
-├── docker-compose.yml       # Service orchestration
-└── requirements.txt         # Python dependencies
+├── infrastructure/             # Terraform IaC
+├── docs/                       # documentation
+├── docker-compose.yml          # service orchestration
+└── requirements.txt            # Python dependencies
 ```
 
 ---
 
-## 🧪 Testing
+## Local Testing
 
-### Data Quality Tests
+### dbt
 
-**dbt Tests:**
 ```bash
 cd transform
 
 # Run all tests
 dbt test
 
-# Test specific model
+# Test a specific model
 dbt test --select dim_customers
 
-# Test with detailed output
+# Persist test failures to the warehouse
 dbt test --store-failures
 ```
 
-**Great Expectations:**
-```bash
-# Run checkpoint
-python scripts/run_checkpoint.py
+### Great Expectations
 
-# View results
+```bash
+python scripts/run_checkpoint.py
 open gx/uncommitted/data_docs/local_site/index.html
 ```
 
-### Unit Tests
-```bash
-# Run Python tests
-pytest tests/
+### Python unit tests
 
-# With coverage
+```bash
+pytest tests/
 pytest --cov=scripts tests/
+```
+
+### DAG-syntax validation
+
+```bash
+python dags/ingest_postgres_orders.py
+python dags/ingest_clickstream_events.py
+python dags/data_quality_checks.py
 ```
 
 ---
 
-## 🔄 Development Workflow
+## Development Workflow
 
-### 1. Feature Development
+### 1. Feature branch
 
 ```bash
-# Create feature branch
-git checkout -b feature/your-feature-name
-
-# Make changes
-# ... edit files ...
-
-# Test locally
-dbt run --select your_model
-dbt test --select your_model
-
-# Commit with semantic message
-git commit -m "feat: add customer segmentation model"
-
-# Push to remote
-git push origin feature/your-feature-name
+git checkout -b feature/<concise-description>
+# edit files
+dbt run  --select <model>
+dbt test --select <model>
+git commit -m "feat: <imperative summary>"
+git push origin feature/<concise-description>
 ```
 
-### 2. Code Review
+### 2. Code review
 
-- Create pull request
-- Ensure tests pass
-- Request review from team
-- Address feedback
+- Open a pull request.
+- Confirm CI checks pass.
+- Address reviewer feedback before merge.
 
-### 3. Merge to Main
+### 3. Merge
 
 ```bash
-# Merge via PR
-# Then update local
+# After PR approval
 git checkout develop
 git pull origin develop
 ```
 
 ---
 
-## 📝 Coding Standards
+## Coding Standards
 
 ### Python
-- Follow PEP 8
-- Use type hints
-- Add docstrings
-- Maximum line length: 100 characters
+
+- Follow PEP 8.
+- Use type hints.
+- Add docstrings to public functions.
+- Maximum line length: 100 characters.
 
 ### SQL
-- Use lowercase keywords
-- Snake_case for identifiers
-- CTEs for complex logic
-- Comments for business logic
+
+- Lowercase keywords.
+- `snake_case` identifiers.
+- CTEs for complex logic.
+- Comments explain *why*, not *what*.
 
 ### dbt
-- One model per file
-- Models in appropriate folders (staging/, marts/)
-- Always add tests (unique, not_null, relationships)
-- Document in schema.yml
+
+- One model per file.
+- Models live in `staging/` or `marts/` subdirectories.
+- Every model has at least `unique`, `not_null`, and applicable `relationships` tests.
+- Document each model in `schema.yml`.
 
 ---
 
-## 🐛 Debugging
+## Debugging
 
-### Airflow DAG Issues
+### Airflow DAG issues
 
-**Check Logs:**
 ```bash
-docker logs airflow-scheduler
-docker exec airflow-scheduler airflow dags list
+docker logs ecommerce-airflow-scheduler
+docker exec ecommerce-airflow-scheduler airflow dags list
+
+# Validate DAG syntax (catches import errors)
+python dags/<dag_file>.py
 ```
 
-**Test DAG Syntax:**
+### dbt model issues
+
 ```bash
-python dags/your_dag.py
+dbt compile --select <model>          # inspect target/compiled/
+dbt run --select <model> --debug      # verbose execution
 ```
 
-### dbt Model Issues
+### Database connectivity
 
-**Compile Query:**
 ```bash
-dbt compile --select your_model
-# Check target/compiled/
-```
-
-**Run with Debug:**
-```bash
-dbt run --select your_model --debug
-```
-
-### Database Connection Issues
-
-**Test Connection:**
-```bash
-docker exec postgres-warehouse psql -U warehouse_user -d warehouse -c "SELECT 1"
+docker exec ecommerce-postgres \
+    psql -U ecommerce_user -d ecommerce -c "SELECT 1;"
 ```
 
 ---
 
-## 📚 Additional Resources
+## Related Documentation
 
-### Data Generation
-See [data-generation.md](./data-generation.md) for:
-- Synthetic data creation
-- Data volume configuration
-- Loading procedures
-
-### Project Demonstration
-See [demo-guide.md](./demo-guide.md) for:
-- 5-minute demo script
-- Key talking points
-- Interview preparation
-
-### Learning Resources
-- [dbt Learn](https://courses.getdbt.com/)
-- [Airflow Documentation](https://airflow.apache.org/docs/)
-- [Great Expectations Tutorial](https://docs.greatexpectations.io/)
+- Synthetic data generation: [data-generation.md](./data-generation.md)
+- Airflow service runbook: [../operations/runbooks/airflow-setup.md](../operations/runbooks/airflow-setup.md)
+- Great Expectations runbook: [../operations/runbooks/great-expectations-reference.md](../operations/runbooks/great-expectations-reference.md)
+- Metabase operations: [../analytics/metabase/metabase-operations-runbook.md](../analytics/metabase/metabase-operations-runbook.md)
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
-1. Fork the repository
-2. Create feature branch
-3. Make changes with tests
-4. Submit pull request
-5. Wait for review
-
----
-
-**Last Updated:** November 10, 2025
-**Environment:** Local Docker Compose
-**Python Version:** 3.11
+1. Fork the repository.
+2. Create a feature branch.
+3. Make changes with tests.
+4. Submit a pull request.
+5. Address review feedback.

@@ -1,10 +1,10 @@
-# Week 2, Day 3-4: PostgreSQL Ingestion DAG
+# PostgreSQL Ingestion DAG
 
 ## Overview
 
 This guide covers setting up and testing the PostgreSQL orders ingestion DAG that extracts data from PostgreSQL and loads it to S3 with date partitioning.
 
-## What We Built
+## What I Built
 
 ### 1. PostgreSQL Ingestion DAG (`dags/ingest_postgres_orders.py`)
 
@@ -518,61 +518,3 @@ After PostgreSQL ingestion is working:
 4. ✅ **Build Clickstream Ingestion DAG**
    - Switch to `feature/clickstream-ingestion` branch
    - Process event CSV files to S3
-
----
-
-## Git Workflow
-
-```bash
-# Check status
-git status
-
-# Stage files
-git add dags/ingest_postgres_orders.py
-git add scripts/setup_airflow_connections.py
-git add docs/week2/postgres-ingestion-guide.md
-
-# Commit
-git commit -m "feat: implement PostgreSQL orders ingestion DAG
-
-- Add incremental extraction by order_date
-- Implement S3 Hive-style partitioning (year/month/day)
-- Add comprehensive data validation checks
-- Include error handling with exponential backoff
-- Add Airflow connections setup script
-- Include detailed testing and troubleshooting guide
-
-Data Flow:
-- Extract orders from PostgreSQL (incremental by date)
-- Validate data quality (nulls, types, business rules)
-- Load to S3 with date partitioning
-- Log comprehensive execution summary
-
-Performance:
-- Expected duration: 5-15 seconds per run
-- Handles 0-500 orders per day
-- Exponential backoff retry strategy"
-
-# Push
-git push origin feature/postgres-ingestion
-```
-
----
-
-## Success Criteria ✅
-
-- [x] DAG file created with 5 tasks
-- [x] Airflow connections setup script created
-- [x] Documentation complete
-- [ ] DAG visible in Airflow UI
-- [ ] Connections verified in Admin panel
-- [ ] DAG runs successfully (manual trigger)
-- [ ] Data appears in S3 with correct partitioning
-- [ ] All validation checks pass
-- [ ] Git commit and push
-
----
-
-**Last Updated:** Week 2, Day 3
-**Status:** PostgreSQL Ingestion DAG Complete
-**Next:** API Ingestion DAG

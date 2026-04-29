@@ -1,208 +1,175 @@
-# Week 2 - Data Generation Guide
+# Synthetic Data Generation Runbook
 
-## Overview
+## Purpose
 
-This guide covers the data generation and loading process for Week 2 of the Modern E-Commerce Analytics Platform project.
-
-## Generated Data Summary
+Generate the synthetic source dataset (customers, orders, order items, clickstream events) and load it into the PostgreSQL `ecommerce` database for local development and CI testing.
 
 | Dataset | Records | Description |
 |---------|---------|-------------|
-| **Customers** | 1,000 | Customer profiles with SCD Type 2 segments |
-| **Orders** | 5,000 | E-commerce transactions |
-| **Order Items** | ~12,500 | Line items (avg 2.5 items/order) |
-| **Clickstream Events** | 50,000 | User behavior tracking |
+| customers | 1,000 | Customer profiles with SCD Type 2 segment history |
+| orders | 5,000 | E-commerce transactions |
+| order_items | ~12,500 | Line items (avg. 2.5 per order) |
+| clickstream_events | 50,000 | User-behaviour events |
+
+---
 
 ## Prerequisites
 
-### 1. Docker Services Running
-
-Ensure PostgreSQL source database is running:
+### 1. Docker services
 
 ```bash
-# Start all services
 docker-compose up -d
-
-# Check services status
 docker ps
-
-# You should see:
-# - ecommerce-postgres-source (port 5433)
-# - ecommerce-postgres-airflow (port 5434)
-# - ecommerce-redis
-# - ecommerce-airflow-webserver
-# - ecommerce-airflow-scheduler
-# - ecommerce-airflow-worker
-# - ecommerce-airflow-triggerer
 ```
 
-### 2. Python Environment
+The `ecommerce-postgres` container must be reported `Healthy`. The Airflow services are not required for this runbook but typically come up in the same compose stack.
 
-Activate virtual environment:
+### 2. Python environment
 
 ```bash
+# macOS / Linux
+source .venv/bin/activate
+
 # Windows
 .venv\Scripts\activate
-
-# Mac/Linux
-source .venv/bin/activate
 ```
 
-### 3. Environment Variables
+### 3. Environment variables
 
-Ensure `.env` file has correct PostgreSQL credentials:
+`.env` must contain:
 
 ```env
 POSTGRES_SOURCE_HOST=localhost
-POSTGRES_SOURCE_PORT=5433
+POSTGRES_SOURCE_PORT=5432
 POSTGRES_SOURCE_USER=ecommerce_user
 POSTGRES_SOURCE_PASSWORD=ecommerce_pass
 POSTGRES_SOURCE_DB=ecommerce
 ```
 
-## Step-by-Step Execution
+> **Note:** `localhost:5432` reaches the consolidated `postgres` container's exposed port from the host. Inside the Docker network, services reach the database via host name `postgres`.
 
-### Step 1: Generate Data
+---
 
-Generate synthetic CSV files:
+## Deployment Steps
+
+### 1. Generate CSV files
 
 ```bash
 python scripts/generate_data.py
 ```
 
-**Expected Output:**
+Expected output (truncated):
+
 ```
-==================================================
 Starting Data Generation Process
-==================================================
-INFO - Generating 1000 customers...
-INFO - ✅ Generated 1000 customers
-INFO -    Segment distribution: {'bronze': 500, 'silver': 300, 'gold': 150, 'platinum': 50}
-INFO - Generating 5000 orders...
-INFO - ✅ Generated 5000 orders
-INFO -    Status distribution: {'completed': 3750, 'pending': 500, ...}
-INFO - Generating order items for 5000 orders...
-INFO - ✅ Generated 12500 order items
-INFO - Generating 50000 clickstream events...
-INFO - ✅ Generated 50000 clickstream events
-INFO - 💾 Saved: data/generated/customers.csv
-INFO - 💾 Saved: data/generated/orders.csv
-INFO - 💾 Saved: data/generated/order_items.csv
-INFO - 💾 Saved: data/generated/clickstream_events.csv
-==================================================
+Generating 1000 customers...
+Generated 1000 customers
+   Segment distribution: {'bronze': 500, 'silver': 300, 'gold': 150, 'platinum': 50}
+Generating 5000 orders...
+Generated 5000 orders
+Generating order items for 5000 orders...
+Generated 12500 order items
+Generating 50000 clickstream events...
+Generated 50000 clickstream events
+Saved: data/generated/customers.csv
+Saved: data/generated/orders.csv
+Saved: data/generated/order_items.csv
+Saved: data/generated/clickstream_events.csv
 DATA GENERATION SUMMARY
-==================================================
-✅ Customers: 1,000
-✅ Orders: 5,000
-✅ Order Items: 12,500
-✅ Clickstream Events: 50,000
-📁 Output Directory: C:\...\data\generated
-==================================================
-🎉 Data generation completed successfully!
+Customers:           1,000
+Orders:              5,000
+Order Items:         12,500
+Clickstream Events:  50,000
+Output Directory:    data/generated/
+Status:              completed
 ```
 
-**Generated Files:**
+Output files:
+
 - `data/generated/customers.csv` (~150 KB)
 - `data/generated/orders.csv` (~500 KB)
 - `data/generated/order_items.csv` (~300 KB)
 - `data/generated/clickstream_events.csv` (~8 MB)
 
-### Step 2: Verify CSV Files
-
-Quick inspection:
+### 2. Inspect generated CSVs (optional)
 
 ```bash
+# macOS / Linux
+head -n 5 data/generated/customers.csv
+
 # Windows PowerShell
 Get-Content data\generated\customers.csv | Select-Object -First 5
-
-# Mac/Linux
-head -n 5 data/generated/customers.csv
 ```
-
-Or use Python:
 
 ```python
 import pandas as pd
-
-# Load and preview
 df = pd.read_csv('data/generated/customers.csv')
 print(df.head())
-print(f"\nShape: {df.shape}")
-print(f"Columns: {df.columns.tolist()}")
+print(f"Shape: {df.shape}")
 ```
 
-### Step 3: Load Data into PostgreSQL
-
-Load CSV data into source database:
+### 3. Load CSVs into PostgreSQL
 
 ```bash
 python scripts/load_data.py
 ```
 
-**Expected Output:**
+The script truncates the target tables and reloads via `psycopg2.execute_values`. Expected output (truncated):
+
 ```
-==================================================
-Starting Data Loading Process
-==================================================
-INFO - ✅ Connected to PostgreSQL database
-INFO - Loading customers from data\generated\customers.csv...
-INFO -   Truncated existing customers table
-INFO - ✅ Loaded 1,000 customers
-INFO - Loading orders from data\generated\orders.csv...
-INFO -   Truncated existing orders table
-INFO - ✅ Loaded 5,000 orders
-INFO - Loading order items from data\generated\order_items.csv...
-INFO -   Truncated existing order_items table
-INFO - ✅ Loaded 12,500 order items
-==================================================
+Connected to PostgreSQL database
+Loading customers from data/generated/customers.csv...
+   Truncated existing customers table
+Loaded 1,000 customers
+Loading orders from data/generated/orders.csv...
+   Truncated existing orders table
+Loaded 5,000 orders
+Loading order items from data/generated/order_items.csv...
+   Truncated existing order_items table
+Loaded 12,500 order items
 DATA VALIDATION
-==================================================
-✓ Customers: 1,000
-✓ Orders: 5,000
-✓ Order Items: 12,500
-✓ Orphan orders (should be 0): 0
-✓ Invalid order totals (should be 0): 0
-✓ Order date range: 2023-10-28 to 2025-10-28
-Sample Order with Customer:
-  Order #5000: John Smith - $156.78 - completed
-  ...
-==================================================
-🎉 Data loading completed successfully!
+Customers:                            1,000
+Orders:                               5,000
+Order Items:                          12,500
+Orphan orders (must be 0):            0
+Invalid order totals (must be 0):     0
+Order date range:                     2023-10-28 to 2025-10-28
+Status:                               completed
 ```
 
-### Step 4: Verify in PostgreSQL
+---
 
-Connect to database and verify:
+## Validation
+
+### 4.1 Database queries
 
 ```bash
-# Using docker exec
-docker exec -it ecommerce-postgres-source psql -U ecommerce_user -d ecommerce
+docker exec -it ecommerce-postgres \
+    psql -U ecommerce_user -d ecommerce
 ```
 
-Run validation queries:
-
 ```sql
--- Check record counts
-SELECT 'customers' AS table_name, COUNT(*) FROM customers
+-- Row counts
+SELECT 'customers'   AS table_name, COUNT(*) FROM customers
 UNION ALL
-SELECT 'orders', COUNT(*) FROM orders
+SELECT 'orders',     COUNT(*) FROM orders
 UNION ALL
 SELECT 'order_items', COUNT(*) FROM order_items;
 
 -- Customer segment distribution
-SELECT customer_segment, COUNT(*) as count
+SELECT customer_segment, COUNT(*) AS count
 FROM customers
 WHERE is_current = TRUE
 GROUP BY customer_segment
 ORDER BY count DESC;
 
--- Orders by status
-SELECT order_status, COUNT(*) as count
+-- Order status distribution
+SELECT order_status, COUNT(*) AS count
 FROM orders
 GROUP BY order_status
 ORDER BY count DESC;
 
--- Sample order with items
+-- Sample order with line items
 SELECT
     o.order_id,
     c.first_name || ' ' || c.last_name AS customer,
@@ -215,231 +182,167 @@ LEFT JOIN order_items oi ON o.order_id = oi.order_id
 GROUP BY o.order_id, customer, o.order_date, o.order_total
 ORDER BY o.order_date DESC
 LIMIT 10;
-
--- Exit psql
-\q
 ```
 
-## Data Quality Checks
-
-### Automated Checks (in load_data.py)
-
-✅ **Referential Integrity:**
-- All orders have valid customer_id references
-- All order_items have valid order_id references
-
-✅ **Data Validity:**
-- No negative order totals
-- No zero quantities in order items
-- All required fields populated
-
-✅ **Uniqueness:**
-- Customer emails are unique
-- No duplicate order IDs
-
-### Manual Verification
+### 4.2 Programmatic checks (optional)
 
 ```python
 import pandas as pd
 
-# Load data
 customers = pd.read_csv('data/generated/customers.csv')
-orders = pd.read_csv('data/generated/orders.csv')
-items = pd.read_csv('data/generated/order_items.csv')
-events = pd.read_csv('data/generated/clickstream_events.csv')
+orders    = pd.read_csv('data/generated/orders.csv')
+items     = pd.read_csv('data/generated/order_items.csv')
+events    = pd.read_csv('data/generated/clickstream_events.csv')
 
-# Basic statistics
-print("Customers:")
-print(f"  Total: {len(customers)}")
-print(f"  Unique emails: {customers['email'].nunique()}")
-print(f"  Segment distribution:\n{customers['customer_segment'].value_counts()}")
-
-print("\nOrders:")
-print(f"  Total: {len(orders)}")
-print(f"  Date range: {orders['order_date'].min()} to {orders['order_date'].max()}")
-print(f"  Avg order value: ${orders['order_total'].mean():.2f}")
-print(f"  Status distribution:\n{orders['order_status'].value_counts()}")
-
-print("\nOrder Items:")
-print(f"  Total: {len(items)}")
-print(f"  Avg items per order: {len(items) / len(orders):.2f}")
-print(f"  Unique products: {items['product_id'].nunique()}")
-
-print("\nClickstream Events:")
-print(f"  Total: {len(events)}")
-print(f"  Event types:\n{events['event_type'].value_counts()}")
-print(f"  Device distribution:\n{events['device_type'].value_counts()}")
+print(f"Customers           : {len(customers)} (unique emails: {customers['email'].nunique()})")
+print(f"Orders              : {len(orders)}")
+print(f"Order date range    : {orders['order_date'].min()} → {orders['order_date'].max()}")
+print(f"Avg order value     : ${orders['order_total'].mean():.2f}")
+print(f"Order items         : {len(items)} (avg/order: {len(items)/len(orders):.2f})")
+print(f"Clickstream events  : {len(events)}")
 ```
 
-## Troubleshooting
+### 4.3 Success criteria
 
-### Issue: Database Connection Failed
-
-**Error:** `psycopg2.OperationalError: could not connect to server`
-
-**Solution:**
-```bash
-# Check if PostgreSQL container is running
-docker ps | grep postgres-source
-
-# If not running, start it
-docker-compose up -d postgres-source
-
-# Check logs
-docker logs ecommerce-postgres-source
-
-# Verify port 5433 is available
-netstat -an | grep 5433
-```
-
-### Issue: CSV Files Not Found
-
-**Error:** `FileNotFoundError: data/generated/customers.csv`
-
-**Solution:**
-```bash
-# Create directory
-mkdir -p data/generated
-
-# Re-run generation
-python scripts/generate_data.py
-```
-
-### Issue: Duplicate Key Error
-
-**Error:** `psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint`
-
-**Solution:**
-```bash
-# The load_data.py script uses TRUNCATE, but if that fails:
-
-# Connect to database
-docker exec -it ecommerce-postgres-source psql -U ecommerce_user -d ecommerce
-
-# Manually truncate
-TRUNCATE TABLE order_items, orders, customers CASCADE;
-
-# Exit and retry
-\q
-python scripts/load_data.py
-```
-
-### Issue: Permission Denied
-
-**Error:** `psycopg2.errors.InsufficientPrivilege`
-
-**Solution:**
-```sql
--- Connect as postgres superuser
-docker exec -it ecommerce-postgres-source psql -U postgres
-
--- Grant permissions
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO ecommerce_user;
-GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO ecommerce_user;
-
--- Exit
-\q
-```
-
-## Data Characteristics
-
-### Customer Data
-
-**Segment Distribution** (realistic hierarchy):
-- Bronze: 50% (500 customers) - Entry-level
-- Silver: 30% (300 customers) - Mid-tier
-- Gold: 15% (150 customers) - Premium
-- Platinum: 5% (50 customers) - VIP
-
-**SCD Type 2 Support:**
-- 30% of customers have segment history (changed tiers)
-- `is_current = TRUE` for active segment records
-- `segment_start_date` and `segment_end_date` track changes
-
-### Order Data
-
-**Temporal Patterns:**
-- Orders span 2 years (2023-10-28 to 2025-10-28)
-- Peak hours: 11AM-12PM, 8PM-10PM (realistic shopping times)
-- Higher frequency on evenings and weekends
-
-**Order Values by Segment:**
-- Bronze: $20-$150
-- Silver: $40-$200
-- Gold: $80-$400
-- Platinum: $150-$800
-
-**Pareto Principle:**
-- 20% of customers generate 80% of orders
-- Reflects real-world customer behavior
-
-### Clickstream Events
-
-**Event Distribution:**
-- Page views: 60% (most common)
-- Add to cart: 15%
-- Search: 12%
-- Purchase: 8%
-- Remove from cart: 5%
-
-**Device Usage (2025 trends):**
-- Mobile: 65% (mobile-first)
-- Desktop: 30%
-- Tablet: 5%
-
-## Next Steps
-
-After successful data generation and loading:
-
-1. ✅ Commit changes to git
-2. ✅ Create Airflow DAGs for ingestion (Week 2, Day 3-4)
-3. ✅ Set up S3 ingestion pipeline
-4. ✅ Test incremental loading
-
-## Git Workflow
-
-```bash
-# Stage changes
-git add scripts/generate_data.py
-git add scripts/load_data.py
-git add data/generated/*.csv
-git add docs/week2/
-
-# Commit
-git commit -m "feat: implement synthetic data generation
-
-- Generate 1K customers with SCD Type 2 segment tracking
-- Generate 5K orders with realistic temporal patterns
-- Generate 10K order items with proper foreign keys
-- Generate 50K clickstream events (CSV export)
-- Implement PostgreSQL bulk loading with execute_values
-- Add environment validation script
-- Include comprehensive documentation
-
-Data Quality Verified:
-- Perfect referential integrity (0 orphan records)
-- Customer segments: 491/307/151/51 (bronze/silver/gold/platinum)
-- Top products have 60-70 orders each
-- Monthly orders: 180-230 consistent distribution
-- Date range: Oct 2023 to Oct 2025 (2 years)
-
-Performance:
-- Data generation: 10-20 seconds
-- PostgreSQL loading: ~4 seconds
-- Bulk inserts using execute_values for efficiency"
-
-# Push to feature branch
-git push origin feature/data-generation
-```
-
-## Documentation
-
-- **Script Documentation:** See docstrings in `scripts/generate_data.py`
-- **Database Schema:** See `scripts/init_db.sql`
-- **Data Model:** See `docs/dimensional_model.md`
+- All four CSV files exist in `data/generated/`
+- PostgreSQL row counts match the dataset summary table above
+- Orphan orders count is `0`
+- Invalid order totals count is `0`
+- Order date range spans `2023-10-28` to `2025-10-28`
 
 ---
 
-**Last Updated:** Week 2, Day 1
-**Status:** Data Generation Complete ✅
-**Next:** Airflow DAG Development
+## Built-in Data-Quality Checks
+
+The `load_data.py` script enforces:
+
+**Referential integrity**
+
+- All `orders.customer_id` values resolve to a `customers.customer_id`
+- All `order_items.order_id` values resolve to an `orders.order_id`
+
+**Data validity**
+
+- No negative `order_total`
+- No zero-or-negative `quantity`
+- All required fields populated
+
+**Uniqueness**
+
+- `customers.email` is globally unique
+- No duplicate `order_id`
+
+---
+
+## Troubleshooting
+
+### Symptom — `psycopg2.OperationalError: could not connect to server`
+
+```bash
+docker ps | grep postgres
+docker-compose up -d postgres        # if not running
+docker logs ecommerce-postgres
+```
+
+Confirm port `5432` is reachable from the host:
+
+```bash
+# macOS / Linux
+nc -zv localhost 5432
+
+# Windows
+netstat -an | findstr 5432
+```
+
+### Symptom — `FileNotFoundError: data/generated/customers.csv`
+
+```bash
+mkdir -p data/generated
+python scripts/generate_data.py
+```
+
+### Symptom — `psycopg2.errors.UniqueViolation`
+
+`load_data.py` truncates target tables before insertion. If the `TRUNCATE` itself fails (e.g. due to active connections), force-truncate manually:
+
+```bash
+docker exec -it ecommerce-postgres \
+    psql -U ecommerce_user -d ecommerce \
+    -c "TRUNCATE TABLE order_items, orders, customers CASCADE;"
+python scripts/load_data.py
+```
+
+### Symptom — `psycopg2.errors.InsufficientPrivilege`
+
+Reapply privileges as the `postgres` superuser:
+
+```bash
+docker exec -it ecommerce-postgres psql -U postgres
+```
+
+```sql
+GRANT ALL PRIVILEGES ON ALL TABLES   IN SCHEMA public TO ecommerce_user;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO ecommerce_user;
+\q
+```
+
+---
+
+## Dataset Characteristics
+
+### Customer data
+
+**Segment distribution** (target hierarchy):
+
+- Bronze: 50% (500)
+- Silver: 30% (300)
+- Gold: 15% (150)
+- Platinum: 5% (50)
+
+**SCD Type 2 support:**
+
+- ~30% of customers have at least one historical segment row
+- `is_current = TRUE` indicates the active row
+- `segment_start_date` and `segment_end_date` bound each version
+
+### Order data
+
+**Temporal patterns:**
+
+- Span: `2023-10-28` → `2025-10-28` (two years)
+- Peak hours: 11:00–12:00 and 20:00–22:00
+- Higher frequency on evenings and weekends
+
+**Order values by segment:**
+
+- Bronze: $20–$150
+- Silver: $40–$200
+- Gold: $80–$400
+- Platinum: $150–$800
+
+**Pareto distribution:** ~20% of customers generate ~80% of orders.
+
+### Clickstream events
+
+**Event distribution:**
+
+- `page_view`: 60%
+- `add_to_cart`: 15%
+- `search`: 12%
+- `purchase`: 8%
+- `remove_from_cart`: 5%
+
+**Device usage:**
+
+- Mobile: 65%
+- Desktop: 30%
+- Tablet: 5%
+
+---
+
+## References
+
+- Generation script: `scripts/generate_data.py`
+- Loader script: `scripts/load_data.py`
+- Source schema DDL: `scripts/init_db.sql`
+- Multi-database bootstrap (consolidated container): `scripts/init_multi_db.sh`

@@ -45,28 +45,4 @@ Developer setup and testing guides.
 
 **Analytics:**
 - [Metabase Setup](./analytics/metabase/)
-- [SQL Query Library](./analytics/metabase/METABASE_ULTIMATE_GUIDE.md#complete-sql-library)
-
----
-
-## 📝 Documentation Standards
-
-### File Naming
-- Use lowercase with hyphens: `file-name.md`
-- ADRs: `XXX-decision-title.md` (e.g., `001-technology-stack.md`)
-
-### Structure
-- One H1 header per document
-- Table of contents for docs > 200 lines
-- Code blocks with language tags
-- Links are relative paths
-
-### Maintenance
-- Update timestamp on each change
-- Version major documentation changes
-- Keep archive for historical reference
-
----
-
-**Last Updated:** November 10, 2025
-**Maintained By:** Data Engineering Team
+- [SQL Query Library](./analytics/metabase/metabase-operations-runbook.md#6-sql-query-reference)
