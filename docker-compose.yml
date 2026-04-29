@@ -3,27 +3,27 @@
 # Docker Compose - Complete Development Environment
 # ============================================
 # Services:
-#   - PostgreSQL (Source Database)
-#   - Airflow (Webserver, Scheduler, Worker)
+#   - PostgreSQL (Single consolidated instance)
+#       - ecommerce   : source e-commerce data
+#       - airflow_db  : Airflow metadata
+#       - metabase_db : Metabase application data
+#   - Airflow (Webserver, Scheduler, Worker, Triggerer)
 #   - Redis (Airflow Celery Backend)
+#   - Metabase (BI & Dashboards)
 # ============================================
-
-# version: '3.8'
 
 # ============================================
 # SHARED CONFIGURATION
 # ============================================
 x-airflow-common:
   &airflow-common
-  # Use official Airflow image (Production-ready)
   image: apache/airflow:2.7.3-python3.11
 
-  # Environment variables for Airflow
   environment:
     &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
-    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: "postgresql+psycopg2://${POSTGRES_AIRFLOW_USER}:${POSTGRES_AIRFLOW_PASSWORD}@${POSTGRES_AIRFLOW_HOST}/${POSTGRES_AIRFLOW_DB}"
-    AIRFLOW__CELERY__RESULT_BACKEND: "db+postgresql://${POSTGRES_AIRFLOW_USER}:${POSTGRES_AIRFLOW_PASSWORD}@${POSTGRES_AIRFLOW_HOST}/${POSTGRES_AIRFLOW_DB}"
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: "postgresql+psycopg2://airflow_user:airflow_pass@postgres/airflow_db"
+    AIRFLOW__CELERY__RESULT_BACKEND: "db+postgresql://airflow_user:airflow_pass@postgres/airflow_db"
     AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
     AIRFLOW__CORE__FERNET_KEY: "${AIRFLOW__CORE__FERNET_KEY}"
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
@@ -36,10 +36,15 @@ x-airflow-common:
     AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
     AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-us-east-1}
 
-    # Python path
+    # Source DB connection (exposed to DAGs via environment)
+    POSTGRES_SOURCE_HOST: postgres
+    POSTGRES_SOURCE_PORT: 5432
+    POSTGRES_SOURCE_USER: ${POSTGRES_USER:-ecommerce_user}
+    POSTGRES_SOURCE_PASSWORD: ${POSTGRES_PASSWORD:-ecommerce_pass}
+    POSTGRES_SOURCE_DB: ${POSTGRES_DB:-ecommerce}
+
     PYTHONPATH: /opt/airflow
 
-  # Volume mounts
   volumes:
     - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
     - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
@@ -48,15 +53,13 @@ x-airflow-common:
     - ${AIRFLOW_PROJ_DIR:-.}/scripts:/opt/airflow/scripts
     - ${AIRFLOW_PROJ_DIR:-.}/data:/opt/airflow/data
 
-  # User configuration
   user: "${AIRFLOW_UID:-50000}:0"
 
-  # Dependencies
   depends_on:
     &airflow-common-depends-on
     redis:
       condition: service_healthy
-    postgres-airflow:
+    postgres:
       condition: service_healthy
 
 # ============================================
@@ -65,45 +68,28 @@ x-airflow-common:
 services:
 
   # ==========================================
-  # PostgreSQL - Source Database (E-commerce data)
+  # PostgreSQL - Single Consolidated Instance
   # ==========================================
-  postgres-source:
+  # Three logical databases via init scripts:
+  #   ecommerce   → source e-commerce data
+  #   airflow_db  → Airflow metadata
+  #   metabase_db → Metabase application data
+  # ==========================================
+  postgres:
     image: postgres:14-alpine
-    container_name: ecommerce-postgres-source
+    container_name: ecommerce-postgres
     environment:
-      POSTGRES_USER: ${POSTGRES_SOURCE_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_SOURCE_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_SOURCE_DB}
+      POSTGRES_USER: ${POSTGRES_USER:-ecommerce_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ecommerce_pass}
+      POSTGRES_DB: ${POSTGRES_DB:-ecommerce}
     volumes:
-      - postgres-source-data:/var/lib/postgresql/data
-      - ./scripts/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
+      - postgres-data:/var/lib/postgresql/data
+      - ./scripts/init_multi_db.sh:/docker-entrypoint-initdb.d/01_init_multi_db.sh
+      - ./scripts/init_db.sql:/docker-entrypoint-initdb.d/02_init_source_db.sql
     ports:
-      - "5433:5432"  # External port 5433 to avoid conflict
+      - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_SOURCE_USER} -d ${POSTGRES_SOURCE_DB}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - ecommerce-network
-    restart: unless-stopped
-
-  # ==========================================
-  # PostgreSQL - Airflow Metadata Database
-  # ==========================================
-  postgres-airflow:
-    image: postgres:14-alpine
-    container_name: ecommerce-postgres-airflow
-    environment:
-      POSTGRES_USER: ${POSTGRES_AIRFLOW_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_AIRFLOW_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_AIRFLOW_DB}
-    volumes:
-      - postgres-airflow-data:/var/lib/postgresql/data
-    ports:
-      - "5434:5432"  # External port 5434
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_AIRFLOW_USER}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ecommerce_user} -d ${POSTGRES_DB:-ecommerce}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -327,20 +313,20 @@ services:
     container_name: ecommerce-metabase
     environment:
       MB_DB_TYPE: postgres
-      MB_DB_DBNAME: ${METABASE_DB:-metabase}
+      MB_DB_DBNAME: metabase_db
       MB_DB_PORT: 5432
-      MB_DB_USER: ${METABASE_DB_USER:-metabase}
-      MB_DB_PASS: ${METABASE_DB_PASSWORD:-metabase_password}
-      MB_DB_HOST: postgres-metabase
+      MB_DB_USER: metabase_user
+      MB_DB_PASS: metabase_pass
+      MB_DB_HOST: postgres
     ports:
-      - "3001:3000"  # Using 3001 to avoid conflict with other Metabase
+      - "3001:3000"
     volumes:
       - metabase-data:/metabase-data
     networks:
       - ecommerce-network
     restart: unless-stopped
     depends_on:
-      postgres-metabase:
+      postgres:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
@@ -349,39 +335,12 @@ services:
       retries: 5
       start_period: 60s
 
-  # ==========================================
-  # PostgreSQL - Metabase Metadata Database
-  # ==========================================
-  postgres-metabase:
-    image: postgres:14-alpine
-    container_name: ecommerce-postgres-metabase
-    environment:
-      POSTGRES_USER: ${METABASE_DB_USER:-metabase}
-      POSTGRES_PASSWORD: ${METABASE_DB_PASSWORD:-metabase_password}
-      POSTGRES_DB: ${METABASE_DB:-metabase}
-    volumes:
-      - postgres-metabase-data:/var/lib/postgresql/data
-    ports:
-      - "5435:5432"  # External port 5435
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${METABASE_DB_USER:-metabase}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - ecommerce-network
-    restart: unless-stopped
-
 # ============================================
 # VOLUMES
 # ============================================
 volumes:
-  postgres-source-data:
-    name: ecommerce-postgres-source-data
-  postgres-airflow-data:
-    name: ecommerce-postgres-airflow-data
-  postgres-metabase-data:
-    name: ecommerce-postgres-metabase-data
+  postgres-data:
+    name: ecommerce-postgres-data
   metabase-data:
     name: ecommerce-metabase-data
 

@@ -1,25 +1,19 @@
 version: 2
 
 # ==============================================================================
-# Staging Models Documentation and Tests
-# ==============================================================================
-# This file documents all staging models in the orders domain and defines
-# data quality tests to ensure transformation accuracy.
+# Staging Models Documentation and Tests — Orders Domain
 # ==============================================================================
 
 models:
   # ============================================================================
   # STAGING: CUSTOMERS
   # ============================================================================
-  - name: stg_orders_customers
+  - name: stg_customers
     description: |
       Cleaned and standardized customer data from PostgreSQL source.
 
-      This staging model performs light transformations:
-      - Type casting for dates and timestamps
-      - Creation of full_name field
-      - Addition of data quality flags
-      - No business logic or aggregations
+      Light transformations: type casting, full_name creation,
+      SCD Type 2 tracking fields, and data quality flags.
 
       **Grain**: One row per customer
       **Source**: postgres_ecommerce.customers
@@ -57,28 +51,13 @@ models:
       - name: phone
         description: "Customer phone number"
 
-      - name: address
-        description: "Customer street address"
-
-      - name: city
-        description: "Customer city"
-
-      - name: state
-        description: "Customer state/province"
-
-      - name: country
-        description: "Customer country"
-
-      - name: postal_code
-        description: "Customer postal/ZIP code"
-
       - name: registration_date
         description: "Date customer registered (cast to date type)"
         tests:
           - not_null
 
       - name: customer_segment
-        description: "Customer value segment (bronze, silver, gold)"
+        description: "Customer value segment (bronze, silver, gold, platinum)"
         tests:
           - not_null
           - accepted_values:
@@ -96,22 +75,15 @@ models:
       - name: is_missing_phone
         description: "Data quality flag: true if phone is null or empty"
 
-      - name: is_incomplete_address
-        description: "Data quality flag: true if address components are missing"
-
   # ============================================================================
   # STAGING: ORDERS
   # ============================================================================
-  - name: stg_orders_orders
+  - name: stg_orders
     description: |
       Cleaned and standardized order header data from PostgreSQL source.
 
-      This staging model performs:
-      - Type casting for dates, timestamps, and decimals
-      - Date component extraction for partitioning
-      - Order size categorization
-      - Data quality flags
-      - No aggregations or joins
+      Transformations: type casting, date component extraction,
+      order size categorization, and data quality flags.
 
       **Grain**: One row per order
       **Source**: postgres_ecommerce.orders
@@ -126,11 +98,11 @@ models:
           - not_null
 
       - name: customer_id
-        description: "Foreign key to stg_orders_customers"
+        description: "Foreign key to stg_customers"
         tests:
           - not_null
           - relationships:
-              to: ref('stg_orders_customers')
+              to: ref('stg_customers')
               field: customer_id
 
       - name: order_date
@@ -212,16 +184,12 @@ models:
   # ============================================================================
   # STAGING: ORDER ITEMS
   # ============================================================================
-  - name: stg_orders_order_items
+  - name: stg_order_items
     description: |
       Cleaned and standardized order line item data from PostgreSQL source.
 
-      This staging model performs:
-      - Type casting for integers and decimals
-      - Calculation of derived metrics (discount %, gross totals)
-      - Discount tier classification
-      - Comprehensive data quality flags
-      - No aggregations
+      Transformations: type casting, derived metrics (discount %, gross totals),
+      discount tier classification, and data quality flags.
 
       **Grain**: One row per order line item
       **Source**: postgres_ecommerce.order_items
@@ -236,11 +204,11 @@ models:
           - not_null
 
       - name: order_id
-        description: "Foreign key to stg_orders_orders"
+        description: "Foreign key to stg_orders"
         tests:
           - not_null
           - relationships:
-              to: ref('stg_orders_orders')
+              to: ref('stg_orders')
               field: order_id
 
       - name: product_id
@@ -299,31 +267,3 @@ models:
         tests:
           - accepted_values:
               values: ['no_discount', 'low_discount', 'medium_discount', 'high_discount', 'extreme_discount']
-
-# ==============================================================================
-# Testing Strategy
-# ==============================================================================
-#
-# Tests are organized by priority:
-#
-# **Critical Tests (not_null, unique)**:
-# - Primary keys must be unique and not null
-# - Foreign keys must not be null
-# - Business-critical fields must not be null
-#
-# **Referential Integrity (relationships)**:
-# - order_items.order_id → orders.order_id
-# - orders.customer_id → customers.customer_id
-#
-# **Data Quality (accepted_values)**:
-# - Enum fields have valid values only
-# - Calculated fields have expected categories
-#
-# **Custom Flags**:
-# - Data quality flags help identify records needing attention
-# - Used in intermediate layer for filtering/handling
-#
-# Run tests with:
-#   dbt test --select stg_orders_*
-#
-# ==============================================================================

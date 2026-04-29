@@ -37,7 +37,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.11'
 
       - name: Install Dependencies
         run: |
@@ -55,16 +55,32 @@ jobs:
   dbt-tests:
     name: dbt Tests
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:14-alpine
+        env:
+          POSTGRES_USER: ci_user
+          POSTGRES_PASSWORD: ci_password
+          POSTGRES_DB: ci_ecommerce
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - uses: actions/checkout@v3
 
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.11'
 
       - name: Install dbt
-        run: pip install dbt-snowflake==1.8.3
+        run: pip install dbt-postgres
 
       - name: Create CI profiles.yml
         run: |
@@ -74,14 +90,13 @@ jobs:
             target: ci
             outputs:
               ci:
-                type: snowflake
-                account: ci-account
-                user: ci-user
-                password: ci-password
-                role: ci-role
-                warehouse: ci-warehouse
-                database: ci-database
-                schema: ci-schema
+                type: postgres
+                host: localhost
+                port: 5432
+                user: ci_user
+                password: ci_password
+                database: ci_ecommerce
+                schema: ci_dbt_schema
                 threads: 1
           EOF
 
@@ -89,6 +104,6 @@ jobs:
         run: dbt deps
         working-directory: ./transform
 
-      - name: dbt Parse
-        run: dbt parse
+      - name: dbt Build
+        run: dbt build --target ci
         working-directory: ./transform

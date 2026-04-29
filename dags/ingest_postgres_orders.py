@@ -3,29 +3,23 @@
 PostgreSQL Orders Ingestion DAG
 ============================================
 
-This DAG extracts orders data from PostgreSQL source database
-and loads it to S3 raw data bucket with date partitioning.
+Extracts orders from PostgreSQL and loads them directly to S3
+using the SqlToS3Operator — no Pandas DataFrames in memory.
 
-Features:
-- Incremental extraction (daily batches)
-- S3 partitioning: year/month/day
-- Data validation
-- Error handling with retries
+Data validation runs via SQL COUNT/SUM queries before extraction
+so no worker memory is consumed on DataFrame operations.
 
 Schedule: Daily at 2 AM UTC
-Author: Zaid Shaikh
 ============================================
 """
 
 import logging
 import os
 from datetime import datetime, timedelta
-from io import StringIO
 
-import pandas as pd
 from airflow import DAG
 from airflow.operators.python import PythonOperator
-from airflow.providers.amazon.aws.hooks.s3 import S3Hook
+from airflow.providers.amazon.aws.transfers.sql_to_s3 import SqlToS3Operator
 from airflow.providers.postgres.hooks.postgres import PostgresHook
 
 # ============================================
@@ -45,7 +39,6 @@ default_args = {
     "max_retry_delay": timedelta(minutes=30),
 }
 
-# S3 Configuration from environment
 S3_RAW_BUCKET = os.getenv("S3_RAW_BUCKET", "ecommerce-raw-data-bnf5etbn")
 
 # ============================================
@@ -54,245 +47,85 @@ S3_RAW_BUCKET = os.getenv("S3_RAW_BUCKET", "ecommerce-raw-data-bnf5etbn")
 
 
 def get_execution_date(**context):
-    """Get execution date for incremental loading"""
-    execution_date = context["execution_date"]
-
-    # Format as YYYY-MM-DD for SQL query
-    date_str = execution_date.strftime("%Y-%m-%d")
-
-    # Push to XCom for downstream tasks
+    """Push execution date string to XCom for downstream tasks."""
+    date_str = context["execution_date"].strftime("%Y-%m-%d")
     context["ti"].xcom_push(key="execution_date_str", value=date_str)
-
     logging.info(f"Processing data for date: {date_str}")
     return date_str
 
 
-def extract_orders_from_postgres(**context):
+def validate_source_data(**context):
     """
-    Extract orders from PostgreSQL for specific date
+    SQL-based pre-flight validation against the source database.
 
-    Uses incremental extraction based on order_date
-    Returns: Number of orders extracted
+    Uses PostgresHook.get_first() — zero DataFrame allocation.
+    Checks:
+      - Row count for the execution date
+      - No negative order totals
+      - All orders have a valid customer_id
     """
-    # Get execution date from previous task
-    execution_date_str = context["ti"].xcom_pull(
+    date_str = context["ti"].xcom_pull(
         key="execution_date_str", task_ids="get_execution_date"
     )
 
-    logging.info(f"Extracting orders for date: {execution_date_str}")
-
-    # Connect to PostgreSQL using Airflow Connection
     pg_hook = PostgresHook(postgres_conn_id="postgres_source")
 
-    # Incremental extraction query
-    # Extract orders where order_date matches execution_date
-    query = f"""
-        SELECT
-            o.order_id,
-            o.customer_id,
-            c.email AS customer_email,
-            c.first_name,
-            c.last_name,
-            c.customer_segment,
-            o.order_date,
-            o.order_total,
-            o.payment_method,
-            o.shipping_address,
-            o.order_status,
-            o.created_at,
-            o.updated_at
+    # Check 1: row count
+    row_count = pg_hook.get_first(
+        f"SELECT COUNT(*) FROM orders WHERE DATE(order_date) = '{date_str}'"
+    )[0]
+    logging.info(f"Orders for {date_str}: {row_count}")
+
+    if row_count == 0:
+        logging.warning(f"No orders found for {date_str} — this may be expected.")
+
+    # Check 2: negative order totals
+    neg_count = pg_hook.get_first(
+        f"SELECT COUNT(*) FROM orders WHERE DATE(order_date) = '{date_str}' AND order_total < 0"
+    )[0]
+    if neg_count > 0:
+        raise ValueError(f"Data quality failure: {neg_count} orders with negative totals on {date_str}")
+    logging.info("No negative order totals found.")
+
+    # Check 3: orphaned orders (customer_id missing from customers)
+    orphan_count = pg_hook.get_first(
+        f"""
+        SELECT COUNT(*)
         FROM orders o
-        JOIN customers c ON o.customer_id = c.customer_id
-        WHERE DATE(o.order_date) = '{execution_date_str}'
-        ORDER BY o.order_date, o.order_id;
-    """
+        LEFT JOIN customers c ON o.customer_id = c.customer_id
+        WHERE DATE(o.order_date) = '{date_str}'
+          AND c.customer_id IS NULL
+        """
+    )[0]
+    if orphan_count > 0:
+        raise ValueError(f"Data quality failure: {orphan_count} orders with no matching customer on {date_str}")
+    logging.info("All orders have valid customer references.")
 
-    # Execute query and get DataFrame
-    df = pg_hook.get_pandas_df(query)
-
-    # Log extraction stats
-    logging.info(f"✅ Extracted {len(df)} orders from PostgreSQL")
-    logging.info(f"   DataFrame shape: {df.shape}")
-    logging.info(f"   Columns: {df.columns.tolist()}")
-
-    if len(df) > 0:
-        logging.info(
-            f"   Order ID range: {df['order_id'].min()} to {df['order_id'].max()}"
-        )
-        logging.info(f"   Order total sum: ${df['order_total'].sum():.2f}")
-        logging.info(
-            f"   Order statuses: {df['order_status'].value_counts().to_dict()}"
-        )
-    else:
-        logging.warning(f"⚠️ No orders found for date: {execution_date_str}")
-
-    # Push DataFrame to XCom as JSON with proper handling of dates
-    # Use date_format='iso' to preserve datetime format
-    # Use orient='split' to preserve column names even for empty DataFrames
-    context["ti"].xcom_push(
-        key="orders_data", value=df.to_json(orient="split", date_format="iso")
-    )
-    context["ti"].xcom_push(key="order_count", value=len(df))
-
-    return len(df)
-
-
-def validate_data(**context):
-    """
-    Validate extracted data before loading to S3
-
-    Checks:
-    - Data completeness
-    - Required fields
-    - Data types
-    - Business rules
-    """
-    # Get data from XCom
-    orders_json = context["ti"].xcom_pull(key="orders_data", task_ids="extract_orders")
-
-    # Convert back to DataFrame using orient='split' to preserve column names
-    df = pd.read_json(StringIO(orders_json), orient="split")
-
-    logging.info("=" * 50)
-    logging.info("DATA VALIDATION")
-    logging.info("=" * 50)
-    logging.info(f"DataFrame shape: {df.shape}")
-    logging.info(f"Available columns: {df.columns.tolist()}")
-
-    # Validation checks
-    validation_passed = True
-
-    # Check 0: DataFrame is not empty
-    if len(df) == 0:
-        logging.warning("⚠️ No data to validate (empty DataFrame)")
-        logging.info("=" * 50)
-        return True  # Empty data is valid, just no data for this date
-
-    # Check 1: Required fields exist
-    required_fields = [
-        "order_id",
-        "customer_id",
-        "customer_email",
-        "order_date",
-        "order_total",
-        "order_status",
-    ]
-
-    missing_fields = [field for field in required_fields if field not in df.columns]
-    if missing_fields:
-        logging.error(f"❌ Missing required fields: {missing_fields}")
-        logging.error(f"   Available columns: {df.columns.tolist()}")
-        logging.info("=" * 50)
-        raise ValueError(f"Missing required fields: {missing_fields}")
-    else:
-        logging.info(f"✅ All required fields present")
-
-    # Check 2: No null values in critical fields
-    critical_fields = ["order_id", "customer_id", "order_date", "order_total"]
-    null_counts = df[critical_fields].isnull().sum()
-
-    if null_counts.sum() > 0:
-        logging.error(f"❌ Null values found: {null_counts.to_dict()}")
-        validation_passed = False
-    else:
-        logging.info(f"✅ No null values in critical fields")
-
-    # Check 3: Business rules
-    if (df["order_total"] < 0).any():
-        logging.error(f"❌ Negative order totals found")
-        validation_passed = False
-    else:
-        logging.info(f"✅ All order totals are positive")
-
-    # Check 4: Data types
-    if df["order_id"].dtype not in ["int64", "int32"]:
-        logging.warning(f"⚠️ order_id type is {df['order_id'].dtype}, expected int")
-
-    logging.info("=" * 50)
-
-    if not validation_passed:
-        raise ValueError("Data validation failed! Check logs for details.")
-
-    logging.info("🎉 Data validation passed!")
-    return True
-
-
-def load_to_s3(**context):
-    """
-    Load orders data to S3 with date partitioning
-
-    S3 Path: s3://bucket/raw/orders/year=YYYY/month=MM/day=DD/orders.csv
-    """
-    # Get data from XCom
-    orders_json = context["ti"].xcom_pull(key="orders_data", task_ids="extract_orders")
-
-    execution_date_str = context["ti"].xcom_pull(
-        key="execution_date_str", task_ids="get_execution_date"
-    )
-
-    # Convert to DataFrame using orient='split' to preserve column names
-    df = pd.read_json(StringIO(orders_json), orient="split")
-
-    if len(df) == 0:
-        logging.info("No data to upload. Skipping S3 load.")
-        return 0
-
-    # Convert to CSV
-    csv_buffer = StringIO()
-    df.to_csv(csv_buffer, index=False)
-    csv_content = csv_buffer.getvalue()
-
-    # Create S3 key with partitioning
-    # Parse execution date
-    date_obj = datetime.strptime(execution_date_str, "%Y-%m-%d")
-    year = date_obj.strftime("%Y")
-    month = date_obj.strftime("%m")
-    day = date_obj.strftime("%d")
-
-    # S3 path with Hive-style partitioning
-    s3_key = f"raw/orders/year={year}/month={month}/day={day}/orders.csv"
-
-    logging.info(f"Uploading to S3: s3://{S3_RAW_BUCKET}/{s3_key}")
-
-    # Upload to S3 using Airflow S3Hook
-    s3_hook = S3Hook(aws_conn_id="aws_default")
-
-    s3_hook.load_string(
-        string_data=csv_content, key=s3_key, bucket_name=S3_RAW_BUCKET, replace=True
-    )
-
-    logging.info(f"✅ Successfully uploaded {len(df)} orders to S3")
-    logging.info(f"   S3 URI: s3://{S3_RAW_BUCKET}/{s3_key}")
-    logging.info(f"   File size: {len(csv_content)} bytes")
-
-    # Push S3 location to XCom
-    context["ti"].xcom_push(key="s3_key", value=s3_key)
-    context["ti"].xcom_push(key="s3_uri", value=f"s3://{S3_RAW_BUCKET}/{s3_key}")
-
-    return s3_key
+    context["ti"].xcom_push(key="order_count", value=row_count)
+    return row_count
 
 
 def log_summary(**context):
-    """
-    Log summary of the ingestion process
-    """
-    execution_date_str = context["ti"].xcom_pull(
+    """Log ingestion summary after S3 upload completes."""
+    date_str = context["ti"].xcom_pull(
         key="execution_date_str", task_ids="get_execution_date"
     )
+    order_count = context["ti"].xcom_pull(key="order_count", task_ids="validate_source_data")
 
-    order_count = context["ti"].xcom_pull(key="order_count", task_ids="extract_orders")
-
-    s3_uri = context["ti"].xcom_pull(key="s3_uri", task_ids="load_to_s3")
+    execution_date = context["execution_date"]
+    year = execution_date.strftime("%Y")
+    month = execution_date.strftime("%m")
+    day = execution_date.strftime("%d")
+    s3_uri = f"s3://{S3_RAW_BUCKET}/raw/orders/year={year}/month={month}/day={day}/orders.csv"
 
     logging.info("=" * 60)
     logging.info("INGESTION SUMMARY")
     logging.info("=" * 60)
-    logging.info(f"Execution Date: {execution_date_str}")
-    logging.info(f"Orders Extracted: {order_count}")
-    logging.info(f"S3 Location: {s3_uri}")
-    logging.info(f"Status: SUCCESS ✅")
+    logging.info(f"Execution Date : {date_str}")
+    logging.info(f"Orders in Source: {order_count}")
+    logging.info(f"S3 Location    : {s3_uri}")
+    logging.info(f"Status         : SUCCESS")
     logging.info("=" * 60)
-
     return True
 
 
@@ -303,92 +136,91 @@ def log_summary(**context):
 with DAG(
     dag_id="ingest_postgres_orders",
     default_args=default_args,
-    description="Incremental ingestion of orders from PostgreSQL to S3",
-    schedule_interval="@daily",  # Run daily at 2 AM UTC
+    description="Incremental ingestion of orders from PostgreSQL to S3 via SqlToS3Operator",
+    schedule_interval="@daily",
     start_date=datetime(2025, 10, 20),
-    catchup=False,  # Don't backfill historical data
-    max_active_runs=1,  # Only one run at a time
+    catchup=False,
+    max_active_runs=1,
     tags=["ingestion", "postgres", "orders", "incremental"],
 ) as dag:
-    # Task 1: Get execution date
+
     task_get_date = PythonOperator(
         task_id="get_execution_date",
         python_callable=get_execution_date,
         provide_context=True,
     )
 
-    # Task 2: Extract orders from PostgreSQL
-    task_extract = PythonOperator(
-        task_id="extract_orders",
-        python_callable=extract_orders_from_postgres,
-        provide_context=True,
-    )
-
-    # Task 3: Validate data
     task_validate = PythonOperator(
-        task_id="validate_data",
-        python_callable=validate_data,
+        task_id="validate_source_data",
+        python_callable=validate_source_data,
         provide_context=True,
     )
 
-    # Task 4: Load to S3
-    task_load = PythonOperator(
-        task_id="load_to_s3",
-        python_callable=load_to_s3,
-        provide_context=True,
+    # SqlToS3Operator streams query results directly to S3 in chunks —
+    # no DataFrame is held in worker memory or passed through XCom.
+    task_extract_to_s3 = SqlToS3Operator(
+        task_id="extract_to_s3",
+        sql="""
+            SELECT
+                o.order_id,
+                o.customer_id,
+                c.email          AS customer_email,
+                c.first_name,
+                c.last_name,
+                c.customer_segment,
+                o.order_date,
+                o.order_total,
+                o.payment_method,
+                o.shipping_address,
+                o.order_status,
+                o.created_at,
+                o.updated_at
+            FROM orders o
+            JOIN customers c ON o.customer_id = c.customer_id
+            WHERE DATE(o.order_date) = '{{ ds }}'
+            ORDER BY o.order_date, o.order_id
+        """,
+        s3_bucket=S3_RAW_BUCKET,
+        s3_key=(
+            "raw/orders"
+            "/year={{ execution_date.strftime('%Y') }}"
+            "/month={{ execution_date.strftime('%m') }}"
+            "/day={{ execution_date.strftime('%d') }}"
+            "/orders.csv"
+        ),
+        sql_conn_id="postgres_source",
+        aws_conn_id="aws_default",
+        file_format="csv",
+        replace=True,
     )
 
-    # Task 5: Log summary
     task_summary = PythonOperator(
         task_id="log_summary",
         python_callable=log_summary,
         provide_context=True,
     )
 
-    # Define task dependencies
-    task_get_date >> task_extract >> task_validate >> task_load >> task_summary
+    task_get_date >> task_validate >> task_extract_to_s3 >> task_summary
 
-
-# ============================================
-# DAG DOCUMENTATION
-# ============================================
 
 dag.doc_md = """
 # PostgreSQL Orders Ingestion DAG
 
 ## Purpose
-Incrementally extract orders from PostgreSQL source database and load to S3 raw data lake.
-
-## Schedule
-- **Frequency**: Daily at 2 AM UTC
-- **Catchup**: Disabled (no historical backfill)
-- **Max Active Runs**: 1 (prevents concurrent runs)
+Incrementally extract orders from PostgreSQL and load to the S3 raw data lake.
 
 ## Data Flow
-1. **Extract**: Query orders by order_date matching execution_date
-2. **Validate**: Check data quality and business rules
-3. **Load**: Upload to S3 with Hive-style partitioning
+1. **get_execution_date** — sets the incremental date window
+2. **validate_source_data** — SQL-based row count, negative total, and orphan checks
+3. **extract_to_s3** — `SqlToS3Operator` streams query results to S3 (no Pandas in-memory)
+4. **log_summary** — records partition path and row count
 
-## S3 Partitioning Strategy
+## S3 Partitioning
 ```
-s3://ecommerce-raw-data/raw/orders/
-  year=2025/
-    month=10/
-      day=28/
-        orders.csv
+s3://ecommerce-raw-data/raw/orders/year=YYYY/month=MM/day=DD/orders.csv
 ```
 
-## Airflow Connections Required
-- `postgres_source`: PostgreSQL source database
-- `aws_default`: AWS credentials for S3 access
-
-## Monitoring
-- Check logs for validation failures
-- Monitor S3 bucket for daily files
-- Review task duration for performance
-
-## Troubleshooting
-- If no orders found: Normal for dates with no transactions
-- Connection errors: Verify Airflow connections
-- S3 upload fails: Check AWS credentials and bucket permissions
+## Connections Required
+- `postgres_source` — PostgreSQL source database
+- `aws_default`     — AWS credentials for S3 access
 """

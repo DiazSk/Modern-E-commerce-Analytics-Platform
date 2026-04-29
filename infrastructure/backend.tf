@@ -17,9 +17,7 @@ terraform {
     # Encrypt state at rest
     encrypt = true
 
-    # Optional: enable DynamoDB locking by creating a table and uncommenting
-    # the line below. If you don't have a lock table yet, leave commented
-    # and create the table separately before enabling locks.
-    # dynamodb_table = "terraform-locks-modern-ecommerce"
+    # DynamoDB table for state locking — prevents concurrent terraform applies
+    dynamodb_table = "terraform-locks-modern-ecommerce"
   }
 }

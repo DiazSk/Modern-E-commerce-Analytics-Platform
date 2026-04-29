@@ -256,6 +256,75 @@ resource "aws_s3_bucket_logging" "data_lake_logging" {
 }
 
 # ========================================
+# DynamoDB Table for Terraform State Locking
+# ========================================
+# Required by the S3 backend in backend.tf.
+# PAY_PER_REQUEST billing means zero cost when not actively locking.
+
+resource "aws_dynamodb_table" "terraform_locks" {
+  name         = "terraform-locks-modern-ecommerce"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "LockID"
+
+  attribute {
+    name = "LockID"
+    type = "S"
+  }
+
+  tags = {
+    Name = "Terraform State Lock Table"
+  }
+}
+
+# ========================================
+# IAM Least-Privilege Role for Airflow
+# ========================================
+# Replaces broad root-level AWS access keys.
+# Grants only the S3 operations Airflow DAG workers actually need
+# against the specific data lake buckets created above.
+
+resource "aws_iam_role" "airflow_s3_role" {
+  name = "${var.project_name}-airflow-s3-role-${var.environment}"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect    = "Allow"
+      Action    = "sts:AssumeRole"
+      Principal = { Service = "ec2.amazonaws.com" }
+    }]
+  })
+}
+
+resource "aws_iam_policy" "airflow_s3_policy" {
+  name        = "${var.project_name}-airflow-s3-policy-${var.environment}"
+  description = "Least-privilege S3 access for Airflow DAG workers"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = ["s3:PutObject", "s3:GetObject", "s3:DeleteObject"]
+        Resource = [
+          for bucket in aws_s3_bucket.data_lake_buckets : "${bucket.arn}/*"
+        ]
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["s3:ListBucket"]
+        Resource = [for bucket in aws_s3_bucket.data_lake_buckets : bucket.arn]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "airflow_s3_attach" {
+  role       = aws_iam_role.airflow_s3_role.name
+  policy_arn = aws_iam_policy.airflow_s3_policy.arn
+}
+
+# ========================================
 # Cost Estimation
 # ========================================
 # Estimated monthly cost (assuming 100GB data, us-east-1):

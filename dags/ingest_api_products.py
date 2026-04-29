@@ -14,7 +14,6 @@ Features:
 - Data validation
 
 Schedule: Daily at 3 AM UTC
-Author: Zaid Shaikh
 ============================================
 """
 

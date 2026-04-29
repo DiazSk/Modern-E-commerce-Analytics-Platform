@@ -3,7 +3,13 @@
         materialized='incremental',
         unique_key='order_item_key',
         tags=['fact', 'core', 'orders', 'incremental'],
-        on_schema_change='fail'
+        on_schema_change='fail',
+        cluster_by=['customer_key', 'product_key'],
+        partition_by={
+            'field': 'order_date',
+            'data_type': 'date',
+            'granularity': 'day'
+        }
     )
 }}
 
@@ -13,16 +19,14 @@
 -- Purpose: Transaction-level fact table for order analytics
 --
 -- Features:
---   - Incremental loading for performance
+--   - Incremental loading based on order_timestamp
 --   - Foreign keys to all dimension tables
 --   - Measures: quantity, unit_price, discount, line_total, order_total
 --   - Grain: One row per order line item
 --
--- Incremental Strategy:
---   - Loads new records based on order_timestamp
---   - Uses order_item_key as unique key for upserts
---
--- Grain: One row per order item (line-level detail)
+-- Optimization:
+--   - partition_by order_date: prunes full-table scans for date-range queries
+--   - cluster_by customer_key, product_key: co-locates data for common joins
 -- ==============================================================================
 
 with orders as (
