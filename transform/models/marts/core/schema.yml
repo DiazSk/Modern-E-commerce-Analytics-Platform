@@ -66,7 +66,7 @@ models:
       tags: ['dimension', 'core', 'customers', 'scd_type_2']
     columns:
       - name: customer_key
-        description: "Surrogate key combining customer_id and segment_start_date"
+        description: "Surrogate key combining customer_id and the snapshot dbt_valid_from (one per version)"
         tests:
           - unique
           - not_null
@@ -101,12 +101,12 @@ models:
               values: [true, false]
 
       - name: effective_date
-        description: "Date when this version became effective"
+        description: "Timestamp this version became valid (inclusive); the first version is backdated to 1900-01-01"
         tests:
           - not_null
 
       - name: expiration_date
-        description: "Date when this version expired (9999-12-31 for current records)"
+        description: "Timestamp this version stopped being valid (exclusive; 9999-12-31 for the current version)"
         tests:
           - not_null
 
@@ -226,4 +226,4 @@ models:
         tests:
           - not_null
           - accepted_values:
-              values: ['pending', 'processing', 'shipped', 'delivered', 'cancelled']
+              values: ['pending', 'processing', 'completed', 'cancelled', 'returned']

@@ -26,7 +26,8 @@ This directory contains the core dimensional models following Kimball's dimensio
 - **Grain**: One row per customer per segment change
 - **Key Features**:
   - Tracks customer segment changes over time
-  - Surrogate key based on customer_id + segment_start_date
+  - Built from the customers_snapshot dbt snapshot
+  - Surrogate key based on customer_id + dbt_valid_from
   - effective_date and expiration_date for historical tracking
   - is_current flag for latest record
 - **Interview Talking Points**:

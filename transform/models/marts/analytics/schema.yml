@@ -16,7 +16,7 @@ models:
           - not_null
 
       - name: customer_key
-        description: "Foreign key to current customer dimension record"
+        description: "Current customer dimension record"
         tests:
           - not_null
           - relationships:

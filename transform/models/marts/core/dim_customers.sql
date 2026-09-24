@@ -11,32 +11,41 @@
 -- ==============================================================================
 -- Purpose: Slowly Changing Dimension Type 2 for customer tracking
 --
--- Features:
---   - Tracks customer segment changes over time
---   - Maintains historical records with effective dates
---   - Surrogate key based on customer_id + segment_start_date
---   - is_current flag for latest record
+-- Source: customers_snapshot (dbt snapshot, check strategy on customer_segment)
 --
 -- SCD Type 2 Implementation:
---   - New row created when customer_segment changes
---   - segment_start_date: When this version became effective
---   - segment_end_date: When this version expired (NULL/9999-12-31 for current)
---   - is_current: TRUE for active record, FALSE for historical
+--   - A new version is created by `dbt snapshot` when customer_segment changes
+--   - effective_date: When this version became valid (inclusive)
+--   - expiration_date: When this version stopped being valid (exclusive,
+--     9999-12-31 for the current version)
+--   - is_current: TRUE for the active version
+--   - The first version of each customer is backdated to 1900-01-01 so orders
+--     placed before the first snapshot still resolve to a version
 --
--- Grain: One row per customer per segment change
+-- Fact tables join on customer_id AND order time within
+-- [effective_date, expiration_date) to get the version valid at that time.
+--
+-- Grain: One row per customer per segment version
 -- ==============================================================================
 
-with source_customers as (
+with snapshot as (
 
-    select * from {{ ref('stg_customers') }}
+    select
+        *,
+        row_number() over (
+            partition by customer_id
+            order by dbt_valid_from
+        ) as version_number
+
+    from {{ ref('customers_snapshot') }}
 
 ),
 
-customers_with_history as (
+final as (
 
     select
-        -- Surrogate Key (unique per customer segment change)
-        {{ dbt_utils.generate_surrogate_key(['customer_id', 'segment_start_date']) }} as customer_key,
+        -- Surrogate Key (unique per customer version)
+        {{ dbt_utils.generate_surrogate_key(['customer_id', 'dbt_valid_from']) }} as customer_key,
 
         -- Natural Key
         customer_id,
@@ -52,9 +61,13 @@ customers_with_history as (
         customer_segment,
 
         -- SCD Type 2 Tracking
-        segment_start_date as effective_date,
-        coalesce(segment_end_date, '9999-12-31'::date) as expiration_date,
-        is_current,
+        case
+            when version_number = 1 then '1900-01-01'::timestamp
+            else dbt_valid_from
+        end as effective_date,
+        coalesce(dbt_valid_to, '9999-12-31'::timestamp) as expiration_date,
+        dbt_valid_to is null as is_current,
+        version_number,
 
         -- Registration Info
         registration_date,
@@ -67,31 +80,7 @@ customers_with_history as (
         is_missing_email,
         is_missing_phone
 
-    from source_customers
-
-),
-
-final as (
-
-    select
-        customer_key,
-        customer_id,
-        email,
-        first_name,
-        last_name,
-        full_name,
-        phone,
-        customer_segment,
-        effective_date,
-        expiration_date,
-        is_current,
-        registration_date,
-        created_at,
-        updated_at,
-        is_missing_email,
-        is_missing_phone
-
-    from customers_with_history
+    from snapshot
 
 )
 
