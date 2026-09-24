@@ -223,6 +223,7 @@ $RECYCLE.BIN/
 # ==========================================
 # CSV files (generated data)
 *.csv
+!transform/seeds/**/*.csv
 !scripts/sample_data.csv
 data/
 
