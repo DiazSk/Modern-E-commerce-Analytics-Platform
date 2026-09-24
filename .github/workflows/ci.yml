@@ -109,5 +109,6 @@ jobs:
         working-directory: ./transform
 
       - name: dbt Build
-        run: dbt build --target ci --exclude resource_type:seed --vars '{raw_schema: ci_dbt_schema_seeds}'
+        run: |
+          dbt build --target ci --exclude resource_type:seed --vars '{raw_schema: ci_dbt_schema_seeds}'
         working-directory: ./transform
