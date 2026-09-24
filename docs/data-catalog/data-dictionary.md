@@ -55,7 +55,7 @@ This data dictionary provides comprehensive documentation for all data tables, c
 
 **Indexes:**
 - Primary Key: `customer_key`
-- Unique: `customer_id, segment_start_date`
+- Unique: `customer_id, dbt_valid_from` (one row per snapshot version)
 - Index: `email`
 - Index: `is_current, customer_segment`
 
@@ -86,7 +86,7 @@ updated_at: '2024-01-01 00:00:00'
 
 **Grain:** One row per product
 
-**Total Records:** 200 products
+**Total Records:** 20 products
 
 | Column Name | Data Type | Nullable | Description | Example Value | Business Rules |
 |-------------|-----------|----------|-------------|---------------|----------------|
@@ -698,7 +698,7 @@ WHERE order_date >= '2025-10-28 00:00:00'
 
 | Metric | Target | Actual | Status |
 |--------|--------|--------|--------|
-| Test Pass Rate | > 95% | 96.3% | ✅ |
+| dbt Tests (CI) | 100% | 147 data + 1 unit test passing | ✅ |
 | NULL Values (Critical Fields) | 0% | 0% | ✅ |
 | Duplicate Records | 0 | 0 | ✅ |
 | Referential Integrity | 100% | 100% | ✅ |
@@ -706,7 +706,7 @@ WHERE order_date >= '2025-10-28 00:00:00'
 
 ### Known Data Limitations
 
-1. **Product Catalog:** Limited to 200 products (API constraint)
+1. **Product Catalog:** Limited to 20 products (FakeStore API catalog)
 2. **Date Range:** Orders span 2 years (2023-11-02 to 2025-10-31)
 3. **Customer Scale:** 1,000 customers (synthetic data)
 4. **Geographic Data:** Limited to US addresses

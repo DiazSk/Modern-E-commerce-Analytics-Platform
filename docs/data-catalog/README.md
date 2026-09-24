@@ -20,12 +20,6 @@ Complete schema reference including:
 - **Business Rules** (segmentation logic, calculations)
 - **Common Queries** (reference examples)
 
-### [Data Quality Audit](./data-quality-audit.md)
-Quality validation results:
-- **96.3% pass rate** across all tests
-- **Great Expectations** validation suite
-- **Performance benchmarks** and audit trails
-
 ---
 
 ## 🗂️ Schema Overview
@@ -68,7 +62,7 @@ Quality validation results:
 |-------|---------|-------------|
 | dim_customers | 1,000 | Low (10-20% YoY) |
 | dim_products | 200 | Low (5-10% YoY) |
-| fact_orders | 5,000 | High (~5K/day) |
+| fact_orders | 9,915 | High (~5K/day) |
 | fact_order_items | 10,000 | High (~10K/day) |
 | fact_events | 50,000 | Very High (~50K/day) |
 
@@ -126,9 +120,9 @@ JOIN dim_products dp ON foi.product_key = dp.product_key
 ## 📝 Data Quality
 
 **Test Coverage:**
-- dbt tests: 146 tests across all models
+- dbt tests: 147 tests across all models
 - Great Expectations: 15 validations on fact_orders
-- Pass rate: 96.3%
+- All tests run in CI on every push against a fixture sample of the source tables
 
 **Known Issues:**
 - None currently tracked

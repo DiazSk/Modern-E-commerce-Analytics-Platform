@@ -63,8 +63,12 @@ customer_orders as (
         avg(f.quantity) as avg_quantity_per_item
 
     from dim_customers c
+    -- fact rows point at the customer version valid at order time, so go
+    -- through every version of the customer to collect all their orders
+    inner join {{ ref('dim_customers') }} v
+        on c.customer_id = v.customer_id
     inner join fact_orders f
-        on c.customer_key = f.customer_key
+        on v.customer_key = f.customer_key
 
     group by
         c.customer_id,

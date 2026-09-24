@@ -84,21 +84,23 @@ def validate_source_data(**context):
         f"SELECT COUNT(*) FROM orders WHERE DATE(order_date) = '{date_str}' AND order_total < 0"
     )[0]
     if neg_count > 0:
-        raise ValueError(f"Data quality failure: {neg_count} orders with negative totals on {date_str}")
+        raise ValueError(
+            f"Data quality failure: {neg_count} orders with negative totals on {date_str}"
+        )
     logging.info("No negative order totals found.")
 
     # Check 3: orphaned orders (customer_id missing from customers)
-    orphan_count = pg_hook.get_first(
-        f"""
+    orphan_count = pg_hook.get_first(f"""
         SELECT COUNT(*)
         FROM orders o
         LEFT JOIN customers c ON o.customer_id = c.customer_id
         WHERE DATE(o.order_date) = '{date_str}'
           AND c.customer_id IS NULL
-        """
-    )[0]
+        """)[0]
     if orphan_count > 0:
-        raise ValueError(f"Data quality failure: {orphan_count} orders with no matching customer on {date_str}")
+        raise ValueError(
+            f"Data quality failure: {orphan_count} orders with no matching customer on {date_str}"
+        )
     logging.info("All orders have valid customer references.")
 
     context["ti"].xcom_push(key="order_count", value=row_count)
@@ -110,7 +112,9 @@ def log_summary(**context):
     date_str = context["ti"].xcom_pull(
         key="execution_date_str", task_ids="get_execution_date"
     )
-    order_count = context["ti"].xcom_pull(key="order_count", task_ids="validate_source_data")
+    order_count = context["ti"].xcom_pull(
+        key="order_count", task_ids="validate_source_data"
+    )
 
     execution_date = context["execution_date"]
     year = execution_date.strftime("%Y")

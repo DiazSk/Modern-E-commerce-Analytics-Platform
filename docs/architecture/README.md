@@ -63,7 +63,6 @@
 ### Core Documentation
 - **[system-data-flow.md](./system-data-flow.md)** - End-to-end data flow from sources to analytics
 - **[dbt-model-specifications.md](./dbt-model-specifications.md)** - Detailed dbt model implementation specs
-- **[performance-benchmarks.md](./performance-benchmarks.md)** - Production performance validation results
 
 ### [Diagrams](./diagrams/)
 Visual architecture representations:
@@ -77,11 +76,6 @@ Production deployment evidence:
 - **S3 data lake structure** - Bucket organization and partitioning strategy
 - **Airflow DAG executions** - Successful pipeline runs
 - **dbt lineage diagram** - Data transformation dependencies
-
-### [Decisions](./decisions/)
-Architecture Decision Records (ADRs):
-- **[001-technology-stack.md](./decisions/001-technology-stack.md)** - Tool selection rationale
-- **[002-partitioning-strategy.md](./decisions/002-partitioning-strategy.md)** - Data partitioning approach
 
 ---
 
@@ -104,9 +98,9 @@ Architecture Decision Records (ADRs):
 - Date-based partitioning for efficient queries
 
 ### 4. Data Quality First
-- **146 dbt tests** across all models
+- **147 dbt tests** across all models
 - **15 Great Expectations** validations
-- **96.3% test pass rate**
+- All tests passing in CI
 
 ---
 
@@ -118,10 +112,8 @@ Architecture Decision Records (ADRs):
 - 10,000 order items
 - 50,000 events
 
-**Performance:**
-- Query optimization: 67% faster
-- Cost reduction: 56% (storage), 85% (compute)
-- Data quality: 96.3% pass rate
+**Data Quality:**
+- 147 data tests + 1 unit test, all passing in CI
 
 ---
 

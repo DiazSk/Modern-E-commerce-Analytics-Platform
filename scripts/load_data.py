@@ -285,12 +285,10 @@ def validate_data(conn):
     logger.info(f"✓ Order Items: {item_count:,}")
 
     # Check 2: Referential integrity
-    cur.execute(
-        """
+    cur.execute("""
         SELECT COUNT(*) FROM orders o
         WHERE NOT EXISTS (SELECT 1 FROM customers c WHERE c.customer_id = o.customer_id);
-    """
-    )
+    """)
     orphan_orders = cur.fetchone()[0]
     logger.info(f"✓ Orphan orders (should be 0): {orphan_orders}")
 
@@ -306,8 +304,7 @@ def validate_data(conn):
 
     # Check 5: Sample data
     logger.info("\nSample Order with Customer:")
-    cur.execute(
-        """
+    cur.execute("""
         SELECT
             o.order_id,
             c.email,
@@ -319,22 +316,19 @@ def validate_data(conn):
         JOIN customers c ON o.customer_id = c.customer_id
         ORDER BY o.order_date DESC
         LIMIT 5;
-    """
-    )
+    """)
 
     for row in cur.fetchall():
         logger.info(f"  Order #{row[0]}: {row[2]} - ${row[4]} - {row[5]}")
 
     # Check 6: Customer segments
-    cur.execute(
-        """
+    cur.execute("""
         SELECT customer_segment, COUNT(*)
         FROM customers
         WHERE is_current = TRUE
         GROUP BY customer_segment
         ORDER BY COUNT(*) DESC;
-    """
-    )
+    """)
     logger.info("\nCustomer Segment Distribution:")
     for segment, count in cur.fetchall():
         logger.info(f"  {segment}: {count:,}")

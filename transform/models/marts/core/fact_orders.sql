@@ -3,13 +3,7 @@
         materialized='incremental',
         unique_key='order_item_key',
         tags=['fact', 'core', 'orders', 'incremental'],
-        on_schema_change='fail',
-        cluster_by=['customer_key', 'product_key'],
-        partition_by={
-            'field': 'order_date',
-            'data_type': 'date',
-            'granularity': 'day'
-        }
+        on_schema_change='fail'
     )
 }}
 
@@ -21,12 +15,10 @@
 -- Features:
 --   - Incremental loading based on order_timestamp
 --   - Foreign keys to all dimension tables
+--   - customer_key is the dim_customers version valid at order time (SCD2
+--     point-in-time join), so history keeps the segment it had back then
 --   - Measures: quantity, unit_price, discount, line_total, order_total
 --   - Grain: One row per order line item
---
--- Optimization:
---   - partition_by order_date: prunes full-table scans for date-range queries
---   - cluster_by customer_key, product_key: co-locates data for common joins
 -- ==============================================================================
 
 with orders as (
@@ -50,7 +42,6 @@ order_items as (
 customers as (
 
     select * from {{ ref('dim_customers') }}
-    where is_current = true
 
 ),
 
@@ -71,7 +62,7 @@ joined as (
 
     select
         -- Unique Key for Fact Table
-        {{ dbt_utils.generate_surrogate_key(['o.order_id', 'oi.product_id']) }} as order_item_key,
+        {{ dbt_utils.generate_surrogate_key(['o.order_id', 'oi.order_item_id']) }} as order_item_key,
 
         -- Foreign Keys to Dimensions
         c.customer_key,
@@ -119,6 +110,8 @@ joined as (
         on o.order_id = oi.order_id
     inner join customers c
         on o.customer_id = c.customer_id
+        and o.order_date >= c.effective_date
+        and o.order_date < c.expiration_date
     inner join products p
         on oi.product_id = p.product_id
     inner join dates d

@@ -167,7 +167,7 @@ End-to-end data flow from source systems through transformation to the analytics
 
 ```sql
 -- dim_customers
-{{ dbt_utils.generate_surrogate_key(['customer_id', 'segment_start_date']) }}
+{{ dbt_utils.generate_surrogate_key(['customer_id', 'dbt_valid_from']) }}
 
 -- dim_products
 {{ dbt_utils.generate_surrogate_key(['product_id']) }}
@@ -198,7 +198,7 @@ End-to-end data flow from source systems through transformation to the analytics
 
 **Rationale**:
 
-- 66,000+ rows make full refresh slow
+- ~9,900 rows (and growing) make full refresh wasteful
 - Orders are append-only (no updates after creation)
 - Reduces runtime from 45s to 5s for daily updates
 
@@ -285,16 +285,16 @@ sources
 | **dim_date** | One row per day | 1,460 rows | Fixed (4 years) |
 | **dim_customers** | One row per customer per segment | ~1,200 rows | ~50 rows/month |
 | **dim_products** | One row per product | ~20 rows | ~2 rows/month |
-| **fact_orders** | One row per order line item | 66,000+ rows | ~3,000 rows/day |
+| **fact_orders** | One row per order line item | ~9,900 rows | ~3,000 rows/day |
 | **customer_lifetime_value** | One row per customer (current) | ~1,000 rows | ~30 rows/month |
 
 ### Join Cardinality Relationships
 
 ```
-fact_orders (66,000)
-├── many-to-one → dim_customers (1,200)     [~55:1 ratio]
-├── many-to-one → dim_products (20)         [~3,300:1 ratio]
-└── many-to-one → dim_date (1,460)          [~45:1 ratio]
+fact_orders (9,900)
+├── many-to-one → dim_customers (1,200)     [~8:1 ratio]
+├── many-to-one → dim_products (20)         [~500:1 ratio]
+└── many-to-one → dim_date (1,460)          [~7:1 ratio]
 ```
 
 ---

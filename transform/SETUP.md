@@ -10,7 +10,6 @@ This directory contains the dbt (data build tool) transformation layer for the M
 
 ```
 transform/
-├── analyses/           # Ad-hoc analytical queries
 ├── macros/            # Reusable SQL macros
 ├── models/            # dbt transformation models
 │   ├── staging/       # Layer 1: Raw data cleaning
