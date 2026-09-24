@@ -127,7 +127,7 @@ package "DATA QUALITY" as quality LIGHTGREY {
 }
 
 package "MONITORING" as monitoring LIGHTGREY {
-    [Airflow Alerts\ndbt Tests (146)\nPostgreSQL Metrics] as alerts
+    [Airflow Alerts\ndbt Tests (147)\nPostgreSQL Metrics] as alerts
 }
 
 package "INFRASTRUCTURE" as infra LIGHTGREY {
@@ -173,7 +173,7 @@ note bottom of sources
     <b>Data Volume (Batch Load):</b>
     • 5,000 total orders
     • 50,000 total events
-    • 9,994 order line items
+    • 9,915 order line items
     • 20 product SKUs (API)
     • 1,000 customers
 
@@ -183,7 +183,7 @@ end note
 
 note bottom of consumption
     <b>Business Impact:</b>
-    • Data Quality: 146 dbt tests passing in CI
+    • Data Quality: 147 dbt tests passing in CI
     • Processing Time: < 2 mins
     • Total Revenue Analyzed: $692K
     • Opportunities Identified: $53K+

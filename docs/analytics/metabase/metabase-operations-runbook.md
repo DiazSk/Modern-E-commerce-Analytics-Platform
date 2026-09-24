@@ -10,7 +10,7 @@ Operational reference for the Metabase BI deployment serving the e-commerce anal
 | External URL | `http://localhost:3001` |
 | Dashboards in scope | Executive, Product Performance, Customer Analytics, Funnel Analysis |
 | Visualizations | 16 |
-| Source data volume | 1,000 customers · 5,000 orders · 9,994 order items · 20 products · 50,000 events |
+| Source data volume | 1,000 customers · 5,000 orders · 9,915 order items · 20 products · 50,000 events |
 
 ---
 
@@ -681,7 +681,7 @@ Expected output:
 |-------------|--------|
 | Customers   | 1,000  |
 | Orders      | 5,000  |
-| Order Items | 9,994  |
+| Order Items | 9,915  |
 | Products    | 20     |
 | Events      | 50,000 |
 
