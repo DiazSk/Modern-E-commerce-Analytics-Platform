@@ -182,7 +182,7 @@ sources:
           **Primary Key**: order_item_id
           **Foreign Keys**: order_id -> orders.order_id
           **Update Pattern**: Immutable (no updates after creation)
-          **Row Count**: ~9,994 line items
+          **Row Count**: ~9,915 line items
 
         columns:
           - name: order_item_id

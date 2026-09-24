@@ -120,7 +120,7 @@ Dimensional modeling following Kimball methodology:
   - dim_date: 1,460 rows (4 years)
   - dim_customers: ~1,200 rows (with SCD Type 2 history)
   - dim_products: ~20 rows (FakeStore API)
-  - fact_orders: ~66,000 rows (order line items)
+  - fact_orders: ~9,900 rows (order line items)
   - customer_lifetime_value: ~1,000 rows (unique customers)
 
 ---
@@ -223,7 +223,7 @@ Dimensional modeling following Kimball methodology:
 **Star Schema Design**
 
 - 3 dimension tables + 1 fact table
-- 66,000+ order transactions processed
+- ~9,900 order line items processed
 - Sub-second query performance
 
 **SCD Type 2 Implementation**
@@ -239,7 +239,7 @@ Dimensional modeling following Kimball methodology:
 
 **Data Quality**
 
-- 146 data tests + 1 unit test, all passing in CI
+- 147 data tests + 1 unit test, all passing in CI
 - Referential integrity enforced
 - Business logic validation
 

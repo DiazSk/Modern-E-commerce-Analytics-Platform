@@ -10,7 +10,7 @@ An end-to-end batch analytics pipeline for e-commerce data: Airflow ingests orde
 - **Infrastructure:** S3 buckets, IAM policies, lifecycle rules and billing alerts provisioned with **Terraform**.
 - **Modeling:** dbt staging → star schema (`fact_orders`, `dim_customers`, `dim_products`, `dim_date`) → customer lifetime value mart.
 - **History:** customer segment changes captured with a **dbt snapshot** and exposed as an SCD Type 2 dimension; the fact table joins to the version valid at order time.
-- **Quality:** 146 dbt data tests + a dbt unit test, run in CI on every push.
+- **Quality:** 147 dbt data tests + a dbt unit test, run in CI on every push.
 - **BI:** Metabase dashboards for revenue, customers, products and events.
 
 > **Data note:** customers, orders and clickstream events are synthetic (generated with Faker, `scripts/generate_data.py`); products come from the public FakeStore API.
@@ -76,7 +76,7 @@ S3 buckets, IAM policies and billing alerts are defined in Terraform, with remot
 
 ### 2. Data Quality & Testing
 
-- **dbt Tests:** 146 data tests (uniqueness, not-null, accepted values, relationships) plus a unit test for the SCD2 point-in-time join.
+- **dbt Tests:** 147 data tests (uniqueness, not-null, accepted values, relationships) plus a unit test for the SCD2 point-in-time join.
 - **Great Expectations:** Added a layer of validation on the source data.
 - **CI:** GitHub Actions loads a small fixture of the source tables (`transform/seeds/ci_fixtures/`) into Postgres and runs `dbt build` on every push, alongside Terraform validation and Python linting.
 

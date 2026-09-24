@@ -50,7 +50,7 @@ fake = Faker()
 # Data generation parameters
 N_CUSTOMERS = 1000
 N_ORDERS = 5000
-N_PRODUCTS = 200  # Product catalog size
+N_PRODUCTS = 20  # Must match the FakeStore API catalog (product_id 1..20)
 N_CLICKSTREAM_EVENTS = 50000
 
 # Date ranges

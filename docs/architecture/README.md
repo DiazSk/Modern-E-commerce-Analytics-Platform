@@ -98,7 +98,7 @@ Production deployment evidence:
 - Date-based partitioning for efficient queries
 
 ### 4. Data Quality First
-- **146 dbt tests** across all models
+- **147 dbt tests** across all models
 - **15 Great Expectations** validations
 - All tests passing in CI
 
@@ -113,7 +113,7 @@ Production deployment evidence:
 - 50,000 events
 
 **Data Quality:**
-- 146 data tests + 1 unit test, all passing in CI
+- 147 data tests + 1 unit test, all passing in CI
 
 ---
 
