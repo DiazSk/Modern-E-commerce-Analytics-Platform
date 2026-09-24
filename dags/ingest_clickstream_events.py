@@ -46,11 +46,22 @@ S3_RAW_BUCKET = os.getenv("S3_RAW_BUCKET", "ecommerce-raw-data-bnf5etbn")
 DATA_PATH = "/opt/airflow/data/generated/clickstream_events.csv"
 
 REQUIRED_FIELDS = [
-    "event_id", "session_id", "user_id", "event_timestamp",
-    "event_type", "product_id", "page_url", "device_type", "browser",
+    "event_id",
+    "session_id",
+    "user_id",
+    "event_timestamp",
+    "event_type",
+    "product_id",
+    "page_url",
+    "device_type",
+    "browser",
 ]
 VALID_EVENT_TYPES = {
-    "page_view", "add_to_cart", "remove_from_cart", "purchase", "search",
+    "page_view",
+    "add_to_cart",
+    "remove_from_cart",
+    "purchase",
+    "search",
 }
 
 # ============================================
@@ -94,14 +105,17 @@ def stream_and_upload_to_s3(**context):
         reader = csv.DictReader(f)
 
         # Validate that required columns exist in the file header
-        missing = [col for col in REQUIRED_FIELDS if col not in (reader.fieldnames or [])]
+        missing = [
+            col for col in REQUIRED_FIELDS if col not in (reader.fieldnames or [])
+        ]
         if missing:
             raise ValueError(f"Clickstream CSV is missing required columns: {missing}")
 
         for row in reader:
             # ---- Validation (row-level) ----
             critical_nulls = [
-                field for field in ["event_id", "user_id", "event_timestamp", "event_type"]
+                field
+                for field in ["event_id", "user_id", "event_timestamp", "event_type"]
                 if not row.get(field)
             ]
             if critical_nulls:
@@ -128,7 +142,14 @@ def stream_and_upload_to_s3(**context):
                 buf = io.StringIO()
                 writer = csv.DictWriter(buf, fieldnames=reader.fieldnames)
                 writer.writeheader()
-                partitions[event_date] = {"buffer": buf, "writer": writer, "count": 0, "year": year, "month": month, "day": day}
+                partitions[event_date] = {
+                    "buffer": buf,
+                    "writer": writer,
+                    "count": 0,
+                    "year": year,
+                    "month": month,
+                    "day": day,
+                }
 
             partitions[event_date]["writer"].writerow(row)
             partitions[event_date]["count"] += 1
@@ -137,7 +158,9 @@ def stream_and_upload_to_s3(**context):
     if null_field_count > 0:
         logging.warning(f"Skipped {null_field_count} rows with null critical fields.")
     if invalid_event_type_count > 0:
-        logging.warning(f"{invalid_event_type_count} rows had unrecognised event_type values.")
+        logging.warning(
+            f"{invalid_event_type_count} rows had unrecognised event_type values."
+        )
 
     if total_rows == 0:
         logging.info("No valid events to upload.")
@@ -177,9 +200,22 @@ def log_summary(**context):
     date_str = context["ti"].xcom_pull(
         key="execution_date_str", task_ids="get_execution_date"
     )
-    total_events = context["ti"].xcom_pull(key="total_events", task_ids="stream_and_upload_to_s3") or 0
-    partition_count = context["ti"].xcom_pull(key="partition_count", task_ids="stream_and_upload_to_s3") or 0
-    uploaded_files = context["ti"].xcom_pull(key="uploaded_files", task_ids="stream_and_upload_to_s3") or []
+    total_events = (
+        context["ti"].xcom_pull(key="total_events", task_ids="stream_and_upload_to_s3")
+        or 0
+    )
+    partition_count = (
+        context["ti"].xcom_pull(
+            key="partition_count", task_ids="stream_and_upload_to_s3"
+        )
+        or 0
+    )
+    uploaded_files = (
+        context["ti"].xcom_pull(
+            key="uploaded_files", task_ids="stream_and_upload_to_s3"
+        )
+        or []
+    )
 
     logging.info("=" * 60)
     logging.info("CLICKSTREAM INGESTION SUMMARY")
