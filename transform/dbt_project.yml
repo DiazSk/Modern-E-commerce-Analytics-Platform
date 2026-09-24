@@ -37,7 +37,7 @@ clean-targets:
   - "logs"
 
 # Require dbt version compatibility
-require-dbt-version: [">=1.6.0", "<2.0.0"]
+require-dbt-version: [">=1.8.0", "<2.0.0"]
 
 # ==============================================================================
 # Model Configurations
@@ -141,6 +141,12 @@ seeds:
     +docs:
       node_color: "#9C27B0"  # Purple in dbt docs
 
+    # Small sample of the raw source tables so CI can build without the
+    # live Postgres/S3 stack. CI points the sources at this schema via
+    # --vars '{raw_schema: ...}'.
+    ci_fixtures:
+      +enabled: "{{ target.name == 'ci' }}"
+
 # ==============================================================================
 # Snapshots Configuration
 # ==============================================================================
@@ -149,9 +155,6 @@ seeds:
 snapshots:
   ecommerce_analytics:
     +target_schema: snapshots
-    +unique_key: id
-    +strategy: timestamp
-    +updated_at: updated_at
 
 # ==============================================================================
 # Data Quality Tests
