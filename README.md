@@ -1,24 +1,23 @@
 # Modern E-Commerce Analytics Platform
 
-A hands-on data engineering project demonstrating an end-to-end analytics pipeline, from data ingestion to business intelligence.
+[![CI Pipeline](https://github.com/DiazSk/Modern-E-commerce-Analytics-Platform/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/DiazSk/Modern-E-commerce-Analytics-Platform/actions/workflows/ci.yml)
+
+An end-to-end batch analytics pipeline for e-commerce data: Airflow ingests orders, products and clickstream events into an S3 data lake and Postgres, dbt models them into a star schema with SCD Type 2 customer history, and Metabase serves the dashboards.
 
 ## 🚀 Project Overview
 
-The goal of this project was to build a robust data platform that mimics a real-world scenario. I wanted to learn how to integrate industry-standard tools like **Apache Airflow**, **dbt**, and **AWS** to process e-commerce data and turn it into actionable insights.
+- **Ingestion:** Airflow DAGs pull from a REST API (FakeStore products), a Postgres OLTP database (orders) and clickstream event files, landing raw data in S3.
+- **Infrastructure:** S3 buckets, IAM policies, lifecycle rules and billing alerts provisioned with **Terraform**.
+- **Modeling:** dbt staging → star schema (`fact_orders`, `dim_customers`, `dim_products`, `dim_date`) → customer lifetime value mart.
+- **History:** customer segment changes captured with a **dbt snapshot** and exposed as an SCD Type 2 dimension; the fact table joins to the version valid at order time.
+- **Quality:** 146 dbt data tests + a dbt unit test, run in CI on every push.
+- **BI:** Metabase dashboards for revenue, customers, products and events.
 
-**What I accomplished:**
-
-- Built automated pipelines to ingest data from APIs, databases, and event streams.
-- Designed a **Star Schema** data warehouse model.
-- Managed cloud infrastructure (AWS S3) using **Terraform**.
-- Ensured data quality with automated tests.
-- Created dashboards to visualize sales and customer behavior.
+> **Data note:** customers, orders and clickstream events are synthetic (generated with Faker, `scripts/generate_data.py`); products come from the public FakeStore API.
 
 ---
 
 ## 🛠️ Tech Stack & Tools
-
-I used this stack to understand how modern data teams build scalable platforms:
 
 - **Languages:** Python, SQL
 - **Infrastructure:** Terraform (IaC), Docker
@@ -51,32 +50,43 @@ I implemented a **Dimensional Model** (Star Schema) to optimize for analytics:
 - **Fact Table:** `fact_orders` (transactions).
 - **Dimensions:** `dim_customers`, `dim_products`, `dim_date`.
 - **Key Concept Implemented:** **SCD Type 2** for `dim_customers` to track history (e.g., when a customer changes segments).
+  - `dbt snapshot` (check strategy on `customer_segment`) records a new version whenever a customer's segment changes in the source.
+  - `fact_orders` joins on `customer_id` **and** `order_date` within `[effective_date, expiration_date)`, so past orders keep the segment the customer had at the time. A dbt unit test (`models/marts/core/_unit_tests.yml`) guards this.
+
+  Try it locally:
+
+  ```sql
+  -- in the source database
+  UPDATE customers SET customer_segment = 'gold' WHERE customer_id = 1;
+  ```
+
+  ```bash
+  cd transform && dbt snapshot && dbt build --select dim_customers+
+  ```
 
 ![Dimensional Model](docs/architecture/diagrams/high_level_dimensional_model_diagram.png)
 
 ---
 
-## 💡 Key Learnings & Features
+## 💡 Key Features
 
 ### 1. Infrastructure as Code (Terraform)
 
-Instead of clicking through the AWS console, I used Terraform to script the creation of S3 buckets and IAM policies. This taught me about state management and reproducible infrastructure.
+S3 buckets, IAM policies and billing alerts are defined in Terraform, with remote state, so the environment can be recreated or torn down from code.
 
 ### 2. Data Quality & Testing
 
-I didn't just move data; I validated it.
-
-- **dbt Tests:** 146 automated tests check for unique keys and null values.
+- **dbt Tests:** 146 data tests (uniqueness, not-null, accepted values, relationships) plus a unit test for the SCD2 point-in-time join.
 - **Great Expectations:** Added a layer of validation on the source data.
-- **Result:** Achieved a **96% pass rate** on data quality checks.
+- **CI:** GitHub Actions loads a small fixture of the source tables (`transform/seeds/ci_fixtures/`) into Postgres and runs `dbt build` on every push, alongside Terraform validation and Python linting.
 
 ### 3. Workflow Orchestration
 
-I wrote Python DAGs in Airflow to handle dependencies. For example, the transformation jobs only run after the ingestion jobs successfully complete.
+Each Airflow DAG chains its tasks (e.g. extract → validate → load to S3 → summary), so a batch only lands in the lake after its validation step passes. dbt is run separately (`dbt snapshot && dbt build`) after ingestion.
 
 ### 4. Cost Optimization
 
-I learned how to use S3 Lifecycle policies to automatically move old data to cheaper storage (Glacier), simulating how a company would save money on long-term retention.
+S3 lifecycle policies move aging raw data to cheaper storage classes (Glacier) automatically.
 
 ---
 
@@ -91,7 +101,7 @@ I built dashboards to simulate answering business questions, such as "Who are ou
 
 ## 🏃 Quick Start (Local Setup)
 
-Want to run this locally? Here is how I set it up:
+To run it locally:
 
 **Prerequisites:** Docker, Python 3.9+, AWS Account.
 

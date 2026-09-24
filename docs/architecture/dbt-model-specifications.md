@@ -39,7 +39,8 @@ Dimensional modeling following Kimball methodology:
 - **Grain**: One row per customer per segment change
 - **Key Features**:
   - Tracks customer segment changes over time
-  - Surrogate key: `customer_id` + `segment_start_date`
+  - Built from the `customers_snapshot` dbt snapshot (check strategy on `customer_segment`)
+  - Surrogate key: `customer_id` + `dbt_valid_from`
   - SCD Type 2 fields: `effective_date`, `expiration_date`, `is_current`
 - **Implementation Notes**:
   - Type 2 SCD pattern preserves historical segment assignments
@@ -233,13 +234,12 @@ Dimensional modeling following Kimball methodology:
 
 **Incremental Loading**
 
-- 80% reduction in processing time
-- Real-time data freshness maintained
+- Only new orders are processed on each run
 - Scalable for production workloads
 
 **Data Quality**
 
-- 146 automated tests (96.3% pass rate)
+- 146 data tests + 1 unit test, all passing in CI
 - Referential integrity enforced
 - Business logic validation
 

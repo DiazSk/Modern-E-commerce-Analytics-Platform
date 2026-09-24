@@ -11,7 +11,6 @@ Production-grade data engineering platform for end-to-end analytics.
 ### [Architecture](./architecture/)
 System design, data flow, and architectural decisions.
 - **[Diagrams](./architecture/diagrams/)** - PlantUML architecture and data model diagrams
-- **[Decisions](./architecture/decisions/)** - Architecture Decision Records (ADRs)
 
 ### [Operations](./operations/)
 Operational runbooks and data ingestion procedures.
@@ -39,8 +38,6 @@ Developer setup and testing guides.
 3. [Data Dictionary](./data-catalog/data-dictionary.md)
 
 **Architecture:**
-- [Technology Stack](./architecture/decisions/001-technology-stack.md)
-- [Partitioning Strategy](./architecture/decisions/002-partitioning-strategy.md)
 - [Architecture Diagrams](./architecture/diagrams/)
 
 **Analytics:**

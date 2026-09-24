@@ -55,7 +55,7 @@ This data dictionary provides comprehensive documentation for all data tables, c
 
 **Indexes:**
 - Primary Key: `customer_key`
-- Unique: `customer_id, segment_start_date`
+- Unique: `customer_id, dbt_valid_from` (one row per snapshot version)
 - Index: `email`
 - Index: `is_current, customer_segment`
 
@@ -698,7 +698,7 @@ WHERE order_date >= '2025-10-28 00:00:00'
 
 | Metric | Target | Actual | Status |
 |--------|--------|--------|--------|
-| Test Pass Rate | > 95% | 96.3% | ✅ |
+| dbt Tests (CI) | 100% | 146 data + 1 unit test passing | ✅ |
 | NULL Values (Critical Fields) | 0% | 0% | ✅ |
 | Duplicate Records | 0 | 0 | ✅ |
 | Referential Integrity | 100% | 100% | ✅ |

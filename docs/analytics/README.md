@@ -18,7 +18,7 @@ Complete BI dashboard documentation:
 - **[metabase-operations-runbook.md](./metabase/metabase-operations-runbook.md)** - Operational reference with complete SQL library
 
 ### [Dashboard Screenshots](./dashboard-screenshots/)
-Production dashboard visualizations (22 screenshots):
+Dashboard visualizations (21 screenshots):
 - **Customer Analytics:** CLV distribution, segmentation, order frequency
 - **Revenue & Orders:** Trend analysis, daily/monthly patterns
 - **Product Performance:** Top products, category analysis, rating correlations
@@ -132,8 +132,6 @@ See the [Metabase Operations Runbook](./metabase/metabase-operations-runbook.md)
 - **Total:** $53,450 in actionable opportunities
 
 **Operational Efficiency:**
-- Reporting time: Hours → Seconds (100x improvement)
-- Query performance: 67% faster
 - Self-service analytics enabled
 
 ---
@@ -142,7 +140,7 @@ See the [Metabase Operations Runbook](./metabase/metabase-operations-runbook.md)
 
 ### Dashboard Design
 1. **Executive Dashboards:** 5-7 key metrics, no clutter
-2. **Operational Dashboards:** Real-time data, actionable insights
+2. **Operational Dashboards:** Daily-refreshed data, actionable insights
 3. **Analytical Dashboards:** Deep-dive capabilities, drill-down enabled
 
 ### Query Optimization

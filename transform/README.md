@@ -24,7 +24,6 @@ transform/
 ├── macros/                # Reusable SQL functions
 ├── seeds/                 # Static reference data (CSV)
 ├── snapshots/             # SCD Type 2 tracking
-├── analyses/              # Ad-hoc analytical queries
 └── docs/                  # Additional documentation
 ```
 
