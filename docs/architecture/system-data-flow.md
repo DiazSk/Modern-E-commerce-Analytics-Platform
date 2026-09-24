@@ -167,7 +167,7 @@ End-to-end data flow from source systems through transformation to the analytics
 
 ```sql
 -- dim_customers
-{{ dbt_utils.generate_surrogate_key(['customer_id', 'segment_start_date']) }}
+{{ dbt_utils.generate_surrogate_key(['customer_id', 'dbt_valid_from']) }}
 
 -- dim_products
 {{ dbt_utils.generate_surrogate_key(['product_id']) }}

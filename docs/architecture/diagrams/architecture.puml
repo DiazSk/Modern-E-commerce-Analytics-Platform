@@ -183,9 +183,7 @@ end note
 
 note bottom of consumption
     <b>Business Impact:</b>
-    • Query Performance: 74% faster
-    • Storage Cost: 56% savings
-    • Data Quality: 96.3% test pass rate
+    • Data Quality: 146 dbt tests passing in CI
     • Processing Time: < 2 mins
     • Total Revenue Analyzed: $692K
     • Opportunities Identified: $53K+

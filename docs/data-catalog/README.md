@@ -20,12 +20,6 @@ Complete schema reference including:
 - **Business Rules** (segmentation logic, calculations)
 - **Common Queries** (reference examples)
 
-### [Data Quality Audit](./data-quality-audit.md)
-Quality validation results:
-- **96.3% pass rate** across all tests
-- **Great Expectations** validation suite
-- **Performance benchmarks** and audit trails
-
 ---
 
 ## 🗂️ Schema Overview
@@ -128,7 +122,7 @@ JOIN dim_products dp ON foi.product_key = dp.product_key
 **Test Coverage:**
 - dbt tests: 146 tests across all models
 - Great Expectations: 15 validations on fact_orders
-- Pass rate: 96.3%
+- All tests run in CI on every push against a fixture sample of the source tables
 
 **Known Issues:**
 - None currently tracked
