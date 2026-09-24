@@ -51,3 +51,28 @@ jobs:
 
       - name: Check Import Sorting
         run: isort --check-only .
+
+  python-tests:
+    name: Python Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Setup Java (for PySpark)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install Dependencies
+        run: |
+          pip install "apache-airflow==2.7.3" --constraint https://raw.githubusercontent.com/apache/airflow/constraints-2.7.3/constraints-3.11.txt
+          pip install "apache-airflow==2.7.3" pyspark==3.5.1 pytest
+
+      - name: Run pytest
+        run: pytest -q
