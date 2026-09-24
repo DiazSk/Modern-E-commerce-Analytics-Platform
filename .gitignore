@@ -292,3 +292,7 @@ great_expectations/
 # - Build artifacts
 # - Terraform state files
 # ==========================================
+
+# graft's local graph cache — regenerable, not committed (run `graft build`).
+/graft/
+.ignore
