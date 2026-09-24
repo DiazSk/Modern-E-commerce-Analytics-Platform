@@ -20,8 +20,7 @@ sources:
       **Data Retention**: Full historical data
 
     # Database configuration
-    database: ecommerce
-    schema: public
+    schema: "{{ var('raw_schema', 'public') }}"
 
     # Source freshness checks (optional for local dev)
     # freshness:
@@ -101,7 +100,7 @@ sources:
             tests:
               - not_null
               - accepted_values:
-                  values: ['bronze', 'silver', 'gold']
+                  values: ['bronze', 'silver', 'gold', 'platinum']
 
           - name: created_at
             description: "Record creation timestamp"
@@ -149,10 +148,10 @@ sources:
 
           - name: payment_method
             description: |
-              Payment method used (credit_card/debit_card/paypal/bank_transfer)
+              Payment method used (credit_card/debit_card/paypal/apple_pay/google_pay)
             tests:
               - accepted_values:
-                  values: ['credit_card', 'debit_card', 'paypal', 'bank_transfer']
+                  values: ['credit_card', 'debit_card', 'paypal', 'apple_pay', 'google_pay']
 
           - name: shipping_address
             description: "Full shipping address for the order"
@@ -160,11 +159,11 @@ sources:
           - name: order_status
             description: |
               Current order status
-              (pending/processing/shipped/delivered/cancelled)
+              (pending/processing/completed/cancelled/returned)
             tests:
               - not_null
               - accepted_values:
-                  values: ['pending', 'processing', 'shipped', 'delivered', 'cancelled']
+                  values: ['pending', 'processing', 'completed', 'cancelled', 'returned']
 
           - name: created_at
             description: "Record creation timestamp"

@@ -7,8 +7,7 @@ version: 2
 sources:
   - name: postgres_ecommerce
     description: E-commerce operational database
-    database: ecommerce
-    schema: public
+    schema: "{{ var('raw_schema', 'public') }}"
 
     tables:
       - name: clickstream_events

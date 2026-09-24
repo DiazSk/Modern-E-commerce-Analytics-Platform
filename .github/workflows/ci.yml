@@ -41,7 +41,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          pip install flake8 black isort
+          pip install flake8==7.4.1 black==26.5.1 isort==9.0.1
 
       - name: Run Flake8
         run: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
@@ -104,6 +104,10 @@ jobs:
         run: dbt deps
         working-directory: ./transform
 
+      - name: Load CI Fixtures
+        run: dbt seed --target ci
+        working-directory: ./transform
+
       - name: dbt Build
-        run: dbt build --target ci
+        run: dbt build --target ci --exclude resource_type:seed --vars '{raw_schema: ci_dbt_schema_seeds}'
         working-directory: ./transform
