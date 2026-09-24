@@ -215,6 +215,57 @@ resource "aws_s3_bucket_lifecycle_configuration" "data_lake_lifecycle" {
       days_after_initiation = 7
     }
   }
+
+  # Athena query results are disposable.
+  rule {
+    id     = "expire-athena-results"
+    status = "Enabled"
+
+    filter {
+      prefix = "athena-results/"
+    }
+
+    expiration {
+      days = 7
+    }
+
+    noncurrent_version_expiration {
+      noncurrent_days = 1
+    }
+  }
+
+  # Kaggle archives can be re-downloaded; the Parquet is the durable copy.
+  rule {
+    id     = "expire-raw-archives"
+    status = "Enabled"
+
+    filter {
+      prefix = "rees46/archive/"
+    }
+
+    expiration {
+      days = 30
+    }
+
+    noncurrent_version_expiration {
+      noncurrent_days = 1
+    }
+  }
+
+  # Re-running a month rewrites its Parquet; don't keep superseded versions
+  # for a year (bucket versioning is on).
+  rule {
+    id     = "expire-replaced-parquet"
+    status = "Enabled"
+
+    filter {
+      prefix = "rees46/events/"
+    }
+
+    noncurrent_version_expiration {
+      noncurrent_days = 7
+    }
+  }
 }
 
 # ========================================
