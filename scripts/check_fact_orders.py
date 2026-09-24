@@ -26,15 +26,13 @@ def main():
         cur = conn.cursor()
 
         # Check if table exists
-        cur.execute(
-            """
+        cur.execute("""
             SELECT EXISTS (
                 SELECT FROM information_schema.tables
                 WHERE table_schema = 'public'
                 AND table_name = 'fact_orders'
             );
-        """
-        )
+        """)
 
         exists = cur.fetchone()[0]
 

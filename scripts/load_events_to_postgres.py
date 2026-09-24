@@ -138,16 +138,14 @@ def load_events_from_s3():
     conn = psycopg2.connect(**PG_CONFIG)
     cur = conn.cursor()
 
-    cur.execute(
-        """
+    cur.execute("""
         SELECT
             event_type,
             COUNT(*) as count
         FROM clickstream_events
         GROUP BY event_type
         ORDER BY count DESC;
-    """
-    )
+    """)
 
     print("\n📊 Event Type Distribution:")
     for row in cur.fetchall():
