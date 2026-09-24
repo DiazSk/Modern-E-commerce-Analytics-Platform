@@ -422,7 +422,7 @@ RECOMMENDED MONITORING
    - Monitor daily data scanned trends
    - Compare against baseline to quantify optimization value
 
-LESSONS LEARNED FOR INTERVIEWS
+KEY OPTIMIZATION TAKEAWAYS
 -------------------------------------------------------------------------
 1. "Optimization is data-driven": We profiled production queries first
 2. "Dual approach": Partitioning + Clustering for compound benefits

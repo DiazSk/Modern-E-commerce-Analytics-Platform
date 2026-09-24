@@ -69,7 +69,7 @@ transform/
 
 1. **Python 3.9-3.11** with dbt-snowflake installed
 2. **Snowflake account** (free trial available)
-3. **AWS S3** with raw data (from Week 2 ingestion)
+3. **AWS S3** with raw data (from the ingestion pipeline)
 
 ### Installation
 
@@ -430,7 +430,7 @@ select * from final
 **Error: `Database Error 002003 (42S02): SQL compilation error: Object does not exist`**
 ```bash
 # Solution: Ensure source tables exist in Snowflake
-# Run data ingestion DAGs first (Week 2)
+# Run data ingestion DAGs first
 ```
 
 **Error: `Compilation Error: depends on a node named 'ref('stg_orders')' which was not found`**

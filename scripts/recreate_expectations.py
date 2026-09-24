@@ -154,7 +154,7 @@ def main():
         print(f"✓ Schema: public_marts_core.fact_orders")
         print(f"✓ Location: gx/expectations/")
         print(f"✓ Total expectations: {len(suite.expectations)}")
-        print(f"\n🚀 Ready for Week 5 Day 3-5 completion!\n")
+        print(f"\n🚀 Expectations recreated successfully!\n")
 
         return 0
 

@@ -6,7 +6,7 @@ This directory contains performance test queries for benchmarking the impact of 
 ## 🎯 Purpose
 - Document baseline (pre-optimization) performance metrics
 - Measure improvement after optimization
-- Provide reproducible benchmarks for interviews and documentation
+- Provide reproducible benchmarks for regression tracking and documentation
 - Establish monitoring baselines for production
 
 ## 📁 Files
