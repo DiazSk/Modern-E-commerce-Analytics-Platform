@@ -68,17 +68,17 @@ a{color:inherit;text-underline-offset:3px;text-decoration-thickness:1px}
 .chip .n{opacity:.6;margin-left:6px}
 
 /* Hero */
-.hero{margin-top:28px;padding-top:24px;overflow-x:clip}
+.hero{margin-top:28px;padding-top:24px}
 .hero h1{grid-column:1/-1;margin:0;font-weight:400;font-size:clamp(44px,6.4vw,92px);line-height:.98;letter-spacing:-.02em;text-wrap:balance}
 .hero .lede{margin:16px 0 0;font-size:16px;color:var(--ink-2);max-width:48ch}
-.figure-pair{grid-column:1/span 12;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gutter);margin-top:36px;align-items:end}
+.figure-pair{grid-column:1/span 12;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gutter);margin-top:36px;align-items:baseline}
 .fig{grid-column:span 3}
 .fig .big{font-size:clamp(64px,7vw,108px);line-height:.9;letter-spacing:-.04em;font-weight:300}
 .fig .big.bf{font-weight:500}
 .fig .what{margin-top:14px;color:var(--ink-2);max-width:30ch}
 .arrow{grid-column:span 1;align-self:center;justify-self:center}
 .arrow svg{width:56px;height:24px;stroke:var(--ink);stroke-width:1.5;fill:none}
-.delta{grid-column:span 5;border-left:1px solid var(--hair);padding-left:24px}
+.delta{grid-column:span 5;align-self:start;border-left:1px solid var(--hair);padding-left:24px}
 .delta .d{font-size:40px;letter-spacing:-.02em;line-height:1}
 .delta .ci{margin-top:10px;color:var(--ink-2)}
 .dots{position:absolute;top:0;right:var(--gutter);width:42%;height:520px;pointer-events:none;z-index:-1;
@@ -368,7 +368,7 @@ const PRESETS = [
   { id: "weekend", label: "Weekends vs weekdays", A: "Weekdays", B: "Weekends",
     inA: (d) => ![0, 6].includes(dow(d)), inB: (d) => [0, 6].includes(dow(d)) },
 ];
-const state = { preset: PRESETS[0], cats: new Set(), pricePeriod: "B", includeGap: false };
+const state = { preset: PRESETS[0], cats: new Set(), pricePeriod: "all", includeGap: false };
 /* Nov 14-17: tracking anomaly in the source (carts logged without purchases).
    Excluded from every window unless the reader puts it back. */
 const isGap = (d) => d >= "2019-11-14" && d <= "2019-11-17";
@@ -389,7 +389,7 @@ const presetsEl = document.getElementById("presets"), catsEl = document.getEleme
 PRESETS.forEach((p) => { const b = document.createElement("button"); b.className = "btn"; b.textContent = p.label; b.dataset.id = p.id; b.addEventListener("click", () => { state.preset = p; render(); }); presetsEl.appendChild(b); });
 const allBtn = document.createElement("button"); allBtn.className = "btn chip"; allBtn.textContent = "All"; allBtn.addEventListener("click", () => { state.cats.clear(); render(); }); catsEl.appendChild(allBtn);
 CATS.forEach((c) => { const b = document.createElement("button"); b.className = "btn chip"; b.dataset.cat = c; b.innerHTML = esc(c) + '<span class="n">' + (catTotals[c] / 1e6 >= 1 ? (catTotals[c] / 1e6).toFixed(1) + "M" : Math.round(catTotals[c] / 1e3) + "k") + "</span>"; b.setAttribute("aria-label", c + ", " + fmtInt(catTotals[c]) + " session-categories"); b.addEventListener("click", () => { state.cats.has(c) ? state.cats.delete(c) : state.cats.add(c); render(); }); catsEl.appendChild(b); });
-document.getElementById("reset").addEventListener("click", () => { state.preset = PRESETS[0]; state.cats.clear(); state.pricePeriod = "B"; state.includeGap = false; render(); });
+document.getElementById("reset").addEventListener("click", () => { state.preset = PRESETS[0]; state.cats.clear(); state.pricePeriod = "all"; state.includeGap = false; render(); });
 const gapToggle = document.getElementById("gap-toggle");
 gapToggle.addEventListener("click", () => { state.includeGap = !state.includeGap; render(); });
 const catsToggle = document.getElementById("cats-toggle");
@@ -486,7 +486,7 @@ const periodsEl = document.getElementById("price-periods");
 function renderPrice() {
   const P = state.preset;
   const opts = [["B", P.B], ["A", P.A], ["all", "All days"]];
-  if (!opts.find((o) => o[0] === state.pricePeriod)) state.pricePeriod = "B";
+  if (!opts.find((o) => o[0] === state.pricePeriod)) state.pricePeriod = "all";
   periodsEl.innerHTML = ""; opts.forEach(([id, label]) => { const b = document.createElement("button"); b.className = "btn chip"; b.textContent = label; b.setAttribute("aria-pressed", String(state.pricePeriod === id)); b.addEventListener("click", () => { state.pricePeriod = id; renderPrice(); }); periodsEl.appendChild(b); });
   const inPeriod = (d) => (state.pricePeriod === "all" ? state.includeGap || !isGap(d) : inW(P, d) === state.pricePeriod);
   const cell = {}, byCat = {};
