@@ -260,7 +260,7 @@ temp/
 # ==========================================
 # DOCUMENTATION BUILD
 # ==========================================
-site/
+/site/
 _site/
 .sass-cache/
 .jekyll-cache/
@@ -297,3 +297,36 @@ great_expectations/
 # graft's local graph cache — regenerable, not committed (run `graft build`).
 /graft/
 .ignore
+
+# Local assistant instructions (not published)
+CLAUDE.md
+
+# Local Spark/Delta test artifacts and Databricks bundle cache
+spark-warehouse/
+metastore_db/
+derby.log
+.databricks/
+
+# Local design/planning notes (kept out of the public repo)
+docs/superpowers/
+
+# dbt build artifacts
+dbt/target/
+dbt/logs/
+
+# CI-only synthetic fixture and dbt-spark profile (no secrets)
+!ci/fixtures/*.csv
+!ci/profiles.yml
+
+# Published aggregate analysis outputs (no raw rows)
+!analysis/results/*.csv
+!analysis/extracts/*.csv
+
+# Local design-tool notes (kept out of the public repo)
+PRODUCT.md
+DESIGN.md
+DESIGN.*.md
+.impeccable/
+
+# Local editor/assistant launch config
+.claude/

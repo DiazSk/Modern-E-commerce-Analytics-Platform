@@ -1,157 +1,111 @@
 # Modern E-Commerce Analytics Platform
 
-[![CI Pipeline](https://github.com/DiazSk/Modern-E-commerce-Analytics-Platform/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/DiazSk/Modern-E-commerce-Analytics-Platform/actions/workflows/ci.yml)
+[![CI](https://github.com/DiazSk/Modern-E-commerce-Analytics-Platform/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/DiazSk/Modern-E-commerce-Analytics-Platform/actions/workflows/ci.yml)
 
-An end-to-end batch analytics pipeline for e-commerce data: Airflow ingests orders, products and clickstream events into an S3 data lake and Postgres, dbt models them into a star schema with SCD Type 2 customer history, and Metabase serves the dashboards.
+**Black Friday week sent more shoppers to the cart.** 11.7% of sessions reached the cart, compared with 9.2% in the four weeks before: **+2.5 pp** (95% CI +2.46 to +2.55). Purchase rate rose from 5.25% to 5.60% (+0.36 pp, CI +0.32 to +0.39).
 
-## 🚀 Project Overview
+**And a four-day tracking gap nearly told the opposite story.** Nov 15 logged 468,262 carts and zero purchases. With Nov 14–17 left in the baseline, every headline result reverses (cart reach −1.7 pp), and each still looks statistically solid. The analysis finds the gap, measures how much it matters, and excludes it. A dbt test now warns if one ever happens again.
 
-- **Ingestion:** Airflow DAGs pull from a REST API (FakeStore products), a Postgres OLTP database (orders) and clickstream event files, landing raw data in S3.
-- **Infrastructure:** S3 buckets, IAM policies, lifecycle rules and billing alerts provisioned with **Terraform**.
-- **Modeling:** dbt staging → star schema (`fact_orders`, `dim_customers`, `dim_products`, `dim_date`) → customer lifetime value mart.
-- **History:** customer segment changes captured with a **dbt snapshot** and exposed as an SCD Type 2 dimension; the fact table joins to the version valid at order time.
-- **Quality:** 147 dbt data tests + a dbt unit test, run in CI on every push.
-- **BI:** Metabase dashboards for revenue, customers, products and events.
+📊 [Interactive dashboard](https://diazsk.github.io/Modern-E-commerce-Analytics-Platform/) · 📝 [Findings memo](analysis/findings.md) · 🔁 [How this project evolved](MIGRATION.md)
 
-> **Data note:** customers, orders and clickstream events are synthetic (generated with Faker, `scripts/generate_data.py`); products come from the public FakeStore API.
+An end-to-end pipeline on **109.8M real e-commerce events** (REES46, Oct–Nov 2019),
+running entirely on **Databricks Free Edition**: ingestion from Kaggle, PySpark
+into Delta Lake, dbt models and tests, and an analysis layer that reports effect
+sizes with confidence intervals.
 
----
+![Purchase rate change by category](analysis/charts/q1_purchase_rate_black_friday.png)
 
-## 🛠️ Tech Stack & Tools
+## Architecture
 
-- **Languages:** Python, SQL
-- **Infrastructure:** Terraform (IaC), Docker
-- **Cloud Storage:** AWS S3 (Data Lake)
-- **Orchestration:** Apache Airflow
-- **Transformation:** dbt (Data Build Tool)
-- **Warehouse:** PostgreSQL (Local)
-- **Quality:** Great Expectations
-- **Visualization:** Metabase
+```mermaid
+flowchart LR
+    K[Kaggle REES46] -->|ingest task| V[(UC volume<br/>landing)]
+    V -->|PySpark transform<br/>dedupe, key, UTC| R[(Delta<br/>raw_events)]
+    R -->|dbt_task| S[stg_events]
+    S --> I[int_sessions] --> F[fct_sessions<br/>incremental merge]
+    S --> P[fct_purchases]
+    S --> D[dim_products / dim_users / dim_date]
+    F --> M1[mart_funnel_daily]
+    D --> M2[mart_cart_abandonment]
+    M1 & M2 --> A[analysis/*.sql → memo, charts, dashboard]
+```
 
----
+The pipeline is one Databricks Workflows job, `rees46_pipeline`, defined as code in a
+Databricks Asset Bundle (`databricks.yml`, `resources/rees46.yml`). It's a
+**historical backfill replay**, triggered once per month, not a live feed.
+Re-running a month replaces it, and Delta rejects any row dated outside that month.
 
-## 📊 Architecture
+## Data model
 
-Here is the high-level design of the system I built:
+| Model | Grain | Notes |
+|---|---|---|
+| `raw_events` | event | Delta, partitioned by `event_date`, exact duplicates removed |
+| `fct_sessions` | session | incremental merge; recomputes every session with events in the loaded month |
+| `fct_purchases` | purchase event | the source has no order IDs |
+| `dim_products` | product | latest attributes, price quartile within category |
+| `dim_users`, `dim_date` | user, day | |
+| `mart_funnel_daily` | session start date × category | a stage counts if the session reached it or any later stage |
+| `mart_cart_abandonment` | category × price band × week | one row per product carted in a session |
 
-![Architecture Diagram](docs/architecture/diagrams/high_level_architecture_diagram.png)
+## Analysis
 
-1.  **Ingest:** Airflow DAGs fetch data from a Mock API, a Postgres DB, and clickstream events.
-2.  **Store:** Raw data is saved to an S3 Data Lake (managed by Terraform).
-3.  **Transform:** dbt models clean and structure the data into a Star Schema (Fact & Dimensions).
-4.  **Visualize:** Metabase connects to the final tables to show dashboards.
+`analysis/queries/*.sql` answers two questions. Where do shoppers drop off in
+view → cart → purchase, and did Black Friday week change it? And does price
+drive cart abandonment within a category? Every comparison is a difference in
+proportions with a 95% CI. `analysis/run_queries.py` runs the queries on the
+SQL warehouse through the Databricks CLI and commits only aggregates:
+`analysis/results/` holds the query outputs and `analysis/extracts/` the
+dashboard data. `analysis/build_site.py` turns them into the
+[dashboard](https://diazsk.github.io/Modern-E-commerce-Analytics-Platform/), a
+static page in `docs/` whose explorer can put the tracking gap back in.
 
----
+## Quality
 
-## 🏗️ Data Modeling
+- **pytest:** covers the transform (dedupe, UTC, null-safe keys, month guard), the
+  job tasks, the analysis runner and the dashboard build.
+- **dbt:** unique, not-null and relationships tests, 3 unit tests, and singular
+  tests: funnel monotonicity, unique mart grains, no `'None'` strings,
+  `fct_sessions` consistent with a from-scratch aggregation, and a warning for
+  any day with carts but no purchases. The from-scratch consistency test caught
+  a real-data issue: REES46 session IDs can span weeks.
+- **CI** (no cloud credentials): lint, pytest, and a two-month dbt build on local
+  Spark + Delta over a **synthetic** fixture, because the dataset's license
+  doesn't allow redistributing rows.
 
-I implemented a **Dimensional Model** (Star Schema) to optimize for analytics:
-
-- **Fact Table:** `fact_orders` (transactions).
-- **Dimensions:** `dim_customers`, `dim_products`, `dim_date`.
-- **Key Concept Implemented:** **SCD Type 2** for `dim_customers` to track history (e.g., when a customer changes segments).
-  - `dbt snapshot` (check strategy on `customer_segment`) records a new version whenever a customer's segment changes in the source.
-  - `fact_orders` joins on `customer_id` **and** `order_date` within `[effective_date, expiration_date)`, so past orders keep the segment the customer had at the time. A dbt unit test (`models/marts/core/_unit_tests.yml`) guards this.
-
-  Try it locally:
-
-  ```sql
-  -- in the source database
-  UPDATE customers SET customer_segment = 'gold' WHERE customer_id = 1;
-  ```
-
-  ```bash
-  cd transform && dbt snapshot && dbt build --select dim_customers+
-  ```
-
-![Dimensional Model](docs/architecture/diagrams/high_level_dimensional_model_diagram.png)
-
----
-
-## 💡 Key Features
-
-### 1. Infrastructure as Code (Terraform)
-
-S3 buckets, IAM policies and billing alerts are defined in Terraform, with remote state, so the environment can be recreated or torn down from code.
-
-### 2. Data Quality & Testing
-
-- **dbt Tests:** 147 data tests (uniqueness, not-null, accepted values, relationships) plus a unit test for the SCD2 point-in-time join.
-- **Great Expectations:** Added a layer of validation on the source data.
-- **CI:** GitHub Actions loads a small fixture of the source tables (`transform/seeds/ci_fixtures/`) into Postgres and runs `dbt build` on every push, alongside Terraform validation and Python linting.
-
-### 3. Workflow Orchestration
-
-Each Airflow DAG chains its tasks (e.g. extract → validate → load to S3 → summary), so a batch only lands in the lake after its validation step passes. dbt is run separately (`dbt snapshot && dbt build`) after ingestion.
-
-### 4. Cost Optimization
-
-S3 lifecycle policies move aging raw data to cheaper storage classes (Glacier) automatically.
-
----
-
-## 📈 Dashboarding
-
-I built dashboards to simulate answering business questions, such as "Who are our top customers?" or "Which product category sells best?".
-
-- **Revenue Analysis:** Tracked sales trends over time.
-- **Customer Segmentation:** Grouped customers by spending habits (Gold, Silver, Bronze).
-
----
-
-## 🏃 Quick Start (Local Setup)
-
-To run it locally:
-
-**Prerequisites:** Docker, Python 3.9+, AWS Account.
+## Run it
 
 ```bash
-# 1. Clone the repo
-git clone https://github.com/DiazSk/Modern-E-commerce-Analytics-Platform.git
-cd Modern-E-commerce-Analytics-Platform
-
-# 2. Setup Python Virtual Env
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install -r requirements.txt
-
-# 3. Configure .env
-cp .env.example .env
-# (Add your AWS credentials in the file)
-
-# 4. Provision Infrastructure
-cd infrastructure
-terraform init
-terraform apply
-
-# 5. Start Services
-cd ..
-docker-compose up -d
+brew tap databricks/tap && brew install databricks
+databricks auth login --host <your-workspace-url>
+databricks secrets create-scope rees46
+databricks secrets put-secret rees46 kaggle_username
+databricks secrets put-secret rees46 kaggle_key
+databricks bundle deploy
+databricks bundle run rees46_pipeline --params month=2019-10
+databricks bundle run rees46_pipeline --params month=2019-11
+python analysis/run_queries.py && python analysis/make_charts.py && python analysis/build_site.py
 ```
 
-- **Airflow UI:** `http://localhost:8081` (admin/admin123)
-- **Metabase UI:** `http://localhost:3001`
+## Tests
 
----
+Local Spark + Delta (Java 17), no Databricks account needed:
 
-## 📂 Project Structure
-
-```text
-Modern-E-commerce-Analytics-Platform/
-├── dags/                  # Airflow pipelines (Python)
-├── transform/             # dbt project (SQL models & tests)
-├── infrastructure/        # Terraform config (AWS resources)
-├── docs/                  # Project documentation & diagrams
-├── scripts/               # Helper scripts for setup/data gen
-└── docker-compose.yml     # Container definition
+```bash
+pip install pyspark==3.5.3 delta-spark==3.2.1 pytest "dbt-core==1.12.5" "dbt-spark[session]==1.11.0"
+pytest -q
+bash ci/run_dbt_ci.sh
 ```
 
----
+## Data and limitations
 
-## 📬 Contact
+[REES46 "eCommerce behavior data from multi category store"](https://www.kaggle.com/datasets/mkechinov/ecommerce-behavior-data-from-multi-category-store)
+(data © original authors; only aggregates are published here). It covers one store
+and two months of 2019. There are no order IDs or demographics, session IDs can
+span weeks, and Nov 14–17 has a tracking gap. See the memo's caveats.
 
-**Zaid Shaikh**
+The first version of this project (synthetic data on Postgres) is at tag
+[`v1-postgres-synthetic`](https://github.com/DiazSk/Modern-E-commerce-Analytics-Platform/tree/v1-postgres-synthetic).
 
-- **GitHub:** [@DiazSk](https://github.com/DiazSk)
-- **LinkedIn:** [Zaid Shaikh](https://www.linkedin.com/in/zaidshaikhengineer/)
-- **Email:** zaid07sk@gmail.com
+## Contact
+
+**Zaid Shaikh** · [GitHub](https://github.com/DiazSk) · [LinkedIn](https://www.linkedin.com/in/zaidshaikhengineer/)

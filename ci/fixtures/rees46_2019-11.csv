@@ -1,0 +1,13 @@
+event_time,event_type,product_id,category_id,category_code,brand,price,user_id,user_session
+2019-11-01 00:05:00 UTC,purchase,1001,2053013563911094004,electronics.smartphone,apple,500.00,101,s1
+2019-11-05 14:00:00 UTC,view,1002,2053013563911094000,appliances.kitchen.refrigerator,samsung,300.00,106,s6
+2019-11-05 14:03:00 UTC,cart,1002,2053013563911094000,appliances.kitchen.refrigerator,samsung,300.00,106,s6
+2019-11-12 16:00:00 UTC,view,1004,2053013563911094002,electronics.audio.headphone,sony,50.00,107,s7
+2019-11-12 16:01:00 UTC,purchase,1004,2053013563911094002,electronics.audio.headphone,sony,50.00,107,s7
+2019-11-29 10:00:00 UTC,view,1005,2053013563911094003,computers.notebook,lenovo,900.00,108,s8
+2019-11-29 10:01:00 UTC,cart,1005,2053013563911094003,computers.notebook,lenovo,900.00,108,s8
+2019-11-29 10:03:00 UTC,purchase,1005,2053013563911094003,computers.notebook,lenovo,900.00,108,s8
+2019-11-29 11:00:00 UTC,view,1001,2053013563911094004,electronics.smartphone,apple,500.00,109,s9
+2019-11-29 11:02:00 UTC,cart,1001,2053013563911094004,electronics.smartphone,apple,500.00,109,s9
+2019-11-30 20:00:00 UTC,view,1004,2053013563911094002,electronics.audio.headphone,sony,50.00,110,s10
+2019-11-02 09:00:00 UTC,view,1004,2053013563911094002,electronics.audio.headphone,sony,50.00,101,s5

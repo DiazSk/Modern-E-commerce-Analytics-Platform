@@ -1,0 +1,17 @@
+# dbt-spark "session" profile for CI: an in-process local Spark with Delta.
+# No Databricks credentials. Shares the warehouse dir and the Hive metastore
+# (current directory) with ci/load_fixture.py.
+rees46:
+  target: ci
+  outputs:
+    ci:
+      type: spark
+      method: session
+      host: NA
+      schema: ci
+      server_side_parameters:
+        spark.sql.extensions: io.delta.sql.DeltaSparkSessionExtension
+        spark.sql.catalog.spark_catalog: org.apache.spark.sql.delta.catalog.DeltaCatalog
+        spark.jars.packages: io.delta:delta-spark_2.12:3.2.1
+        spark.sql.session.timeZone: UTC
+        spark.sql.warehouse.dir: "{{ env_var('SPARK_WAREHOUSE_DIR') }}"

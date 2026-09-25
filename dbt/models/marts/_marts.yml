@@ -1,0 +1,122 @@
+version: 2
+
+models:
+  - name: fct_sessions
+    description: >
+      One row per session (incremental, merge on user_session). With
+      load_month set, recomputes every session that has an event in that
+      month; REES46 session IDs can span weeks.
+    columns:
+      - name: user_session
+        data_tests: [unique, not_null]
+      - name: session_date
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_day
+
+  - name: fct_purchases
+    description: One row per purchase event (there are no order IDs in REES46).
+    columns:
+      - name: event_key
+        data_tests: [unique, not_null]
+      - name: product_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_products')
+                field: product_id
+      - name: user_session
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('fct_sessions')
+                field: user_session
+
+  - name: dim_products
+    description: Latest attributes per product (Type 1); price_band = price quartile within category_l1.
+    columns:
+      - name: product_id
+        data_tests: [unique, not_null]
+      - name: price_band
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [1, 2, 3, 4]
+                quote: false
+
+  - name: dim_users
+    columns:
+      - name: user_id
+        data_tests: [unique, not_null]
+
+  - name: dim_date
+    columns:
+      - name: date_day
+        data_tests: [unique, not_null]
+
+  - name: mart_funnel_daily
+    description: >
+      Funnel per session start date and top-level category. A session counts
+      in a category if it has any event there; carted/purchased within that
+      category under the funnel rule. Sessions are attributed to the day they
+      started (REES46 session IDs can span weeks).
+    columns:
+      - name: session_date
+        description: Date the session started (not the date of each event).
+        data_tests: [not_null]
+  - name: mart_cart_abandonment
+    description: >
+      Cart abandonment per category, price band and week. An item is a product
+      carted in a session; abandoned if that session never purchases it.
+      Purchases without a cart event are not counted as carted.
+
+unit_tests:
+  - name: fct_sessions_recomputes_sessions_with_events_in_load_month
+    model: fct_sessions
+    overrides:
+      macros:
+        is_incremental: true
+      vars:
+        load_month: "2019-10"
+    given:
+      - input: this
+        rows:
+          - {user_session: already_loaded, session_date: 2019-11-20}
+      - input: ref('int_sessions')
+        rows:
+          - {user_session: long_running, session_date: 2019-09-02}
+          - {user_session: september_only, session_date: 2019-09-15}
+          - {user_session: october, session_date: 2019-10-12}
+          - {user_session: november_only, session_date: 2019-11-01}
+      - input: ref('stg_events')
+        rows:
+          - {user_session: long_running, event_date: 2019-09-02}
+          - {user_session: long_running, event_date: 2019-10-20}
+          - {user_session: september_only, event_date: 2019-09-15}
+          - {user_session: september_only, event_date: 2019-09-30}
+          - {user_session: october, event_date: 2019-10-12}
+          - {user_session: november_only, event_date: 2019-11-01}
+    expect:
+      rows:
+        - {user_session: long_running}
+        - {user_session: october}
+  - name: abandonment_flags_week_containing_black_friday_start
+    model: mart_cart_abandonment
+    overrides:
+      vars:
+        black_friday_week_start: "2019-11-29"
+    given:
+      - input: ref('stg_events')
+        rows:
+          - {user_session: a, product_id: 1, event_type: cart, event_date: 2019-11-26}
+          - {user_session: b, product_id: 1, event_type: cart, event_date: 2019-11-12}
+      - input: ref('dim_products')
+        rows:
+          - {product_id: 1, category_l1: electronics, price_band: 2}
+    expect:
+      rows:
+        - {week_start: 2019-11-25, is_black_friday_week: true}
+        - {week_start: 2019-11-11, is_black_friday_week: false}

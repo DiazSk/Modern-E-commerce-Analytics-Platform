@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: stg_events
+    description: >
+      One row per event. Categories split from the dotted category_code;
+      missing category/brand become 'unknown'.
+    columns:
+      - name: event_key
+        data_tests: [unique, not_null]
+      - name: category_l1
+        data_tests: [not_null]
+      - name: brand
+        data_tests: [not_null]

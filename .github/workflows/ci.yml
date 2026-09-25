@@ -7,27 +7,6 @@ on:
     branches: [develop, main]
 
 jobs:
-  terraform-checks:
-    name: Terraform Validation
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: 1.5.0
-
-      - name: Terraform Format Check
-        run: terraform fmt -check -recursive
-        working-directory: ./infrastructure
-
-      - name: Terraform Validate
-        run: |
-          terraform init -backend=false
-          terraform validate
-        working-directory: ./infrastructure
-
   python-quality:
     name: Python Code Quality
     runs-on: ubuntu-latest
@@ -52,63 +31,48 @@ jobs:
       - name: Check Import Sorting
         run: isort --check-only .
 
-  dbt-tests:
-    name: dbt Tests
+  python-tests:
+    name: Python Tests
     runs-on: ubuntu-latest
-
-    services:
-      postgres:
-        image: postgres:14-alpine
-        env:
-          POSTGRES_USER: ci_user
-          POSTGRES_PASSWORD: ci_password
-          POSTGRES_DB: ci_ecommerce
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Install dbt
-        run: pip install dbt-postgres
+      - name: Setup Java (for PySpark)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
 
-      - name: Create CI profiles.yml
-        run: |
-          mkdir -p ~/.dbt
-          cat > ~/.dbt/profiles.yml <<EOF
-          ecommerce_analytics:
-            target: ci
-            outputs:
-              ci:
-                type: postgres
-                host: localhost
-                port: 5432
-                user: ci_user
-                password: ci_password
-                database: ci_ecommerce
-                schema: ci_dbt_schema
-                threads: 1
-          EOF
+      - name: Install Dependencies
+        run: pip install pyspark==3.5.3 delta-spark==3.2.1 pytest
 
-      - name: Install dbt Dependencies
-        run: dbt deps
-        working-directory: ./transform
+      - name: Run pytest
+        run: pytest -q
 
-      - name: Load CI Fixtures
-        run: dbt seed --target ci
-        working-directory: ./transform
+  dbt:
+    name: dbt build (Spark + Delta)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-      - name: dbt Build
-        run: |
-          dbt build --target ci --exclude resource_type:seed --vars '{raw_schema: ci_dbt_schema_seeds}'
-        working-directory: ./transform
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Setup Java (for Spark)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install Dependencies
+        run: pip install "dbt-core==1.12.5" "dbt-spark[session]==1.11.0" pyspark==3.5.3 delta-spark==3.2.1
+
+      - name: dbt build on synthetic fixture (Oct, then Nov incremental)
+        run: bash ci/run_dbt_ci.sh
