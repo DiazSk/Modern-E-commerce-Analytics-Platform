@@ -1,20 +1,21 @@
 # Modern E-Commerce Analytics Platform — V2 (in progress)
 
-> This branch rebuilds the platform on **real** e-commerce events. The
-> finished V1 (synthetic data on Postgres) is at tag
-> [`v1-postgres-synthetic`](https://github.com/DiazSk/Modern-E-commerce-Analytics-Platform/tree/v1-postgres-synthetic).
-> Design: [`docs/superpowers/specs/2026-09-24-v2-rees46-athena-design.md`](docs/superpowers/specs/2026-09-24-v2-rees46-athena-design.md)
+> This branch rebuilds the platform on **real** e-commerce events, entirely on
+> **Databricks Free Edition**. The finished V1 (synthetic data on Postgres) is at
+> tag [`v1-postgres-synthetic`](https://github.com/DiazSk/Modern-E-commerce-Analytics-Platform/tree/v1-postgres-synthetic).
+> Design: [`docs/superpowers/specs/2026-09-25-v2-rees46-databricks-design.md`](docs/superpowers/specs/2026-09-25-v2-rees46-databricks-design.md)
 
 ## Pipeline (current)
 
+One Databricks Workflows job, `rees46_pipeline`, defined as code in a
+Databricks Asset Bundle (`databricks.yml`, `resources/rees46.yml`). It's a
+historical backfill replay, triggered manually per month; not a live feed.
+
 ```
-Kaggle REES46 (Oct 2019) ──▶ S3 raw (archive)
-      │  Airflow DAG `rees46_pipeline` (manual trigger per month: a
-      │  historical backfill replay, not a live feed)
-      ▼
-PySpark: dedupe, type, UTC ──▶ S3 processed: rees46/events/event_date=YYYY-MM-DD/
-      ▼
-Glue table rees46_raw.events (partition projection) ──▶ Athena
+ingest     Kaggle ──▶ /Volumes/workspace/rees46/landing/2019-Oct.csv
+transform  PySpark: dedupe, key, UTC ──▶ Delta workspace.rees46.raw_events
+           (partitioned by event_date; the month is replaced with replaceWhere,
+            and Delta rejects any row outside it)
 ```
 
 ## Data
@@ -28,23 +29,20 @@ hash of all columns after exact duplicates are removed), no demographics,
 ## Run it
 
 ```bash
-cp .env.example .env          # fill in AWS + Kaggle values
-cd infrastructure && terraform init && terraform apply && cd ..
-docker compose up -d --build  # Airflow UI: http://localhost:8081 (airflow/airflow)
+brew tap databricks/tap && brew install databricks
+databricks auth login --host <your-workspace-url>
+databricks secrets create-scope rees46
+databricks secrets put-secret rees46 kaggle_username
+databricks secrets put-secret rees46 kaggle_key
+databricks bundle deploy
+databricks bundle run rees46_pipeline --params month=2019-10
 ```
-
-Trigger `rees46_pipeline` with `{"month": "2019-10"}`, then in Athena
-(workgroup `modern-ecommerce-analytics-platform-dev`):
-
-```sql
-select count(*) from rees46_raw.events;
-```
-
-**Resources:** Spark runs in local mode inside the Airflow container. Give
-Docker at least 6 GB of memory, or lower `SPARK_DRIVER_MEMORY` in `.env`.
 
 ## Tests
 
+Local Spark + Delta (Java 17), no Databricks account needed:
+
 ```bash
+pip install pyspark==3.5.3 delta-spark==3.2.1 pytest
 pytest -q
 ```
