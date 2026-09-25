@@ -1,44 +1,49 @@
-# ================================
-# Variables
-# ================================
-
-# Define the AWS provider and the region as a variable for reusability
-variable "aws_region" {
-  description = "The AWS region to deploy resources in"
+variable "project" {
+  description = "Short lowercase name used in resource names"
   type        = string
-  default     = "us-east-1"
-}
-
-variable "project_name" {
-  description = "Project name for resource naming and tagging"
-  type        = string
-  default     = "modern-ecommerce-analytics-platform"
-}
-
-variable "environment" {
-  description = "Environment (dev, staging, prod)"
-  type        = string
-  default     = "dev"
-}
-
-# Use a map to define the buckets we want to create
-variable "s3_buckets" {
-  description = "A map of S3 buckets to create for the project."
-  type        = map(string)
-  default = {
-    "raw"       = "ecommerce-raw-data"
-    "processed" = "ecommerce-processed-data"
-  }
-}
-
-# Email address for billing alerts
-variable "billing_alert_email" {
-  description = "Email address to receive billing alerts"
-  type        = string
-  default     = "zaid07sk@gmail.com" # Change this to your actual email
+  default     = "ecomv2"
 
   validation {
-    condition     = can(regex("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", var.billing_alert_email))
-    error_message = "Must be a valid email address."
+    condition     = can(regex("^[a-z0-9]{3,10}$", var.project))
+    error_message = "project must be 3-10 lowercase letters/digits (storage account naming rules)."
   }
+}
+
+variable "location" {
+  description = "Azure region; must be allowed by the Azure for Students policy"
+  type        = string
+  default     = "eastus"
+}
+
+variable "sql_admin_login" {
+  description = "SQL server administrator login"
+  type        = string
+  default     = "ecomadmin"
+}
+
+variable "sql_admin_password" {
+  description = "SQL server administrator password; set in the gitignored secret.auto.tfvars"
+  type        = string
+  sensitive   = true
+
+  validation {
+    condition     = length(var.sql_admin_password) >= 16
+    error_message = "sql_admin_password must be at least 16 characters."
+  }
+}
+
+variable "operator_ip" {
+  description = "Public IPv4 of the machine allowed through the SQL firewall"
+  type        = string
+
+  validation {
+    condition     = can(cidrhost("${var.operator_ip}/32", 0))
+    error_message = "operator_ip must be a single IPv4 address, e.g. 203.0.113.7."
+  }
+}
+
+variable "alert_email" {
+  description = "Where budget alerts are sent"
+  type        = string
+  default     = "zaid07sk@gmail.com"
 }

@@ -1,18 +1,24 @@
-# ========================================
-# Outputs
-# ========================================
-
-output "data_lake_bucket_names" {
-  description = "Names of created S3 buckets"
-  value       = { for k, v in aws_s3_bucket.data_lake_buckets : k => v.bucket }
+output "resource_group_name" {
+  description = "Resource group holding everything"
+  value       = azurerm_resource_group.main.name
 }
 
-output "data_lake_bucket_arns" {
-  description = "ARNs of created S3 buckets (useful for IAM policies)"
-  value       = { for k, v in aws_s3_bucket.data_lake_buckets : k => v.arn }
+output "storage_account_name" {
+  description = "ADLS Gen2 account (containers: raw, processed)"
+  value       = azurerm_storage_account.lake.name
 }
 
-output "logs_bucket_name" {
-  description = "Name of the access logs bucket"
-  value       = aws_s3_bucket.logs.bucket
+output "sql_server_fqdn" {
+  description = "Azure SQL server host for dbt / sqlcmd"
+  value       = azurerm_mssql_server.main.fully_qualified_domain_name
+}
+
+output "sql_database_name" {
+  description = "Warehouse database name"
+  value       = azapi_resource.warehouse.name
+}
+
+output "sql_database_id" {
+  description = "Resource id, used to verify the free-offer settings"
+  value       = azapi_resource.warehouse.id
 }
