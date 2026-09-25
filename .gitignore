@@ -306,3 +306,6 @@ spark-warehouse/
 metastore_db/
 derby.log
 .databricks/
+
+# Local design/planning notes (kept out of the public repo)
+docs/superpowers/

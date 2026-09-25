@@ -3,7 +3,6 @@
 > This branch rebuilds the platform on **real** e-commerce events, entirely on
 > **Databricks Free Edition**. The finished V1 (synthetic data on Postgres) is at
 > tag [`v1-postgres-synthetic`](https://github.com/DiazSk/Modern-E-commerce-Analytics-Platform/tree/v1-postgres-synthetic).
-> Design: [`docs/superpowers/specs/2026-09-25-v2-rees46-databricks-design.md`](docs/superpowers/specs/2026-09-25-v2-rees46-databricks-design.md)
 
 ## Pipeline (current)
 
