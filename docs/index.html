@@ -47,7 +47,7 @@ a{color:inherit;text-underline-offset:3px;text-decoration-thickness:1px}
 
 /* Plates with registration marks */
 .plate{position:relative;margin-top:72px;padding-top:48px}
-.plate .reg{position:absolute;width:15px;height:15px;pointer-events:none}
+.plate .reg{position:absolute;z-index:1;width:15px;height:15px;pointer-events:none}
 .plate .reg::before,.plate .reg::after{content:"";position:absolute;background:var(--ink)}
 .plate .reg::before{left:7px;top:0;width:1px;height:15px}
 .plate .reg::after{top:7px;left:0;height:1px;width:15px}
@@ -57,7 +57,7 @@ a{color:inherit;text-underline-offset:3px;text-decoration-thickness:1px}
 .plate-head h2{grid-column:1/span 7;margin:0;font-weight:400;font-size:clamp(28px,3.4vw,44px);line-height:1.08;letter-spacing:-.02em;text-wrap:balance}
 .plate-head p{grid-column:8/span 5;margin:0;color:var(--ink-2);max-width:48ch}
 .caption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px 24px;margin-top:20px;padding-top:12px;border-top:1px solid var(--hair);color:var(--ink-3)}
-.caption code{font:inherit;color:var(--ink-2);text-transform:none;letter-spacing:.02em}
+.caption code{font:inherit;color:var(--ink-2);text-transform:none;letter-spacing:.02em;overflow-wrap:anywhere}
 
 /* Controls: rects, zero radius */
 .btn{font:500 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;padding:12px 14px;border:0;background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);cursor:pointer;border-radius:0;transition:background .1s ease,color .1s ease}
@@ -68,23 +68,23 @@ a{color:inherit;text-underline-offset:3px;text-decoration-thickness:1px}
 .chip .n{opacity:.6;margin-left:6px}
 
 /* Hero */
-.hero{margin-top:56px;padding-top:40px}
-.hero h1{grid-column:1/span 10;margin:0;font-weight:400;font-size:clamp(44px,6.4vw,92px);line-height:.98;letter-spacing:-.02em;text-wrap:balance}
-.hero .lede{grid-column:1/span 6;margin:36px 0 0;font-size:19px;color:var(--ink-2);max-width:56ch}
-.figure-pair{grid-column:1/span 12;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gutter);margin-top:56px;align-items:end}
-.fig{grid-column:span 4}
-.fig .big{font-size:clamp(64px,9vw,136px);line-height:.9;letter-spacing:-.04em;font-weight:300}
+.hero{margin-top:28px;padding-top:24px;overflow-x:clip}
+.hero h1{grid-column:1/-1;margin:0;font-weight:400;font-size:clamp(44px,6.4vw,92px);line-height:.98;letter-spacing:-.02em;text-wrap:balance}
+.hero .lede{margin:16px 0 0;font-size:16px;color:var(--ink-2);max-width:48ch}
+.figure-pair{grid-column:1/span 12;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gutter);margin-top:36px;align-items:end}
+.fig{grid-column:span 3}
+.fig .big{font-size:clamp(64px,7vw,108px);line-height:.9;letter-spacing:-.04em;font-weight:300}
 .fig .big.bf{font-weight:500}
 .fig .what{margin-top:14px;color:var(--ink-2);max-width:30ch}
 .arrow{grid-column:span 1;align-self:center;justify-self:center}
 .arrow svg{width:56px;height:24px;stroke:var(--ink);stroke-width:1.5;fill:none}
-.delta{grid-column:span 3;border-left:1px solid var(--hair);padding-left:24px}
+.delta{grid-column:span 5;border-left:1px solid var(--hair);padding-left:24px}
 .delta .d{font-size:40px;letter-spacing:-.02em;line-height:1}
 .delta .ci{margin-top:10px;color:var(--ink-2)}
 .dots{position:absolute;top:0;right:var(--gutter);width:42%;height:520px;pointer-events:none;z-index:-1;
   background-image:radial-gradient(var(--ink) .9px,transparent 1.2px);background-size:8px 8px;opacity:.28;
   -webkit-mask:radial-gradient(260px 260px at var(--mx,70%) var(--my,40%),#000,transparent 75%);mask:radial-gradient(260px 260px at var(--mx,70%) var(--my,40%),#000,transparent 75%)}
-.stamp{position:absolute;right:calc(var(--gutter) - 56px);top:-40px;width:176px;height:176px;transition:transform .6s var(--ease)}
+.stamp{position:absolute;z-index:2;right:calc(var(--gutter) - 56px);top:-40px;width:176px;height:176px;transition:transform .6s var(--ease)}
 .stamp:hover{transform:translateY(-4px)}
 .stamp svg{width:100%;height:100%;animation:spin 25s linear infinite}
 .stamp .disc{fill:var(--seal)}
@@ -99,8 +99,7 @@ a{color:inherit;text-underline-offset:3px;text-decoration-thickness:1px}
 .credits span{color:var(--ink-3)}
 .proof{margin-top:16px;color:var(--ink-3)}
 .gap{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gutter);align-items:center;margin-top:48px;padding:22px 0;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);background:repeating-linear-gradient(135deg,transparent 0 7px,color-mix(in srgb,var(--seal) 70%,transparent) 7px 8px)}
-.gap .mono{grid-column:1/span 2;margin:0;color:var(--ink)}
-.gap p:not(.mono){grid-column:3/span 7;margin:0;font-size:18px;line-height:1.5;max-width:70ch}
+.gap p{grid-column:1/span 9;margin:0;font-size:18px;line-height:1.5;max-width:70ch}
 .gap b{font-weight:600}
 .gap .btn{grid-column:11/span 2;justify-self:end;background:var(--sheet)}
 
@@ -180,24 +179,26 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;
 @media (max-width:1000px){
   :root{--gutter:24px}
   .plate-head h2,.plate-head p{grid-column:1/-1}.plate-head p{margin-top:14px}
-  .gap .mono{grid-column:1/-1}.gap p:not(.mono){grid-column:1/span 9}.gap .btn{grid-column:10/span 3}
+  .gap p{grid-column:1/span 9}.gap .btn{grid-column:10/span 3}
   .two>.a,.two>.b{grid-column:1/-1}
   .notes ol,.notes aside{grid-column:1/-1}.notes aside{margin-top:32px}
   .hero .lede{grid-column:1/span 10}
-  .reg{display:none}
+  .reg{transform:scale(.73)}.reg.tl,.reg.bl{left:2px}.reg.tr,.reg.br{right:2px}
 }
 @media (max-width:720px){
   :root{--gutter:18px;--bar:60px}
   body{font-size:16px}
   .bar .id{display:none}.bar .links a:not(:first-child){display:none}
-  .hero h1{grid-column:1/-1}.hero .lede{grid-column:1/-1;font-size:17px}
-  .gap .mono,.gap p:not(.mono),.gap .btn{grid-column:1/-1;justify-self:start}.gap p:not(.mono){margin:10px 0 14px;font-size:16px}
-  .figure-pair{row-gap:24px}.fig{grid-column:1/-1}.arrow{display:none}.fig .big{font-size:clamp(56px,18vw,96px)}.delta{grid-column:1/-1;border-left:0;padding-left:0;border-top:1px solid var(--hair);padding-top:18px}
-  .stamp{width:112px;height:112px;right:-8px;top:-24px}
+  .hero h1{grid-column:1/-1;font-size:clamp(34px,10.5vw,52px)}
+  .gap p,.gap .btn{grid-column:1/-1;justify-self:start}.gap p{margin:0 0 14px;font-size:16px}
+  .figure-pair{row-gap:24px}.fig{grid-column:span 6}.arrow{display:none}.fig .big{font-size:clamp(52px,15vw,96px)}
+  .hero{margin-top:12px;padding-top:12px}.delta{grid-column:1/-1;border-left:0;padding-left:0;border-top:1px solid var(--hair);padding-top:18px}
+  .stamp{width:84px;height:84px;right:-6px;top:-14px}
+  .hero h1{padding-right:44px}
   .dots{width:70%}
   .credits{grid-template-columns:repeat(2,1fr)}.credits div:nth-child(2){border-right:0}.credits div:nth-child(n+3){border-top:1px solid var(--hair)}.credits div:nth-child(3){padding-left:0}
   .credits b{font-size:28px}
-  .explore{position:static}.explore .inner{grid-template-columns:1fr 1fr;gap:8px}
+  .explore{position:static}.explore .inner{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
   .explore .label,.explore #presets{grid-column:1/-1}
   .heat .rowh{font-size:12px}.heat .cell{height:36px;font-size:11px}
 }
@@ -212,7 +213,7 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;
 THESIS: The analysis as a design annual's plate section: each finding is a registered plate with its source credited beneath, refusing the grey KPI-card BI dashboard.
 OWN-WORLD: Near-white drifting stock (#F5F4F6, warm and green edges), ink #16181A, 1px #C9C7C4 hairlines, registration crosshairs at plate corners, one periwinkle seal (#DCDDF3), Geist for everything, Geist Mono caps only for measurements/sources, zero-radius ink rects for controls, one blue data series (#2a78d6) with shape for period.
 STORY: A skimmer reads the Black Friday finding and its scale in one viewport; a technical reader re-slices periods and categories and sees every rate's CI and SQL source recompute.
-FIRST VIEWPORT: Sticky mono token bar; 92px headline; 66.7% → 54.3% set huge; delta with CI; rotating seal half off the plate corner; credits row below.
+FIRST VIEWPORT: Sticky mono token bar; full-width 92px headline; cart reach 9.2% → 11.7% set huge with the delta, CI and lede beside it; rotating seal overprinting the plate corner; the hatched “What the gap did” strip and credits row just below.
 FORM: Design annual plate section (user-chosen challenger over rolled candidate 6), seed e9d8cd45.
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
 -->
@@ -243,17 +244,16 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     </div>
     <div class="grid">
       <h1 id="h-finding">Black Friday week sent more shoppers to the cart — and a four-day tracking gap nearly told the opposite story.</h1>
-      <p class="lede">Across 109.8M real events from one online store, sessions reaching the cart rose from 9.2% in the four weeks before to 11.7% during Black Friday week, and purchases from 5.25% to 5.60%. Counted naively, the same data says the opposite: on Nov 15 the store logged 468,262 carts and zero purchases.</p>
+
       <div class="figure-pair">
         <div class="fig"><div class="big num">9.2%</div><div class="what">of sessions reached the cart, the 4 weeks before (Oct 28 – Nov 24, gap excluded)</div></div>
         <div class="arrow" aria-hidden="true"><svg viewBox="0 0 56 24"><path d="M1 12h52M44 4l9 8-9 8"/></svg></div>
         <div class="fig"><div class="big bf num">11.7%</div><div class="what">during Black Friday week (Nov 25 – 30)</div></div>
-        <div class="delta"><div class="d num">+2.5 pp</div><div class="ci mono num">95% CI +2.5 to +2.5 pp</div><div class="ci">Purchase rate +0.36 pp (CI +0.32 to +0.39). Cart abandonment +0.5 pp, essentially unchanged.</div></div>
+        <div class="delta"><div class="d num">+2.5 pp</div><div class="ci mono num">95% CI +2.46 to +2.55 pp</div><div class="ci">Purchase rate +0.36 pp (CI +0.32 to +0.39). Cart abandonment +0.5 pp, essentially unchanged.</div><p class="lede">Across 109.8M real events from one online store, sessions reaching the cart rose from 9.2% in the four weeks before to 11.7% during Black Friday week, and purchases from 5.25% to 5.60%. Counted naively, the same data says the opposite: on Nov 15 the store logged 468,262 carts and zero purchases.</p></div>
       </div>
     </div>
     <div class="gap" role="note" aria-label="Effect of the tracking gap">
-      <p class="mono">What the gap did</p>
-      <p>Leave Nov 14–17 in the baseline and every headline flips: cart reach <b class="num">−1.7 pp</b>, purchase rate <b class="num">−0.08 pp</b>, abandonment <b class="num">−12.3 pp</b>. Nov 15 recorded carts with no purchases; Nov 17 recorded 185,195, about eight times a normal day.</p>
+      <p><b>What the gap did:</b> leave Nov 14–17 in the baseline and every headline flips: cart reach <b class="num">−1.7 pp</b>, purchase rate <b class="num">−0.08 pp</b>, abandonment <b class="num">−12.3 pp</b>. Nov 15 recorded carts with no purchases; Nov 17 recorded 185,195, about eight times a normal day.</p>
       <a class="btn" href="#explore" id="gap-jump">Try it in the explorer</a>
     </div>
     <div class="credits mono" role="list" aria-label="Scale of the data">
@@ -493,7 +493,7 @@ function renderPrice() {
   aband.forEach((r) => { if (!inPeriod(r.date)) return; const k = r.cat + "|" + r.band, c = (cell[k] = cell[k] || [0, 0]); c[0] += r.ab; c[1] += r.n; byCat[r.cat] = (byCat[r.cat] || 0) + r.n; });
   const cats = Object.keys(byCat).sort((a, b) => byCat[b] - byCat[a]), rates = Object.values(cell).filter((c) => c[1] >= 200).map((c) => c[0] / c[1]);
   const rmin = Math.min(...rates), rmax = Math.max(...rates), bin = (v) => Math.min(6, Math.floor(((v - rmin) / (rmax - rmin || 1)) * 7));
-  const heat = document.getElementById("heat"); heat.style.gridTemplateColumns = "minmax(92px,1.3fr) repeat(4,minmax(0,1fr))"; heat.innerHTML = "";
+  const heat = document.getElementById("heat"); heat.style.gridTemplateColumns = "minmax(72px,1.3fr) repeat(4,minmax(0,1fr))"; heat.innerHTML = "";
   const add = (cls, html, attrs = {}) => { const d = document.createElement(attrs.tag || "div"); d.className = cls; d.innerHTML = html; for (const k in attrs) if (k !== "tag") d.setAttribute(k, attrs[k]); heat.appendChild(d); return d; };
   add("h", "", { role: "columnheader" }); ["Cheapest ¼", "2nd ¼", "3rd ¼", "Priciest ¼"].forEach((h) => add("h", h, { role: "columnheader" }));
   cats.forEach((cat) => { add("rowh", esc(cat), { role: "rowheader" }); [1, 2, 3, 4].forEach((band) => { const c = cell[cat + "|" + band]; if (!c) { add("cell low", "—", { role: "cell", "aria-label": `${cat}, band ${band}: no carts` }); return; } const v = c[0] / c[1], low = c[1] < 200, b = bin(v), d = add("cell" + (low ? " low" : ""), low ? "n<200" : fmtPct(v, 0), { role: "cell", tabindex: 0, "aria-label": `${cat}, price band ${band}: ${fmtPct(v)} abandoned of ${fmtInt(c[1])} carted items` }); if (!low) { d.style.background = `var(${RAMP[b]})`; d.style.color = b >= 4 ? "#fff" : "var(--ink)"; } const html = `<span class="mono">${esc(cat)} · price band ${band} of 4</span><b>${fmtPct(v)} abandoned</b><br>${fmtInt(c[0])} of ${fmtInt(c[1])} carted items`; d.addEventListener("pointerenter", (e) => showTip(html, e.clientX, e.clientY)); d.addEventListener("pointerleave", hideTip); d.addEventListener("focus", () => { const r = d.getBoundingClientRect(); showTip(html, r.right, r.top); }); d.addEventListener("blur", hideTip); }); });
