@@ -52,6 +52,17 @@ models:
       - name: date_day
         data_tests: [unique, not_null]
 
+  - name: mart_funnel_daily
+    description: >
+      Funnel per session day and top-level category. A session counts in a
+      category if it has any event there; carted/purchased within that
+      category under the funnel rule.
+  - name: mart_cart_abandonment
+    description: >
+      Cart abandonment per category, price band and week. An item is a product
+      carted in a session; abandoned if that session never purchases it.
+      Purchases without a cart event are not counted as carted.
+
 unit_tests:
   - name: fct_sessions_lookback_is_anchored_on_load_month
     model: fct_sessions
