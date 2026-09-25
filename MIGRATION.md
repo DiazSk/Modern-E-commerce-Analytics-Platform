@@ -29,8 +29,8 @@ Two issues that synthetic data could never have produced:
   with a from-scratch aggregation found 2,951 stale sessions. The model now
   recomputes every session with events in the loaded month.
 - **A tracking gap on Nov 14–17.** On Nov 15 the store logged 468,262 carts and no
-  purchases, and left in the baseline, those four days reversed every Black Friday
-  finding. The analysis excludes them, and the dashboard lets you put them back in.
+  purchases, and left in the baseline, those four days reversed all three headline Black Friday
+  findings. The analysis excludes them, and the dashboard lets you put them back in.
 
 ## Platform history
 The first V2 design targeted AWS (S3 + Athena), then Azure (ADLS + Azure SQL).

@@ -8,12 +8,16 @@ with sp as (
         min(case when event_type = 'cart' then event_date end) as cart_date,
         max(case when event_type = 'purchase' then 1 else 0 end) as purchased
     from workspace.rees46_dbt.stg_events
-    where user_session is not null and event_date >= '2019-10-28'
+    where user_session is not null
     group by user_session, product_id
+),
+-- Same carted-item unit as q2 (join included), so the corrected row matches it.
+carted as (
+    select sp.* from sp join workspace.rees46_dbt.dim_products p on sp.product_id = p.product_id
 ),
 
 units as (
-    select 'cart_abandonment' as metric, cart_date as d, 1 - purchased as hit from sp where cart_date is not null
+    select 'cart_abandonment' as metric, cart_date as d, 1 - purchased as hit from carted where cart_date is not null
     union all
     select 'cart_rate', session_date, cast(reached_cart as int) from workspace.rees46_dbt.fct_sessions
     union all

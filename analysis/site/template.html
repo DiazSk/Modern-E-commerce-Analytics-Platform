@@ -210,14 +210,6 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;
 </style>
 </head>
 <body>
-<!--
-THESIS: The analysis as a design annual's plate section: each finding is a registered plate with its source credited beneath, refusing the grey KPI-card BI dashboard.
-OWN-WORLD: Near-white drifting stock (#F5F4F6, warm and green edges), ink #16181A, 1px #C9C7C4 hairlines, registration crosshairs at plate corners, one periwinkle seal (#DCDDF3), Schibsted Grotesk for everything, Geist Mono caps only for measurements/sources, zero-radius ink rects for controls, one blue data series (#2a78d6) with shape for period.
-STORY: A skimmer reads the Black Friday finding and its scale in one viewport; a technical reader re-slices periods and categories and sees every rate's CI and SQL source recompute.
-FIRST VIEWPORT: Sticky mono token bar; full-width 92px headline; cart reach 9.2% → 11.7% set huge with the delta, CI and lede beside it; rotating seal overprinting the plate corner; the hatched “What the gap did” strip and credits row just below.
-FORM: Design annual plate section (user-chosen challenger over rolled candidate 6), seed e9d8cd45.
-FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
--->
 <a class="sr" href="#main">Skip to content</a>
 <header class="bar">
   <div class="wrap">
@@ -284,7 +276,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     <div class="legend mono" id="funnel-legend"></div>
     <figure><svg class="chart" id="funnel-chart" role="img" aria-labelledby="h-funnel funnel-note"></svg></figure>
     <div class="tbl" id="funnel-table" hidden></div>
-    <div class="caption mono"><span>Pl. II — Funnel for the selection · unit: session × category</span><span><button class="btn chip" data-table="funnel-table" aria-expanded="false" aria-controls="funnel-table">Show table</button> Source <code>analysis/extracts/mart_funnel_daily.csv</code></span></div>
+    <div class="caption mono"><span>Pl. II — Funnel for the selection · unit: <span id="funnel-unit">session</span></span><span><button class="btn chip" data-table="funnel-table" aria-expanded="false" aria-controls="funnel-table">Show table</button> Source <code id="funnel-src">analysis/extracts/sessions_daily.csv</code></span></div>
   </section>
 
   <section id="categories" class="wrap plate" aria-labelledby="h-cat">
@@ -320,7 +312,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     <div class="notes">
       <ol>
         <li><span><b>Nov 14–17 is excluded from every baseline.</b> The source logged %%GAP_CARTS%% carts and zero purchases on Nov 15, then %%GAP_PURCHASES_17%% purchases on Nov 17: a tracking failure, not shopper behavior. The explorer's toggle puts the days back so you can see what they do. A warn-level dbt test flags any day like this.</span></li>
-        <li><span><b>“Session” is the dataset's session ID.</b> Most last about a minute (median %%MEDIAN_SECONDS%% s), but %%SPAN_DAY%% span more than a day and the longest runs %%SPAN_MAX%% days. Sessions are dated by when they started.</span></li>
+        <li><span><b>“Session” is the dataset's session ID.</b> Most last about a minute (median %%MEDIAN_SECONDS%% s), but %%SPAN_DAY%% cross midnight into another calendar day and the longest runs %%SPAN_MAX%% days. Sessions are dated by when they started.</span></li>
         <li><span><b>No order IDs exist in the source,</b> so “purchases” are purchase events, not orders.</span></li>
         <li><span><b>Units overlap by category:</b> one session can count in several categories, so category-level intervals are somewhat optimistic. The headline cart and purchase rates are session-level.</span></li>
         <li><span><b>Price bands use each product's latest price,</b> which for some products is a Black Friday price.</span></li>
@@ -348,12 +340,13 @@ const D = JSON.parse(document.getElementById("data").textContent);
 const NS = "http://www.w3.org/2000/svg";
 const MIN_N = 1000;
 const fmtPct = (x, d = 1) => (100 * x).toFixed(d) + "%";
-const fmtPP = (x) => (x < 0 ? "−" : "+") + Math.abs(100 * x).toFixed(1);
+const fmtPP = (x, d = 1) => (x < 0 ? "−" : "+") + Math.abs(100 * x).toFixed(d);
 const fmtInt = (x) => Math.round(x).toLocaleString("en-US");
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const el = (tag, attrs = {}, parent) => { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); if (parent) parent.appendChild(n); return n; };
 const wald = (k1, n1, k0, n0) => { const p1 = k1 / n1, p0 = k0 / n0, se = Math.sqrt(p1 * (1 - p1) / n1 + p0 * (1 - p0) / n0); return { p1, p0, d: p1 - p0, lo: p1 - p0 - 1.96 * se, hi: p1 - p0 + 1.96 * se }; };
 
+const sessionsDaily = D.extracts.sessions_daily.map((r) => ({ date: r.session_date, cat: null, n: +r.sessions, cart: +r.carted_sessions, buy: +r.purchased_sessions }));
 const funnel = D.extracts.mart_funnel_daily.map((r) => ({ date: r.session_date, cat: r.category_l1, n: +r.sessions, cart: +r.carted_sessions, buy: +r.purchased_sessions }));
 const aband = D.extracts.abandonment_daily.map((r) => ({ cat: r.category_l1, band: +r.price_band, date: r.cart_date, n: +r.carted_items, ab: +r.abandoned_items }));
 const dow = (iso) => new Date(iso + "T00:00:00Z").getUTCDay();
@@ -402,7 +395,11 @@ const table = (id, head, rows) => { document.getElementById(id).innerHTML = "<ta
 /* Plate II: funnel for selection */
 function renderFunnel() {
   const P = state.preset, s = { A: { n: 0, cart: 0, buy: 0 }, B: { n: 0, cart: 0, buy: 0 } };
-  funnel.forEach((r) => { if (!selected(r.cat)) return; const w = inW(P, r.date); if (!w) return; s[w].n += r.n; s[w].cart += r.cart; s[w].buy += r.buy; });
+  // All categories: session grain, so it matches the headline. A selection needs the session x category mart.
+  const src = state.cats.size ? funnel : sessionsDaily;
+  document.getElementById("funnel-unit").textContent = state.cats.size ? "session × category" : "session";
+  document.getElementById("funnel-src").textContent = "analysis/extracts/" + (state.cats.size ? "mart_funnel_daily" : "sessions_daily") + ".csv";
+  src.forEach((r) => { if (r.cat !== null && !selected(r.cat)) return; const w = inW(P, r.date); if (!w) return; s[w].n += r.n; s[w].cart += r.cart; s[w].buy += r.buy; });
   const rows = [["Reached cart", "cart"], ["Purchased", "buy"]].map(([name, key]) => ({ name, ...wald(s.B[key], s.B.n, s.A[key], s.A.n) }));
   document.getElementById("funnel-legend").innerHTML = "<span><i></i>" + esc(P.A) + " · " + fmtInt(s.A.n) + "</span><span><i class='fill'></i>" + esc(P.B) + " · " + fmtInt(s.B.n) + "</span>";
   const svg = document.getElementById("funnel-chart"), W = widthOf(svg), L = Math.min(170, W * 0.3), R = 150, rowH = 76, H = rows.length * rowH + 40;
@@ -413,12 +410,12 @@ function renderFunnel() {
     const y = 30 + i * rowH;
     el("text", { x: 0, y: y + 5, class: "label" }, svg).textContent = r.name;
     [[r.p0, "A"], [r.p1, "B"]].forEach(([v, w], j) => { const yy = y + (j ? 16 : -12); const m = el("g", { class: "mark", style: `transform:translate(${x(v)}px,${yy}px)`, tabindex: 0 }, svg); el("line", { x1: -x(v) + L, x2: 0, y1: 0, y2: 0, stroke: "var(--hair)", "stroke-width": 1 }, m); el("circle", { r: 7, fill: w === "B" ? "var(--series)" : "var(--sheet)", stroke: "var(--series)", "stroke-width": 2 }, m); const html = `<span class="mono">${esc(w === "B" ? P.B : P.A)}</span><b>${esc(r.name)}: ${fmtPct(v)}</b>`; m.addEventListener("pointerenter", (e) => showTip(html, e.clientX, e.clientY)); m.addEventListener("pointerleave", hideTip); m.addEventListener("focus", () => { const b = m.getBoundingClientRect(); showTip(html, b.right, b.top); }); m.addEventListener("blur", hideTip); });
-    el("text", { x: W - R + 18, y: y + 2, class: "val" }, svg).textContent = fmtPP(r.d) + " pp";
-    el("text", { x: W - R + 18, y: y + 18, class: "val" }, svg).textContent = `CI ${fmtPP(r.lo)} to ${fmtPP(r.hi)}`;
+    el("text", { x: W - R + 18, y: y + 2, class: "val" }, svg).textContent = fmtPP(r.d, 2) + " pp";
+    el("text", { x: W - R + 18, y: y + 18, class: "val" }, svg).textContent = `CI ${fmtPP(r.lo, 2)} to ${fmtPP(r.hi, 2)}`;
   });
   const clear = rows.filter((r) => r.lo > 0 || r.hi < 0);
-  document.getElementById("funnel-note").textContent = `${P.B} vs ${P.A}, ${state.cats.size ? [...state.cats].join(", ") : "all categories"}: cart reach ${fmtPP(rows[0].d)} pp and purchase rate ${fmtPP(rows[1].d)} pp. ${clear.length ? ((t) => t[0].toUpperCase() + t.slice(1))(clear.map((r) => r.name.toLowerCase()).join(" and ")) + " changed beyond the 95% interval." : "Neither change is distinguishable from zero."}`;
-  table("funnel-table", ["Stage", P.A, P.B, "Difference (pp)", "95% CI (pp)"], rows.map((r) => [r.name, fmtPct(r.p0, 2), fmtPct(r.p1, 2), fmtPP(r.d), fmtPP(r.lo) + " to " + fmtPP(r.hi)]));
+  document.getElementById("funnel-note").textContent = `${P.B} vs ${P.A}, ${state.cats.size ? [...state.cats].join(", ") : "all categories"}: cart reach ${fmtPP(rows[0].d, 2)} pp and purchase rate ${fmtPP(rows[1].d, 2)} pp. ${clear.length ? ((t) => t[0].toUpperCase() + t.slice(1))(clear.map((r) => r.name.toLowerCase()).join(" and ")) + " changed beyond the 95% interval." : "Neither change is distinguishable from zero."}`;
+  table("funnel-table", ["Stage", P.A, P.B, "Difference (pp)", "95% CI (pp)"], rows.map((r) => [r.name, fmtPct(r.p0, 2), fmtPct(r.p1, 2), fmtPP(r.d, 2), fmtPP(r.lo, 2) + " to " + fmtPP(r.hi, 2)]));
 }
 
 /* Dot + CI chart used by plates III and V */

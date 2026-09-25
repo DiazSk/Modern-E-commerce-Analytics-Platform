@@ -63,7 +63,7 @@ def tokens(results: dict[str, list[dict]]) -> dict[str, str]:
         "BUY_HIGH": pp(buy["ci_high"], 2),
         "ABANDON_BASE": pct(aband["baseline_rate"]),
         "ABANDON_BF": pct(aband["black_friday_rate"]),
-        "ABANDON_DIFF": pp(aband["diff"]),
+        "ABANDON_DIFF": pp(aband["diff"], 2),
         "NAIVE_CART_DIFF": pp(naive["cart_rate"]["diff"]),
         "NAIVE_ABANDON_DIFF": pp(naive["cart_abandonment"]["diff"]),
         "NAIVE_BUY_DIFF": pp(naive["purchase_rate"]["diff"], 2),

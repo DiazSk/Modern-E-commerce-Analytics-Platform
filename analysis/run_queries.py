@@ -19,6 +19,12 @@ WAREHOUSE_NAME = "Serverless Starter Warehouse"
 EXTRACTS = {
     "mart_funnel_daily": "select * from workspace.rees46_dbt.mart_funnel_daily "
     "order by session_date, category_l1",
+    # Session grain (mart_funnel_daily is session x category), for the
+    # dashboard's all-categories funnel so it matches q1_overall exactly.
+    "sessions_daily": "select session_date, count(*) as sessions, "
+    "sum(cast(reached_cart as int)) as carted_sessions, "
+    "sum(cast(reached_purchase as int)) as purchased_sessions "
+    "from workspace.rees46_dbt.fct_sessions group by session_date order by session_date",
     "mart_cart_abandonment": "select * from workspace.rees46_dbt.mart_cart_abandonment "
     "order by week_start, category_l1, price_band",
     # Daily grain for the dashboard, so its Nov 14-17 toggle is exact to the day.

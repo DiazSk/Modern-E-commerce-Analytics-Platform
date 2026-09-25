@@ -72,7 +72,7 @@ These are observational results, so each recommendation is a test to run, not a 
 - **For the data team:** alert on funnel-shape breaks, not just row counts. The four gap days had plenty of rows; their shape was what was wrong.
 
 ## 5. Caveats
-- **"Session" is the dataset's session ID, and it can span weeks.** 0.28% of sessions span more than one day, 0.035% span 7+ days, and the longest spans 60 days. The median session lasts 61 seconds (`queries/q0_data_profile.sql`). Sessions are dated by their first event.
+- **"Session" is the dataset's session ID, and it can span weeks.** 0.28% of sessions end on a later calendar day than they start, 0.035% end 7+ calendar days later, and the longest spans 60 days. The median session lasts 61 seconds (`queries/q0_data_profile.sql`). Sessions are dated by their first event.
 - **There are no order IDs.** "Purchases" are purchase events.
 - **Price bands use each product's latest price,** which may be a Black Friday price.
 - **Units aren't independent.** In the category comparison, one session can count in several categories, so those CIs are optimistic. The overall comparison is at session level.
@@ -80,4 +80,4 @@ These are observational results, so each recommendation is a test to run, not a 
 - **Scope:** one store, two months of 2019. The CI pipeline runs on synthetic data; these numbers come from the real dataset in Databricks.
 
 ## Method
-The comparisons are differences in proportions with 95% Wald confidence intervals: diff ± 1.96·√(p₁(1−p₁)/n₁ + p₀(1−p₀)/n₀). Groups under 1,000 observations in either period or band are excluded from the category and price-band comparisons. Everything is reproducible with `python analysis/run_queries.py`. The abandonment queries join to `dim_products`, which drops 9 carted items with no product record. That's why `q3_anomaly_impact.csv` counts 795,126 baseline items where section 2 counts 795,117.
+The comparisons are differences in proportions with 95% Wald confidence intervals: diff ± 1.96·√(p₁(1−p₁)/n₁ + p₀(1−p₀)/n₀). Groups under 1,000 observations in either period or band are excluded from the category and price-band comparisons. Everything is reproducible with `python analysis/run_queries.py`.
