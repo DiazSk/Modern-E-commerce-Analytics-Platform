@@ -1,4 +1,6 @@
+import sys
 import zipfile
+from pathlib import Path
 
 import pytest
 
@@ -58,3 +60,15 @@ def test_transform_task_rejects_unknown_month(tmp_path, table):
         transform_task.main(
             ["--month", "2019-9", "--volume-dir", str(tmp_path), "--table", table]
         )
+
+
+@pytest.mark.parametrize("script", ["ingest_task.py", "transform_task.py"])
+def test_task_scripts_import_siblings_when_run_without___file__(script, monkeypatch):
+    # Databricks' serverless runner exec()s the task file without __file__
+    # (sys.argv[0] is the script path), so the sibling import must not need it.
+    path = Path(__file__).resolve().parents[1] / "src" / script
+    monkeypatch.setattr(sys, "argv", [str(path)])
+    monkeypatch.setattr(sys, "path", [p for p in sys.path if not p.endswith("/src")])
+    monkeypatch.delitem(sys.modules, "rees46_transform", raising=False)
+
+    exec(compile(path.read_text(), str(path), "exec"), {"__name__": "task"})

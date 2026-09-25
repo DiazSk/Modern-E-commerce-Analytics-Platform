@@ -9,7 +9,10 @@ import os
 import sys
 from pathlib import Path
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))  # sibling import
+# Sibling import. Databricks' serverless runner exec()s this file without
+# __file__; sys.argv[0] is then the script path.
+_here = os.path.dirname(os.path.abspath(globals().get("__file__", sys.argv[0])))
+sys.path.insert(0, _here)
 
 from pyspark.sql import SparkSession  # noqa: E402
 
