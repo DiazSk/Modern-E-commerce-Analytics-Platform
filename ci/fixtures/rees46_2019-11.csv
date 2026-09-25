@@ -10,3 +10,4 @@ event_time,event_type,product_id,category_id,category_code,brand,price,user_id,u
 2019-11-29 11:00:00 UTC,view,1001,2053013563911094004,electronics.smartphone,apple,500.00,109,s9
 2019-11-29 11:02:00 UTC,cart,1001,2053013563911094004,electronics.smartphone,apple,500.00,109,s9
 2019-11-30 20:00:00 UTC,view,1004,2053013563911094002,electronics.audio.headphone,sony,50.00,110,s10
+2019-11-02 09:00:00 UTC,view,1004,2053013563911094002,electronics.audio.headphone,sony,50.00,101,s5
