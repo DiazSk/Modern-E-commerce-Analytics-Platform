@@ -132,15 +132,15 @@ def diff_chart(rows, title, subtitle, xlabel, out):
 def main() -> None:
     diff_chart(
         read("q1_category_black_friday"),
-        "Black Friday week barely moved purchase rates",
-        "Change vs the prior 4 weeks, by category · session × category · 95% CI",
+        "Most categories converted a little better on Black Friday week",
+        "Change vs the prior 4 weeks (Nov 14–17 tracking gap excluded) · session × category · 95% CI",
         "Difference in purchase rate (percentage points)",
         "q1_purchase_rate_black_friday.png",
     )
     diff_chart(
         read("q2_band_contrast"),
-        "Pricier items aren't consistently abandoned more",
-        "Abandonment, top price quartile minus bottom, within each category · 95% CI",
+        "Pricier items are usually abandoned less, not more",
+        "Abandonment, top price quartile minus bottom, within each category · Nov 14–17 excluded · 95% CI",
         "Top-quartile minus bottom-quartile abandonment (percentage points)",
         "q2_abandonment_price_band.png",
     )
