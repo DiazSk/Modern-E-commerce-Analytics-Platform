@@ -21,6 +21,22 @@ EXTRACTS = {
     "order by session_date, category_l1",
     "mart_cart_abandonment": "select * from workspace.rees46_dbt.mart_cart_abandonment "
     "order by week_start, category_l1, price_band",
+    # Daily grain for the dashboard, so its Nov 14-17 toggle is exact to the day.
+    "abandonment_daily": """
+        with sp as (
+            select user_session, product_id,
+                   min(case when event_type = 'cart' then event_date end) as cart_date,
+                   max(case when event_type = 'purchase' then 1 else 0 end) as purchased
+            from workspace.rees46_dbt.stg_events
+            where user_session is not null
+            group by user_session, product_id
+        )
+        select p.category_l1, p.price_band, sp.cart_date,
+               count(*) as carted_items, sum(1 - sp.purchased) as abandoned_items
+        from sp join workspace.rees46_dbt.dim_products p on sp.product_id = p.product_id
+        where sp.cart_date is not null
+        group by p.category_l1, p.price_band, sp.cart_date
+        order by sp.cart_date, p.category_l1, p.price_band""",
 }
 
 

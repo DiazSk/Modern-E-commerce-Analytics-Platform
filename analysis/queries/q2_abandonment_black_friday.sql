@@ -1,11 +1,34 @@
--- Q2c: overall cart abandonment, Black Friday week vs the four weeks before.
-with rates as (
+-- Q2c: overall cart abandonment, Black Friday week vs the four weeks before
+-- (Nov 14-17 excluded from the baseline: tracking anomaly). 95% Wald CI.
+with sp as (
+    -- One row per product carted in a session, dated by its first cart event.
     select
-        sum(case when week_start = '2019-11-25' then carted_items else 0 end) as n1,
-        sum(case when week_start = '2019-11-25' then abandoned_items else 0 end) / sum(case when week_start = '2019-11-25' then carted_items else 0 end) as p1,
-        sum(case when week_start between '2019-10-28' and '2019-11-18' then carted_items else 0 end) as n0,
-        sum(case when week_start between '2019-10-28' and '2019-11-18' then abandoned_items else 0 end) / sum(case when week_start between '2019-10-28' and '2019-11-18' then carted_items else 0 end) as p0
-    from workspace.rees46_dbt.mart_cart_abandonment
+        user_session,
+        product_id,
+        min(case when event_type = 'cart' then event_date end) as cart_date,
+        max(case when event_type = 'purchase' then 1 else 0 end) as purchased
+    from workspace.rees46_dbt.stg_events
+    where user_session is not null
+    group by user_session, product_id
+),
+
+carted as (
+    select p.category_l1, p.price_band, sp.cart_date, sp.purchased
+    from sp
+    join workspace.rees46_dbt.dim_products p on sp.product_id = p.product_id
+    where sp.cart_date is not null
+      and sp.cart_date not between '2019-11-14' and '2019-11-17'
+),
+
+rates as (
+    select
+        sum(case when cart_date between '2019-11-25' and '2019-11-30' then 1 else 0 end) as n1,
+        sum(case when cart_date between '2019-11-25' and '2019-11-30' then 1 - purchased else 0 end)
+            / sum(case when cart_date between '2019-11-25' and '2019-11-30' then 1 else 0 end) as p1,
+        sum(case when cart_date between '2019-10-28' and '2019-11-24' then 1 else 0 end) as n0,
+        sum(case when cart_date between '2019-10-28' and '2019-11-24' then 1 - purchased else 0 end)
+            / sum(case when cart_date between '2019-10-28' and '2019-11-24' then 1 else 0 end) as p0
+    from carted
 )
 
 select

@@ -1,10 +1,14 @@
 -- Q1a: session-level funnel, Black Friday week vs the four weeks before it.
 -- Sessions are dated by their start. 95% Wald CI on the difference.
+-- Baseline excludes Nov 14-17: a tracking anomaly in the source (Nov 15 has
+-- 468k cart events and zero purchases; Nov 17 ~8x normal purchases). See
+-- q0_anomaly_daily.sql and q3_anomaly_impact.sql.
 with periods as (
     select
         case
             when session_date between '2019-11-25' and '2019-11-30' then 'black_friday_week'
-            when session_date between '2019-10-28' and '2019-11-24' then 'baseline_4_weeks'
+            when session_date between '2019-10-28' and '2019-11-24'
+                 and session_date not between '2019-11-14' and '2019-11-17' then 'baseline_4_weeks'
         end as period,
         cast(reached_cart as int) as carted,
         cast(reached_purchase as int) as purchased
