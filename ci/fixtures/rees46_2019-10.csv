@@ -1,0 +1,14 @@
+event_time,event_type,product_id,category_id,category_code,brand,price,user_id,user_session
+2019-10-05 10:00:00 UTC,view,1002,2053013563911094000,appliances.kitchen.refrigerator,samsung,300.00,102,s2
+2019-10-05 10:02:00 UTC,purchase,1002,2053013563911094000,appliances.kitchen.refrigerator,samsung,300.00,102,s2
+2019-10-06 12:00:00 UTC,view,1003,2053013563911094001,,,10.00,103,s3
+2019-10-06 12:01:00 UTC,cart,1003,2053013563911094001,,,10.00,103,s3
+2019-10-10 09:00:00 UTC,view,1004,2053013563911094002,electronics.audio.headphone,sony,50.00,104,s4
+2019-10-10 09:00:00 UTC,view,1004,2053013563911094002,electronics.audio.headphone,sony,50.00,104,s4
+2019-10-10 09:05:00 UTC,view,1005,2053013563911094003,computers.notebook,lenovo,900.00,104,s4
+2019-10-10 09:06:00 UTC,cart,1005,2053013563911094003,computers.notebook,lenovo,900.00,104,s4
+2019-10-10 09:10:00 UTC,purchase,1005,2053013563911094003,computers.notebook,lenovo,900.00,104,s4
+2019-10-20 18:00:00 UTC,view,1001,2053013563911094004,electronics.smartphone,apple,500.00,101,s5
+2019-10-21 08:00:00 UTC,view,1006,2053013563911094004,electronics.smartphone,xiaomi,150.00,105,
+2019-10-31 23:50:00 UTC,view,1001,2053013563911094004,electronics.smartphone,apple,500.00,101,s1
+2019-10-31 23:55:00 UTC,cart,1001,2053013563911094004,electronics.smartphone,apple,500.00,101,s1

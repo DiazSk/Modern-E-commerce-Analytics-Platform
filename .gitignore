@@ -313,3 +313,7 @@ docs/superpowers/
 # dbt build artifacts
 dbt/target/
 dbt/logs/
+
+# CI-only synthetic fixture and dbt-spark profile (no secrets)
+!ci/fixtures/*.csv
+!ci/profiles.yml
