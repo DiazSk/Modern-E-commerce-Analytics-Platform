@@ -1,0 +1,37 @@
+version: 2
+
+models:
+  - name: fct_sessions
+    description: >
+      One row per session (incremental, merge on user_session). With
+      load_month set, rebuilds sessions starting on or after the day before
+      that month, so sessions crossing into the loaded month are recomputed.
+    columns:
+      - name: user_session
+        data_tests: [unique, not_null]
+      - name: session_date
+        data_tests: [not_null]
+
+unit_tests:
+  - name: fct_sessions_lookback_is_anchored_on_load_month
+    model: fct_sessions
+    overrides:
+      macros:
+        is_incremental: true
+      vars:
+        load_month: "2019-10"
+    given:
+      - input: this
+        rows:
+          - {user_session: already_loaded, session_date: 2019-11-20}
+      - input: ref('int_sessions')
+        rows:
+          - {user_session: sept_last_day, session_date: 2019-09-30}
+          - {user_session: sept_mid, session_date: 2019-09-15}
+          - {user_session: october, session_date: 2019-10-12}
+          - {user_session: november, session_date: 2019-11-20}
+    expect:
+      rows:
+        - {user_session: sept_last_day}
+        - {user_session: october}
+        - {user_session: november}

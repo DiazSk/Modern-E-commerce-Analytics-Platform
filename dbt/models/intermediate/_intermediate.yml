@@ -1,0 +1,20 @@
+version: 2
+
+models:
+  - name: int_sessions
+    description: >
+      One row per session. Funnel rule: a session reaches a stage if it has
+      that event or any later-stage event.
+
+unit_tests:
+  - name: int_sessions_purchase_without_cart_reaches_cart
+    model: int_sessions
+    given:
+      - input: ref('stg_events')
+        rows:
+          - {user_session: s2, user_id: 102, event_type: view, event_date: 2019-10-05, event_time: "2019-10-05 10:00:00", price: 300.00}
+          - {user_session: s2, user_id: 102, event_type: purchase, event_date: 2019-10-05, event_time: "2019-10-05 10:02:00", price: 300.00}
+          - {user_session: null, user_id: 105, event_type: view, event_date: 2019-10-21, event_time: "2019-10-21 08:00:00", price: 150.00}
+    expect:
+      rows:
+        - {user_session: s2, views: 1, carts: 0, purchases: 1, reached_cart: true, reached_purchase: true}
