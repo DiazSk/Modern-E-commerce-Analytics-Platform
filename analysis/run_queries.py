@@ -1,0 +1,98 @@
+"""Run the analysis SQL on the Databricks SQL warehouse and save CSVs.
+
+Uses the Databricks CLI's existing login (`databricks auth login`); prints
+no credentials. Every file in analysis/queries/ becomes
+analysis/results/<name>.csv, and the two marts are exported to
+analysis/extracts/ for Tableau Public. Only aggregates are written.
+"""
+
+import argparse
+import csv
+import json
+import subprocess
+import time
+from pathlib import Path
+from typing import Callable
+
+HERE = Path(__file__).resolve().parent
+WAREHOUSE_NAME = "Serverless Starter Warehouse"
+EXTRACTS = {
+    "mart_funnel_daily": "select * from workspace.rees46_dbt.mart_funnel_daily "
+    "order by session_date, category_l1",
+    "mart_cart_abandonment": "select * from workspace.rees46_dbt.mart_cart_abandonment "
+    "order by week_start, category_l1, price_band",
+}
+
+
+def cli(*args: str, body: dict | None = None) -> dict:
+    cmd = ["databricks", *args, "--output", "json"]
+    if body is not None:
+        cmd += ["--json", json.dumps(body)]
+    return json.loads(
+        subprocess.run(cmd, check=True, capture_output=True, text=True).stdout
+    )
+
+
+def warehouse_id() -> str:
+    for w in cli("warehouses", "list"):
+        if w["name"] == WAREHOUSE_NAME:
+            return w["id"]
+    raise RuntimeError(f"warehouse {WAREHOUSE_NAME!r} not found")
+
+
+def result_rows(
+    response: dict, fetch_chunk: Callable[[str], dict]
+) -> tuple[list[str], list[list[str]]]:
+    """Header and all rows of a finished statement, following every chunk."""
+    state = response["status"]["state"]
+    if state != "SUCCEEDED":
+        message = response["status"].get("error", {}).get("message", "")
+        raise RuntimeError(f"statement {state}: {message}")
+    header = [c["name"] for c in response["manifest"]["schema"]["columns"]]
+    chunk = response.get("result") or {}
+    rows = list(chunk.get("data_array") or [])
+    while chunk.get("next_chunk_internal_link"):
+        chunk = fetch_chunk(chunk["next_chunk_internal_link"])
+        rows += chunk.get("data_array") or []
+    return header, rows
+
+
+def run(statement: str, wh: str) -> tuple[list[str], list[list[str]]]:
+    body = {"warehouse_id": wh, "statement": statement, "wait_timeout": "50s"}
+    response = cli("api", "post", "/api/2.0/sql/statements", body=body)
+    while response["status"]["state"] in ("PENDING", "RUNNING"):
+        time.sleep(5)
+        response = cli(
+            "api", "get", f"/api/2.0/sql/statements/{response['statement_id']}"
+        )
+    return result_rows(response, lambda link: cli("api", "get", link))
+
+
+def write_csv(path: Path, header: list[str], rows: list[list[str]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(header)
+        writer.writerows(rows)
+    print(f"{path.relative_to(HERE.parent)}: {len(rows)} rows")
+
+
+def main(argv: list[str] | None = None) -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--only", help="run a single query or extract by name")
+    args = parser.parse_args(argv)
+    wh = warehouse_id()
+    jobs = {
+        p.stem: (p.read_text(), HERE / "results" / f"{p.stem}.csv")
+        for p in sorted((HERE / "queries").glob("*.sql"))
+    }
+    jobs |= {
+        name: (sql, HERE / "extracts" / f"{name}.csv") for name, sql in EXTRACTS.items()
+    }
+    for name, (sql, out) in jobs.items():
+        if args.only in (None, name):
+            write_csv(out, *run(sql, wh))
+
+
+if __name__ == "__main__":
+    main()

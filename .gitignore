@@ -317,3 +317,7 @@ dbt/logs/
 # CI-only synthetic fixture and dbt-spark profile (no secrets)
 !ci/fixtures/*.csv
 !ci/profiles.yml
+
+# Published aggregate analysis outputs (no raw rows)
+!analysis/results/*.csv
+!analysis/extracts/*.csv
