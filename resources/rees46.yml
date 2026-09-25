@@ -1,0 +1,53 @@
+resources:
+  schemas:
+    rees46:
+      catalog_name: ${var.catalog}
+      name: ${var.schema}
+      comment: REES46 e-commerce events (historical backfill replay)
+
+  volumes:
+    landing:
+      catalog_name: ${var.catalog}
+      schema_name: ${resources.schemas.rees46.name}
+      name: landing
+      comment: Kaggle downloads; deleted after each successful transform
+
+  jobs:
+    rees46_pipeline:
+      name: rees46_pipeline
+      description: >
+        Historical backfill replay of the 2019 REES46 dataset, triggered
+        manually per month. Re-running a month replaces it.
+      max_concurrent_runs: 1
+      parameters:
+        - name: month
+          default: "2019-10"
+      environments:
+        - environment_key: default
+          spec:
+            client: "2"
+            dependencies:
+              - kaggle==1.6.17
+      tasks:
+        - task_key: ingest
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/ingest_task.py
+            parameters:
+              - --month
+              - "{{job.parameters.month}}"
+              - --volume-dir
+              - /Volumes/${var.catalog}/${var.schema}/landing
+        - task_key: transform
+          depends_on:
+            - task_key: ingest
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/transform_task.py
+            parameters:
+              - --month
+              - "{{job.parameters.month}}"
+              - --volume-dir
+              - /Volumes/${var.catalog}/${var.schema}/landing
+              - --table
+              - ${var.catalog}.${var.schema}.raw_events

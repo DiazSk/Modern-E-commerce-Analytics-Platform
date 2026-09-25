@@ -1,0 +1,20 @@
+# Databricks Asset Bundle: the REES46 pipeline on Databricks Free Edition.
+# Deploy:  databricks bundle deploy
+# Run:     databricks bundle run rees46_pipeline --params month=2019-10
+bundle:
+  name: rees46
+
+include:
+  - resources/*.yml
+
+variables:
+  catalog:
+    description: Unity Catalog catalog (Free Edition's default is "workspace")
+    default: workspace
+  schema:
+    description: Schema holding the landing volume and tables
+    default: rees46
+
+targets:
+  free:
+    default: true
