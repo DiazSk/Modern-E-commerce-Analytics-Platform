@@ -6,9 +6,11 @@ Skips the download if the CSV or its Kaggle .zip is already in the volume.
 
 import argparse
 import os
+import shutil
 import subprocess
 import sys
 import zipfile
+import zlib
 from pathlib import Path
 
 # Sibling import. Databricks' serverless runner exec()s this file without
@@ -30,14 +32,21 @@ def locate_csv(data_dir: Path, filename: str) -> Path:
         return csv
     if not archive.exists():
         raise FileNotFoundError(f"neither {csv} nor {archive} exists")
+    # Extract to a temporary name and rename only when complete, so an
+    # interrupted or corrupt extraction never leaves a partial CSV that a
+    # re-run would load as the whole month.
+    partial = data_dir / f"{filename}.partial"
     try:
-        with zipfile.ZipFile(archive) as z:
-            z.extract(filename, data_dir)
-    except zipfile.BadZipFile as e:
+        with zipfile.ZipFile(archive) as z, z.open(filename) as src:
+            with open(partial, "wb") as dst:
+                shutil.copyfileobj(src, dst, length=16 * 1024 * 1024)
+    except (zipfile.BadZipFile, zlib.error, EOFError) as e:
+        partial.unlink(missing_ok=True)
         archive.unlink()
         raise RuntimeError(
             f"{archive} was incomplete and has been removed; re-run to download again"
         ) from e
+    os.replace(partial, csv)
     return csv
 
 

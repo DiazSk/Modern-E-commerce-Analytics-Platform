@@ -298,7 +298,7 @@ great_expectations/
 /graft/
 .ignore
 
-# Local Claude Code instructions (not published)
+# Local assistant instructions (not published)
 CLAUDE.md
 
 # Local Spark/Delta test artifacts and Databricks bundle cache

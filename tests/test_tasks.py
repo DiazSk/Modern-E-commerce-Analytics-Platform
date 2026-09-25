@@ -72,3 +72,21 @@ def test_task_scripts_import_siblings_when_run_without___file__(script, monkeypa
     monkeypatch.delitem(sys.modules, "rees46_transform", raising=False)
 
     exec(compile(path.read_text(), str(path), "exec"), {"__name__": "task"})
+
+
+def test_locate_csv_leaves_no_partial_csv_when_extraction_fails(tmp_path):
+    # Valid zip structure, corrupted member bytes: extraction fails at the CRC
+    # check after writing data. A partial CSV must not survive, or the next
+    # run would load a short month as if it were complete.
+    archive = tmp_path / "2019-Oct.csv.zip"
+    with zipfile.ZipFile(archive, "w", compression=zipfile.ZIP_STORED) as z:
+        z.writestr("2019-Oct.csv", "x" * 100_000)
+    data = bytearray(archive.read_bytes())
+    data[50_000] ^= 0xFF
+    archive.write_bytes(bytes(data))
+
+    with pytest.raises(RuntimeError, match="re-run to download again"):
+        ingest_task.locate_csv(tmp_path, "2019-Oct.csv")
+
+    assert not (tmp_path / "2019-Oct.csv").exists()
+    assert not archive.exists()
