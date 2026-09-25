@@ -1,6 +1,6 @@
 # Modern E-Commerce Analytics Platform
 
-[![CI](https://github.com/DiazSk/Modern-E-commerce-Analytics-Platform/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/DiazSk/Modern-E-commerce-Analytics-Platform/actions/workflows/ci.yml)
+[![CI](https://github.com/DiazSk/Modern-E-commerce-Analytics-Platform/actions/workflows/ci.yml/badge.svg?branch=main&event=push)](https://github.com/DiazSk/Modern-E-commerce-Analytics-Platform/actions/workflows/ci.yml?query=branch%3Amain+event%3Apush)
 
 **Black Friday week sent more shoppers to the cart.** 11.7% of sessions reached the cart, compared with 9.2% in the four weeks before: **+2.5 pp** (95% CI +2.46 to +2.55). Purchase rate rose from 5.25% to 5.60% (+0.36 pp, CI +0.32 to +0.39).
 
