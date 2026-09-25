@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>REES46 · Funnel &amp; cart abandonment, Oct–Nov 2019</title>
 <meta name="description" content="109.8M real e-commerce events: where shoppers drop off, what Black Friday week changed, and whether price drives cart abandonment. Every rate with a 95% confidence interval.">
-<link rel="preload" href="fonts/Geist-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/SchibstedGrotesk-Variable.woff2" as="font" type="font/woff2" crossorigin>
 <style>
-@font-face{font-family:"Geist";src:url("fonts/Geist-Variable.woff2") format("woff2");font-weight:100 900;font-display:swap}
+@font-face{font-family:"Schibsted Grotesk";src:url("fonts/SchibstedGrotesk-Variable.woff2") format("woff2");font-weight:400 900;font-display:swap}
 @font-face{font-family:"Geist Mono";src:url("fonts/GeistMono-Variable.woff2") format("woff2");font-weight:100 900;font-display:swap}
 :root{
   --sheet:#F5F4F6; --sheet-warm:#FAF6F5; --sheet-green:#EEF3EF;
@@ -17,7 +17,7 @@
   --r100:#cde2fb; --r200:#9ec5f4; --r300:#6da7ec; --r400:#3987e5; --r500:#256abf; --r600:#184f95; --r700:#0d366b;
   --ease:cubic-bezier(.19,1,.22,1);
   --gutter:40px; --bar:72px;
-  --sans:"Geist",ui-sans-serif,system-ui,sans-serif;
+  --sans:"Schibsted Grotesk",ui-sans-serif,system-ui,sans-serif;
   --mono:"Geist Mono",ui-monospace,Menlo,monospace;
 }
 *{box-sizing:border-box}
@@ -27,7 +27,7 @@ body{margin:0;background:var(--sheet);color:var(--ink);font:400 17px/1.55 var(--
 a{color:inherit;text-underline-offset:3px;text-decoration-thickness:1px}
 :focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 .mono{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase}
-.num{font-variant-numeric:tabular-nums}
+.num{font-variant-numeric:lining-nums proportional-nums}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .wrap{max-width:1320px;margin:0 auto;padding:0 var(--gutter)}
 .grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gutter)}
@@ -73,7 +73,7 @@ a{color:inherit;text-underline-offset:3px;text-decoration-thickness:1px}
 .hero .lede{margin:16px 0 0;font-size:16px;color:var(--ink-2);max-width:48ch}
 .figure-pair{grid-column:1/span 12;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gutter);margin-top:36px;align-items:baseline}
 .fig{grid-column:span 3}
-.fig .big{font-size:clamp(64px,7vw,108px);line-height:.9;letter-spacing:-.04em;font-weight:300}
+.fig .big{font-size:clamp(64px,7vw,108px);line-height:.9;letter-spacing:-.04em;font-weight:400}
 .fig .big.bf{font-weight:500}
 .fig .what{margin-top:14px;color:var(--ink-2);max-width:30ch}
 .arrow{grid-column:span 1;align-self:center;justify-self:center}
@@ -84,7 +84,8 @@ a{color:inherit;text-underline-offset:3px;text-decoration-thickness:1px}
 .dots{position:absolute;top:0;right:var(--gutter);width:42%;height:520px;pointer-events:none;z-index:-1;
   background-image:radial-gradient(var(--ink) .9px,transparent 1.2px);background-size:8px 8px;opacity:.28;
   -webkit-mask:radial-gradient(260px 260px at var(--mx,70%) var(--my,40%),#000,transparent 75%);mask:radial-gradient(260px 260px at var(--mx,70%) var(--my,40%),#000,transparent 75%)}
-.stamp{position:absolute;z-index:2;right:calc(var(--gutter) - 56px);top:-40px;width:176px;height:176px;transition:transform .6s var(--ease)}
+/* hang 56px past the column, but never past the viewport */
+.stamp{position:absolute;z-index:2;right:calc(var(--gutter) - min(56px, var(--gutter) + max(0px, (100vw - 1320px) / 2) - 24px));top:-40px;width:176px;height:176px;transition:transform .6s var(--ease)}
 .stamp:hover{transform:translateY(-4px)}
 .stamp svg{width:100%;height:100%;animation:spin 25s linear infinite}
 .stamp .disc{fill:var(--seal)}
@@ -211,7 +212,7 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;
 <body>
 <!--
 THESIS: The analysis as a design annual's plate section: each finding is a registered plate with its source credited beneath, refusing the grey KPI-card BI dashboard.
-OWN-WORLD: Near-white drifting stock (#F5F4F6, warm and green edges), ink #16181A, 1px #C9C7C4 hairlines, registration crosshairs at plate corners, one periwinkle seal (#DCDDF3), Geist for everything, Geist Mono caps only for measurements/sources, zero-radius ink rects for controls, one blue data series (#2a78d6) with shape for period.
+OWN-WORLD: Near-white drifting stock (#F5F4F6, warm and green edges), ink #16181A, 1px #C9C7C4 hairlines, registration crosshairs at plate corners, one periwinkle seal (#DCDDF3), Schibsted Grotesk for everything, Geist Mono caps only for measurements/sources, zero-radius ink rects for controls, one blue data series (#2a78d6) with shape for period.
 STORY: A skimmer reads the Black Friday finding and its scale in one viewport; a technical reader re-slices periods and categories and sees every rate's CI and SQL source recompute.
 FIRST VIEWPORT: Sticky mono token bar; full-width 92px headline; cart reach 9.2% → 11.7% set huge with the delta, CI and lede beside it; rotating seal overprinting the plate corner; the hatched “What the gap did” strip and credits row just below.
 FORM: Design annual plate section (user-chosen challenger over rolled candidate 6), seed e9d8cd45.
@@ -330,7 +331,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
         <p>Built on Databricks Free Edition: Kaggle ingest, PySpark into Delta Lake, dbt models and tests, reproducible SQL. The page is generated from committed aggregates only.</p>
         <a class="btn primary" href="https://github.com/DiazSk/Modern-E-commerce-Analytics-Platform">View the repository</a>
         <a class="btn" href="https://github.com/DiazSk/Modern-E-commerce-Analytics-Platform/blob/main/analysis/findings.md">Read the memo</a>
-        <p class="mono" style="margin-top:24px;color:var(--ink-3)">Data: REES46 via Kaggle, © original authors. Type: Geist, SIL OFL 1.1.</p>
+        <p class="mono" style="margin-top:24px;color:var(--ink-3)">Data: REES46 via Kaggle, © original authors. Type: Schibsted Grotesk and Geist Mono, SIL OFL 1.1.</p>
       </aside>
     </div>
   </section>
