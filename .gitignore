@@ -300,3 +300,9 @@ great_expectations/
 
 # Local Claude Code instructions (not published)
 CLAUDE.md
+
+# Local Spark/Delta test artifacts and Databricks bundle cache
+spark-warehouse/
+metastore_db/
+derby.log
+.databricks/

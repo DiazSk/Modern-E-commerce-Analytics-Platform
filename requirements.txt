@@ -1,4 +1,0 @@
-# Installed into the Airflow image (see Dockerfile). Airflow itself comes
-# from the base image and is re-pinned there so pip never upgrades it.
-pyspark==3.5.1
-kaggle==1.6.17

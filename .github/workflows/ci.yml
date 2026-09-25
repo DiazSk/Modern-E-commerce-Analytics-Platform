@@ -7,27 +7,6 @@ on:
     branches: [develop, main]
 
 jobs:
-  terraform-checks:
-    name: Terraform Validation
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: 1.5.0
-
-      - name: Terraform Format Check
-        run: terraform fmt -check -recursive
-        working-directory: ./infrastructure
-
-      - name: Terraform Validate
-        run: |
-          terraform init -backend=false
-          terraform validate
-        working-directory: ./infrastructure
-
   python-quality:
     name: Python Code Quality
     runs-on: ubuntu-latest
@@ -70,9 +49,7 @@ jobs:
           java-version: '17'
 
       - name: Install Dependencies
-        run: |
-          pip install "apache-airflow==2.7.3" --constraint https://raw.githubusercontent.com/apache/airflow/constraints-2.7.3/constraints-3.11.txt
-          pip install "apache-airflow==2.7.3" pyspark==3.5.1 pytest
+        run: pip install pyspark==3.5.3 delta-spark==3.2.1 pytest
 
       - name: Run pytest
         run: pytest -q
