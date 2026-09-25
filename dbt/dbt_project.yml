@@ -1,0 +1,26 @@
+name: rees46
+version: "1.0.0"
+config-version: 2
+profile: rees46
+
+model-paths: ["models"]
+test-paths: ["tests"]
+clean-targets: ["target", "logs"]
+
+vars:
+  raw_schema: rees46              # schema holding raw_events (same catalog)
+  load_month: null                # YYYY-MM just loaded; scopes the incremental rebuild
+  data_start: "2019-10-01"
+  data_end: "2019-11-30"
+  black_friday_week_start: "2019-11-25"
+  black_friday_week_end: "2019-11-30"
+
+models:
+  rees46:
+    +file_format: delta
+    staging:
+      +materialized: view
+    intermediate:
+      +materialized: view
+    marts:
+      +materialized: table

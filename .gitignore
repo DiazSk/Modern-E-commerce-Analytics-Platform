@@ -309,3 +309,7 @@ derby.log
 
 # Local design/planning notes (kept out of the public repo)
 docs/superpowers/
+
+# dbt build artifacts
+dbt/target/
+dbt/logs/
