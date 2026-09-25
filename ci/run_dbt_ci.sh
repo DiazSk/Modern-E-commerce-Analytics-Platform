@@ -6,7 +6,16 @@ set -euo pipefail
 
 cd "$(dirname "$0")/../dbt"
 export DBT_PROFILES_DIR="$PWD/../ci"
-export SPARK_WAREHOUSE_DIR="${SPARK_WAREHOUSE_DIR:-$(mktemp -d)}"
+if [ -z "${SPARK_WAREHOUSE_DIR:-}" ]; then
+  SPARK_WAREHOUSE_DIR="$(mktemp -d)"
+  created_warehouse=1
+fi
+export SPARK_WAREHOUSE_DIR
+cleanup() {
+  rm -rf metastore_db derby.log
+  if [ "${created_warehouse:-0}" = 1 ]; then rm -rf "$SPARK_WAREHOUSE_DIR"; fi
+}
+trap cleanup EXIT
 rm -rf metastore_db derby.log
 
 for month in 2019-10 2019-11; do
@@ -18,10 +27,13 @@ for month in 2019-10 2019-11; do
   fi
   dbt build --vars "{raw_schema: ci, load_month: '$month'}"
 done
-# A malformed load_month must fail at compile time, before any SQL runs.
-if dbt compile --select fct_sessions --vars "{raw_schema: ci, load_month: '2019-10; drop table x'}" >/dev/null 2>&1; then
-  echo "expected dbt compile to reject a malformed load_month" >&2
-  exit 1
-fi
+# A malformed load_month must fail at compile time with the explicit message.
+for bad in '2019-10; drop table x' '2019-9' $'2019-10\n'; do
+  if out=$(dbt compile --select fct_sessions --vars "{raw_schema: ci, load_month: \"${bad//$'\n'/\\n}\"}" 2>&1); then
+    echo "expected dbt compile to reject load_month=$(printf %q "$bad")" >&2
+    exit 1
+  fi
+  grep -q "load_month must be YYYY-MM" <<<"$out" || { echo "wrong failure for $(printf %q "$bad"):" >&2; tail -5 <<<"$out" >&2; exit 1; }
+done
 
 echo "dbt CI build passed"

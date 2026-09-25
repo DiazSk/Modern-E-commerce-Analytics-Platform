@@ -10,7 +10,12 @@ models:
       - name: user_session
         data_tests: [unique, not_null]
       - name: session_date
-        data_tests: [not_null]
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_day
 
   - name: fct_purchases
     description: One row per purchase event (there are no order IDs in REES46).
@@ -98,3 +103,20 @@ unit_tests:
       rows:
         - {user_session: long_running}
         - {user_session: october}
+  - name: abandonment_flags_week_containing_black_friday_start
+    model: mart_cart_abandonment
+    overrides:
+      vars:
+        black_friday_week_start: "2019-11-29"
+    given:
+      - input: ref('stg_events')
+        rows:
+          - {user_session: a, product_id: 1, event_type: cart, event_date: 2019-11-26}
+          - {user_session: b, product_id: 1, event_type: cart, event_date: 2019-11-12}
+      - input: ref('dim_products')
+        rows:
+          - {product_id: 1, category_l1: electronics, price_band: 2}
+    expect:
+      rows:
+        - {week_start: 2019-11-25, is_black_friday_week: true}
+        - {week_start: 2019-11-11, is_black_friday_week: false}
