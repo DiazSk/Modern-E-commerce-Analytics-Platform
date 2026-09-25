@@ -15,6 +15,10 @@ ingest     Kaggle ──▶ /Volumes/workspace/rees46/landing/2019-Oct.csv
 transform  PySpark: dedupe, key, UTC ──▶ Delta workspace.rees46.raw_events
            (partitioned by event_date; the month is replaced with replaceWhere,
             and Delta rejects any row outside it)
+dbt_build  dbt on the Serverless Starter Warehouse ──▶ workspace.rees46_dbt
+           stg_events → int_sessions → fct_sessions (incremental) · fct_purchases
+           · dim_products · dim_users · dim_date → mart_funnel_daily
+           · mart_cart_abandonment
 ```
 
 ## Data
@@ -42,6 +46,10 @@ databricks bundle run rees46_pipeline --params month=2019-10
 Local Spark + Delta (Java 17), no Databricks account needed:
 
 ```bash
-pip install pyspark==3.5.3 delta-spark==3.2.1 pytest
-pytest -q
+pip install pyspark==3.5.3 delta-spark==3.2.1 pytest "dbt-core==1.12.5" "dbt-spark[session]==1.11.0"
+pytest -q                 # transform + job-task tests
+bash ci/run_dbt_ci.sh     # dbt build + tests on a synthetic fixture (Oct, then Nov)
 ```
+
+The dbt fixture in `ci/fixtures/` is synthetic (same schema as REES46);
+the real dataset's license doesn't allow redistributing rows.

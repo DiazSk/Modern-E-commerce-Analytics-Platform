@@ -53,3 +53,26 @@ jobs:
 
       - name: Run pytest
         run: pytest -q
+
+  dbt:
+    name: dbt build (Spark + Delta)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Setup Java (for Spark)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install Dependencies
+        run: pip install "dbt-core==1.12.5" "dbt-spark[session]==1.11.0" pyspark==3.5.3 delta-spark==3.2.1
+
+      - name: dbt build on synthetic fixture (Oct, then Nov incremental)
+        run: bash ci/run_dbt_ci.sh

@@ -15,6 +15,14 @@ variables:
     description: Schema holding the landing volume and tables
     default: rees46
 
+  warehouse_id:
+    description: SQL warehouse used by the dbt task
+    lookup:
+      warehouse: Serverless Starter Warehouse
+  dbt_schema:
+    description: Schema for dbt models (same catalog)
+    default: rees46_dbt
+
 targets:
   free:
     default: true
