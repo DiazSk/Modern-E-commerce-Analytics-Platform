@@ -1,6 +1,6 @@
 -- purchased <= carted <= sessions in every funnel row, and purchased <= carted
 -- items in every abandonment row.
-select 'funnel' as mart, cast(event_date as string) as grain
+select 'funnel' as mart, cast(session_date as string) as grain
 from {{ ref('mart_funnel_daily') }}
 where purchased_sessions > carted_sessions or carted_sessions > sessions
 union all

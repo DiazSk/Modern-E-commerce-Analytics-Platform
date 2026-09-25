@@ -54,9 +54,14 @@ models:
 
   - name: mart_funnel_daily
     description: >
-      Funnel per session day and top-level category. A session counts in a
-      category if it has any event there; carted/purchased within that
-      category under the funnel rule.
+      Funnel per session start date and top-level category. A session counts
+      in a category if it has any event there; carted/purchased within that
+      category under the funnel rule. Sessions are attributed to the day they
+      started (REES46 session IDs can span weeks).
+    columns:
+      - name: session_date
+        description: Date the session started (not the date of each event).
+        data_tests: [not_null]
   - name: mart_cart_abandonment
     description: >
       Cart abandonment per category, price band and week. An item is a product

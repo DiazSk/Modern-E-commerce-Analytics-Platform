@@ -12,7 +12,7 @@ with session_category as (
 )
 
 select
-    sc.session_date as event_date,
+    sc.session_date,
     sc.category_l1,
     count(*) as sessions,
     sum(sc.reached_cart) as carted_sessions,
