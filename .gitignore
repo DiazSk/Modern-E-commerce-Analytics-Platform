@@ -260,7 +260,7 @@ temp/
 # ==========================================
 # DOCUMENTATION BUILD
 # ==========================================
-site/
+/site/
 _site/
 .sass-cache/
 .jekyll-cache/
@@ -321,3 +321,12 @@ dbt/logs/
 # Published aggregate analysis outputs (no raw rows)
 !analysis/results/*.csv
 !analysis/extracts/*.csv
+
+# Local design-tool notes (kept out of the public repo)
+PRODUCT.md
+DESIGN.md
+DESIGN.*.md
+.impeccable/
+
+# Local editor/assistant launch config
+.claude/
