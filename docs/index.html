@@ -237,7 +237,7 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;
       </svg>
     </div>
     <div class="grid">
-      <h1 id="h-finding">Black Friday week sent more shoppers to the cart — and a four-day tracking gap nearly told the opposite story.</h1>
+      <h1 id="h-finding">Black Friday week sent more shoppers to the cart, and a four-day tracking gap nearly told the opposite story.</h1>
 
       <div class="figure-pair">
         <div class="fig"><div class="big num">9.2%</div><div class="what">of sessions reached the cart, the 4 weeks before (Oct 28 – Nov 24, gap excluded)</div></div>
@@ -257,7 +257,7 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;
       <div role="listitem"><span>Shoppers</span><b class="num">5.3M</b></div>
     </div>
     <p class="proof mono">Every rate on this page carries a 95% confidence interval and names the SQL that produced it.</p>
-    <div class="caption mono"><span>Pl. I — Headline finding</span><span>Source <code>analysis/queries/q1_overall_black_friday.sql</code> · <code>q3_anomaly_impact.sql</code> · <code>q0_anomaly_daily.sql</code> · <code>q0_totals.sql</code></span></div>
+    <div class="caption mono"><span>Pl. I · Headline finding</span><span>Source <code>analysis/queries/q1_overall_black_friday.sql</code> · <code>q3_anomaly_impact.sql</code> · <code>q0_anomaly_daily.sql</code> · <code>q0_totals.sql</code></span></div>
   </section>
 
   <div class="explore" id="explore" aria-label="Explorer controls">
@@ -277,7 +277,7 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;
     <div class="legend mono" id="funnel-legend"></div>
     <figure><svg class="chart" id="funnel-chart" role="img" aria-labelledby="h-funnel funnel-note"></svg></figure>
     <div class="tbl" id="funnel-table" hidden></div>
-    <div class="caption mono"><span>Pl. II — Funnel for the selection · unit: <span id="funnel-unit">session</span></span><span><button class="btn chip" data-table="funnel-table" aria-expanded="false" aria-controls="funnel-table">Show table</button> Source <code id="funnel-src">analysis/extracts/sessions_daily.csv</code></span></div>
+    <div class="caption mono"><span>Pl. II · Funnel for the selection · unit: <span id="funnel-unit">session</span></span><span><button class="btn chip" data-table="funnel-table" aria-expanded="false" aria-controls="funnel-table">Show table</button> Source <code id="funnel-src">analysis/extracts/sessions_daily.csv</code></span></div>
   </section>
 
   <section id="categories" class="wrap plate" aria-labelledby="h-cat">
@@ -285,7 +285,7 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;
     <div class="legend mono"><span><i class="fill"></i>95% CI excludes 0</span><span><i></i>No detectable change</span></div>
     <figure><svg class="chart" id="cat-chart" role="img" aria-labelledby="h-cat cat-note"></svg></figure>
     <div class="tbl" id="cat-table" hidden></div>
-    <div class="caption mono"><span>Pl. III — Difference in purchase rate · categories with ≥1,000 session-categories in both windows</span><span><button class="btn chip" data-table="cat-table" aria-expanded="false" aria-controls="cat-table">Show table</button> Source <code>analysis/extracts/mart_funnel_daily.csv</code></span></div>
+    <div class="caption mono"><span>Pl. III · Difference in purchase rate · categories with ≥1,000 session-categories in both windows</span><span><button class="btn chip" data-table="cat-table" aria-expanded="false" aria-controls="cat-table">Show table</button> Source <code>analysis/extracts/mart_funnel_daily.csv</code></span></div>
   </section>
 
   <section id="trend" class="wrap plate" aria-labelledby="h-trend">
@@ -293,7 +293,7 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;
     <div class="legend mono" id="trend-legend"></div>
     <figure><svg class="chart" id="trend-chart" role="img" aria-labelledby="h-trend trend-note" tabindex="0"></svg></figure>
     <div class="tbl" id="trend-table" hidden></div>
-    <div class="caption mono"><span>Pl. IV — Purchased ÷ session-categories, by session start date</span><span><button class="btn chip" data-table="trend-table" aria-expanded="false" aria-controls="trend-table">Show table</button> Source <code>analysis/extracts/mart_funnel_daily.csv</code></span></div>
+    <div class="caption mono"><span>Pl. IV · Purchased ÷ session-categories, by session start date</span><span><button class="btn chip" data-table="trend-table" aria-expanded="false" aria-controls="trend-table">Show table</button> Source <code>analysis/extracts/mart_funnel_daily.csv</code></span></div>
   </section>
 
   <section id="price" class="wrap plate" aria-labelledby="h-price">
@@ -305,7 +305,7 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;
       <figure class="b"><svg class="chart" id="contrast-chart" role="img" aria-labelledby="contrast-title"></svg><p class="mono" id="contrast-title" style="color:var(--ink-3);margin:10px 0 0">Top quartile minus bottom quartile, percentage points, 95% CI</p></figure>
     </div>
     <div class="tbl" id="price-table" hidden></div>
-    <div class="caption mono"><span>Pl. V — Abandoned ÷ carted items · item = product carted in a session, dated by its first cart</span><span><button class="btn chip" data-table="price-table" aria-expanded="false" aria-controls="price-table">Show table</button> Source <code>analysis/extracts/abandonment_daily.csv</code></span></div>
+    <div class="caption mono"><span>Pl. V · Abandoned ÷ carted items · item = product carted in a session, dated by its first cart</span><span><button class="btn chip" data-table="price-table" aria-expanded="false" aria-controls="price-table">Show table</button> Source <code>analysis/extracts/abandonment_daily.csv</code></span></div>
   </section>
 
   <section id="notes" class="wrap plate" aria-labelledby="h-notes">
@@ -495,14 +495,14 @@ function renderPrice() {
   const heat = document.getElementById("heat"); heat.style.gridTemplateColumns = "minmax(72px,1.3fr) repeat(4,minmax(0,1fr))"; heat.innerHTML = "";
   const add = (cls, html, attrs = {}) => { const d = document.createElement(attrs.tag || "div"); d.className = cls; d.innerHTML = html; for (const k in attrs) if (k !== "tag") d.setAttribute(k, attrs[k]); heat.appendChild(d); return d; };
   add("h", "", { role: "columnheader" }); ["Cheapest ¼", "2nd ¼", "3rd ¼", "Priciest ¼"].forEach((h) => add("h", h, { role: "columnheader" }));
-  cats.forEach((cat) => { add("rowh", esc(cat), { role: "rowheader" }); [1, 2, 3, 4].forEach((band) => { const c = cell[cat + "|" + band]; if (!c) { add("cell low", "—", { role: "cell", "aria-label": `${cat}, band ${band}: no carts` }); return; } const v = c[0] / c[1], low = c[1] < 200, b = bin(v), d = add("cell" + (low ? " low" : ""), low ? "n<200" : fmtPct(v, 0), { role: "cell", tabindex: 0, "aria-label": `${cat}, price band ${band}: ${fmtPct(v)} abandoned of ${fmtInt(c[1])} carted items` }); if (!low) { d.style.background = `var(${RAMP[b]})`; d.style.color = b >= 4 ? "#fff" : "var(--ink)"; } const html = `<span class="mono">${esc(cat)} · price band ${band} of 4</span><b>${fmtPct(v)} abandoned</b><br>${fmtInt(c[0])} of ${fmtInt(c[1])} carted items`; d.addEventListener("pointerenter", (e) => showTip(html, e.clientX, e.clientY)); d.addEventListener("pointerleave", hideTip); d.addEventListener("focus", () => { const r = d.getBoundingClientRect(); showTip(html, r.right, r.top); }); d.addEventListener("blur", hideTip); }); });
+  cats.forEach((cat) => { add("rowh", esc(cat), { role: "rowheader" }); [1, 2, 3, 4].forEach((band) => { const c = cell[cat + "|" + band]; if (!c) { add("cell low", "n/a", { role: "cell", "aria-label": `${cat}, band ${band}: no carts` }); return; } const v = c[0] / c[1], low = c[1] < 200, b = bin(v), d = add("cell" + (low ? " low" : ""), low ? "n<200" : fmtPct(v, 0), { role: "cell", tabindex: 0, "aria-label": `${cat}, price band ${band}: ${fmtPct(v)} abandoned of ${fmtInt(c[1])} carted items` }); if (!low) { d.style.background = `var(${RAMP[b]})`; d.style.color = b >= 4 ? "#fff" : "var(--ink)"; } const html = `<span class="mono">${esc(cat)} · price band ${band} of 4</span><b>${fmtPct(v)} abandoned</b><br>${fmtInt(c[0])} of ${fmtInt(c[1])} carted items`; d.addEventListener("pointerenter", (e) => showTip(html, e.clientX, e.clientY)); d.addEventListener("pointerleave", hideTip); d.addEventListener("focus", () => { const r = d.getBoundingClientRect(); showTip(html, r.right, r.top); }); d.addEventListener("blur", hideTip); }); });
   document.getElementById("ramp").innerHTML = `<span>${fmtPct(rmin, 0)}</span><span class="swatches">${RAMP.map((v) => `<i style="background:var(${v})"></i>`).join("")}</span><span>${fmtPct(rmax, 0)} abandoned</span><span>· hatched = fewer than 200 items</span>`;
   const rows = cats.map((cat) => { const t = cell[cat + "|4"], b = cell[cat + "|1"]; if (!t || !b || t[1] < MIN_N || b[1] < MIN_N) return null; return { name: cat, nT: t[1], nB: b[1], ...wald(t[0], t[1], b[0], b[1]) }; }).filter(Boolean).sort((a, b) => b.d - a.d);
   dotCI(document.getElementById("contrast-chart"), rows, { left: 110, what: "Priciest − cheapest quartile, abandonment", empty: "Too few carts in this window for a within-category comparison.", detail: (r) => `Priciest ${fmtPct(r.p1)} · cheapest ${fmtPct(r.p0)}<br>n ${fmtInt(r.nT)} / ${fmtInt(r.nB)}` });
   const more = rows.filter((r) => r.lo > 0).length, less = rows.filter((r) => r.hi < 0).length;
   document.getElementById("price-note").textContent = `Quartiles of each product's latest price within its category. In the days shown, the priciest quartile is abandoned more in ${more} of ${rows.length} categories and less in ${less}. Price alone does not explain abandonment.`;
   const label = opts.find((o) => o[0] === state.pricePeriod)[1];
-  table("price-table", ["Category", "Cheapest ¼", "2nd ¼", "3rd ¼", "Priciest ¼", "Carted items (" + label + ")"], cats.map((cat) => [cat, ...[1, 2, 3, 4].map((b) => { const c = cell[cat + "|" + b]; return c ? fmtPct(c[0] / c[1]) : "—"; }), fmtInt(byCat[cat])]));
+  table("price-table", ["Category", "Cheapest ¼", "2nd ¼", "3rd ¼", "Priciest ¼", "Carted items (" + label + ")"], cats.map((cat) => [cat, ...[1, 2, 3, 4].map((b) => { const c = cell[cat + "|" + b]; return c ? fmtPct(c[0] / c[1]) : "n/a"; }), fmtInt(byCat[cat])]));
 }
 
 function render() {
