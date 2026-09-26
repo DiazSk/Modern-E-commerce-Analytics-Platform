@@ -2,7 +2,7 @@
 
 *REES46 multi-category store, Oct–Nov 2019 · 109.8M events · 23.0M sessions · 1.66M purchases · 5.3M shoppers*
 
-Interactive version: [the dashboard](https://diazsk.github.io/Modern-E-commerce-Analytics-Platform/). It includes a toggle that puts the tracking gap back in.
+Interactive version: [the dashboard](https://diazsk.github.io/ecommerce-funnel-lakehouse/). It includes a toggle that puts the tracking gap back in.
 
 ## TL;DR
 - **Black Friday week sent more shoppers to the cart.** 11.7% of sessions reached the cart, compared with 9.2% in the four weeks before: **+2.5 pp** (95% CI +2.46 to +2.55). Purchase rate rose from 5.25% to 5.60% (+0.36 pp, CI +0.32 to +0.39).

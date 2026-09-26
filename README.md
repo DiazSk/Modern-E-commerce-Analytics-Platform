@@ -1,12 +1,12 @@
 # Modern E-Commerce Analytics Platform
 
-[![CI](https://github.com/DiazSk/Modern-E-commerce-Analytics-Platform/actions/workflows/ci.yml/badge.svg?branch=main&event=push)](https://github.com/DiazSk/Modern-E-commerce-Analytics-Platform/actions/workflows/ci.yml?query=branch%3Amain+event%3Apush)
+[![CI](https://github.com/DiazSk/ecommerce-funnel-lakehouse/actions/workflows/ci.yml/badge.svg?branch=main&event=push)](https://github.com/DiazSk/ecommerce-funnel-lakehouse/actions/workflows/ci.yml?query=branch%3Amain+event%3Apush)
 
 **Black Friday week sent more shoppers to the cart.** 11.7% of sessions reached the cart, compared with 9.2% in the four weeks before: **+2.5 pp** (95% CI +2.46 to +2.55). Purchase rate rose from 5.25% to 5.60% (+0.36 pp, CI +0.32 to +0.39).
 
 **And a four-day tracking gap nearly told the opposite story.** Nov 15 logged 468,262 carts and zero purchases. With Nov 14–17 left in the baseline, every headline result reverses (cart reach −1.7 pp), and each still looks statistically solid. The analysis finds the gap, measures how much it matters, and excludes it. A dbt test now warns if one ever happens again.
 
-📊 [Interactive dashboard](https://diazsk.github.io/Modern-E-commerce-Analytics-Platform/) · 📝 [Findings memo](analysis/findings.md) · 🔁 [How this project evolved](MIGRATION.md)
+📊 [Interactive dashboard](https://diazsk.github.io/ecommerce-funnel-lakehouse/) · 📝 [Findings memo](analysis/findings.md) · 🔁 [How this project evolved](MIGRATION.md)
 
 An end-to-end pipeline on **109.8M real e-commerce events** (REES46, Oct–Nov 2019),
 running entirely on **Databricks Free Edition**: ingestion from Kaggle, PySpark
@@ -72,7 +72,7 @@ proportions with a 95% CI. `analysis/run_queries.py` runs the queries on the
 SQL warehouse through the Databricks CLI and commits only aggregates:
 `analysis/results/` holds the query outputs and `analysis/extracts/` the
 dashboard data. `analysis/build_site.py` turns them into the
-[dashboard](https://diazsk.github.io/Modern-E-commerce-Analytics-Platform/), a
+[dashboard](https://diazsk.github.io/ecommerce-funnel-lakehouse/), a
 static page in `docs/` whose explorer can put the tracking gap back in.
 
 ## Quality
@@ -120,7 +120,7 @@ and two months of 2019. There are no order IDs or demographics, session IDs can
 span weeks, and Nov 14–17 has a tracking gap. See the memo's caveats.
 
 The first version of this project (synthetic data on Postgres) is at tag
-[`v1-postgres-synthetic`](https://github.com/DiazSk/Modern-E-commerce-Analytics-Platform/tree/v1-postgres-synthetic).
+[`v1-postgres-synthetic`](https://github.com/DiazSk/ecommerce-funnel-lakehouse/tree/v1-postgres-synthetic).
 
 ## Contact
 
