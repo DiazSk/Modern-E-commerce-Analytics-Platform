@@ -69,7 +69,8 @@ a{color:inherit;text-underline-offset:3px;text-decoration-thickness:1px}
 
 /* Hero */
 .hero{margin-top:28px;padding-top:24px}
-.hero h1{grid-column:1/-1;margin:0;font-weight:400;font-size:clamp(44px,6.4vw,92px);line-height:.98;letter-spacing:-.02em;text-wrap:balance}
+/* keep text clear of the seal (176px wide, hangs up to 56px into the gutter) */
+.hero h1{grid-column:1/-1;margin:0;padding-right:168px;font-weight:400;font-size:clamp(44px,6.4vw,92px);line-height:.98;letter-spacing:-.02em;text-wrap:balance}
 .hero .lede{margin:16px 0 0;font-size:16px;color:var(--ink-2);max-width:48ch}
 .figure-pair{grid-column:1/span 12;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gutter);margin-top:36px;align-items:baseline}
 .fig{grid-column:span 3}
